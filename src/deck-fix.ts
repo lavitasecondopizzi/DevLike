@@ -70,16 +70,15 @@ function renderModal(){
 function injectStarterDeckPreview(){
   const g=game();
   if(!g||g.screen!=="team")return;
-  document.querySelectorAll<HTMLElement>(".developer-choice[data-dev]").forEach(choice=>{
-    if(choice.querySelector(".starter-deck-preview"))return;
-    const developerId=choice.dataset.dev;
-    if(!developerId)return;
-    const cards=starterDeckForDeveloper(developerId);
-    const preview=document.createElement("div");
-    preview.className="starter-deck-preview";
-    preview.innerHTML=`<div class="starter-deck-title">MAZZO BASE · 5 TOOL</div><div class="starter-deck-cards">${cards.map(card=>`<span class="starter-deck-card" title="${esc(card.description)}"><b>${esc(card.name)}</b><small>${card.cost} ⚡</small></span>`).join("")}</div>`;
-    choice.querySelector(".dev-card")?.insertAdjacentElement("afterend",preview);
-  });
+  const grid=document.querySelector<HTMLElement>(".developer-choice-grid");
+  if(!grid||grid.parentElement?.querySelector(".starter-deck-preview"))return;
+  const selectedId=g.selectedStartingId??g.startingCandidates[0]?.id;
+  if(!selectedId)return;
+  const cards=starterDeckForDeveloper(selectedId);
+  const preview=document.createElement("div");
+  preview.className="starter-deck-preview";
+  preview.innerHTML=`<div class="starter-deck-title">MAZZO BASE · 5 TOOL</div><div class="starter-deck-cards">${cards.map(card=>`<span class="starter-deck-card" title="${esc(card.description)}"><b>${esc(card.name)}</b><small>${card.cost} ⚡</small></span>`).join("")}</div>`;
+  grid.insertAdjacentElement("afterend",preview);
 }
 
 function injectButton(){
