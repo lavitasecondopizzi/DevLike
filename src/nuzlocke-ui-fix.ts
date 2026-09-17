@@ -103,3 +103,5 @@ export function setupNuzlockeUi() {
   observer.observe(document.body, { childList: true, subtree: true });
   refresh();
 }
+
+setupNuzlockeUi();
