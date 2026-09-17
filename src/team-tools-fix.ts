@@ -5,24 +5,32 @@ function moveToolsToMap(game:Game){
   const strip=document.querySelector<HTMLElement>(".map-panel .team-strip");
   if(!strip) return;
 
-  let tools=strip.querySelector<HTMLElement>(".team-tools");
-  if(!tools){
-    tools=document.createElement("div");
-    tools.className="team-tools";
-    tools.innerHTML='<div class="team-tools-title">GESTIONE TEAM</div>';
-    strip.prepend(tools);
-  }
+  // deck-fix owns the single GESTIONE TEAM block. Keep it inside the
+  // team sidebar so it stays directly above the developer cards.
+  const controls=document.querySelector<HTMLElement>(".map-panel .team-controls");
+  if(controls && controls.parentElement!==strip) strip.prepend(controls);
 
-  const header=document.querySelector<HTMLElement>(".header-right");
-  const equipment=header?.querySelector<HTMLElement>('[data-action="open-equipment"]');
-  const deck=header?.querySelector<HTMLElement>("[data-open-deck]");
+  // Remove the obsolete secondary implementation if an older DOM survived.
+  strip.querySelectorAll<HTMLElement>(".team-tools").forEach(el=>el.remove());
 
-  if(equipment && equipment.parentElement!==tools) tools.appendChild(equipment);
-  if(deck && deck.parentElement!==tools) tools.appendChild(deck);
+  // The renderer still creates the old header equipment button. It must not
+  // compete with the team sidebar controls.
+  document.querySelectorAll<HTMLElement>('.header-right [data-action="open-equipment"]').forEach(el=>el.remove());
 }
 
 export function setupTeamToolsFix(game:Game){
   const observer=new MutationObserver(()=>moveToolsToMap(game));
   observer.observe(document.body,{childList:true,subtree:true});
-  setInterval(()=>moveToolsToMap(game),100);
+
+  // The injected ZAINO button is not present when render.bind() runs, so bind
+  // it here explicitly and use the normal Game API. main.ts will re-render.
+  document.addEventListener("click",event=>{
+    const target=(event.target as HTMLElement).closest<HTMLElement>('.team-controls [data-action="open-equipment"]');
+    if(!target || game.screen!=="map") return;
+    event.preventDefault();
+    event.stopPropagation();
+    game.openEquipment();
+  });
+
+  moveToolsToMap(game);
 }
