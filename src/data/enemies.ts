@@ -1,40 +1,10 @@
 import type { Enemy } from "../entities/types";
 
 export const enemies: Enemy[] = [
-  {
-    id: "bug",
-    name: "BUG",
-    hp: 32,
-    maxHp: 32,
-    intent: { label: "Morde il codice", damage: 7, stress: 4 }
-  },
-  {
-    id: "meeting",
-    name: "MEETING",
-    hp: 40,
-    maxHp: 40,
-    intent: { label: "Poteva essere una mail", damage: 5, stress: 9 }
-  },
-  {
-    id: "legacy",
-    name: "LEGACY CODE",
-    hp: 55,
-    maxHp: 55,
-    intent: { label: "Non toccarmi", damage: 11, stress: 6 }
-  },
-  {
-    id: "client",
-    name: "CLIENTE",
-    hp: 70,
-    maxHp: 70,
-    intent: { label: "Piccola modifica", damage: 13, stress: 10 }
-  }
+  { id: "bug", name: "BUG", type: "Errore software", description: "Un errore piccolo, fastidioso e perfettamente capace di rompere tutto.", hp: 32, maxHp: 32, code: 9, debug: 12, passive: "Propagazione: ogni attacco aumenta di +1 lo Stress inflitto nel turno successivo.", advantages: ["+15% danni contro Junior e Freelancer", "+2 Stress contro developer sotto il 50% HP"], weaknesses: ["-15% efficacia contro Hacker", "È vulnerabile al Debug"], advantageDeveloperIds: ["junior", "freelancer"], weaknessDeveloperIds: ["hacker"], advantageConditions: ["lowHp"], weaknessConditions: [], intent: { label: "Morde il codice", damage: 7, stress: 4 } },
+  { id: "meeting", name: "MEETING", type: "Riunione infinita", description: "Una riunione che avrebbe potuto essere una mail. Ma ormai siete tutti qui.", hp: 40, maxHp: 40, code: 6, debug: 14, passive: "Agenda: se il developer ha 50+ Stress, infligge +3 Stress.", advantages: ["+15% danni contro Hacker", "+3 Stress contro developer già sotto pressione"], weaknesses: ["-15% efficacia contro Stagista", "Debole al Debug di chi conosce il contesto"], advantageDeveloperIds: ["hacker"], weaknessDeveloperIds: ["intern"], advantageConditions: ["highStress"], weaknessConditions: [], intent: { label: "Poteva essere una mail", damage: 5, stress: 9 } },
+  { id: "legacy", name: "LEGACY CODE", type: "Codice legacy", description: "Nessuno sa perché esiste. Tutti sanno che non va toccato.", hp: 55, maxHp: 55, code: 16, debug: 8, passive: "NON TOCCARE: il primo DEBUG di ogni turno subisce -2 danni.", advantages: ["+15% danni contro Junior e Designer", "Riduce il primo DEBUG del turno"], weaknesses: ["-15% efficacia contro Senior e Architect", "Vulnerabile a CODA pesante"], advantageDeveloperIds: ["junior", "designer"], weaknessDeveloperIds: ["senior", "architect"], advantageConditions: [], weaknessConditions: [], intent: { label: "Non toccarmi", damage: 11, stress: 6 } },
+  { id: "client", name: "CLIENTE", type: "Cliente", description: "Una piccola modifica. Solo 47 requisiti nuovi e una scadenza per ieri.", hp: 70, maxHp: 70, code: 18, debug: 10, passive: "Cambio requisiti: ogni 2 turni aumenta di +2 lo Stress inflitto.", advantages: ["+15% danni contro Senior, Stagista e Hacker", "+2 Stress ogni 2 turni"], weaknesses: ["-15% efficacia contro Hacker e Freelancer", "Debole agli exploit e alle trattative"], advantageDeveloperIds: ["senior", "intern", "hacker"], weaknessDeveloperIds: ["hacker", "freelancer"], advantageConditions: ["everyTwoTurns"], weaknessConditions: [], intent: { label: "Piccola modifica", damage: 13, stress: 10 } }
 ];
 
-export const boss: Enemy = {
-  id: "deadline",
-  name: "DEADLINE",
-  hp: 120,
-  maxHp: 120,
-  intent: { label: "DOMANI È ONLINE", damage: 18, stress: 14 }
-};
+export const boss: Enemy = { id: "deadline", name: "DEADLINE", type: "Scadenza finale", description: "DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.", hp: 120, maxHp: 120, code: 22, debug: 18, passive: "DOMANI È ONLINE: ogni turno aumenta di +2 i danni e lo Stress inflitti.", advantages: ["+15% danni contro developer oltre 75 Stress", "Diventa più pericolosa ogni turno"], weaknesses: ["-10% efficacia contro chi è a piena HP", "Vulnerabile a team equilibrati"], advantageDeveloperIds: [], weaknessDeveloperIds: [], advantageConditions: ["highStress"], weaknessConditions: ["fullHp"], intent: { label: "DOMANI È ONLINE", damage: 18, stress: 14 } };
