@@ -1,0 +1,24 @@
+/* MAP PATH HISTORY */
+.map-lines .map-line:not(.active){display:none!important}
+
+/* Visited nodes remain active-looking, but clearly darker and non-interactive. */
+.map-node.visited:not(.current){
+  opacity:.55!important;
+  filter:brightness(.65)!important;
+  cursor:default!important;
+}
+.map-node.visited:not(.current):hover{
+  border-color:inherit!important;
+  background:inherit!important;
+  transform:none!important;
+}
+.map-node.visited:not(.current)[disabled]{
+  opacity:.55!important;
+  filter:brightness(.65)!important;
+}
+
+/* Only currently selectable destinations get the normal active emphasis. */
+.map-node.available:not(.visited){
+  opacity:1!important;
+  filter:none!important;
+}
