@@ -6,6 +6,7 @@ import "./codex-fix.css";
 import "./nuzlocke.css";
 import "./map-ui-fix.css";
 import "./map-visual-fix.css";
+import "./nuzlocke-rules-ui";
 import "./map-fix";
 import "./map-ui-fix";
 import "./balance-fix";
