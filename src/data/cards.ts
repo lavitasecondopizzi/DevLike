@@ -12,7 +12,7 @@ export const startingDeck:Card[]=[
 
 export const rewardCards:Card[]=[
  // TIER 1 · difficoltà x1.0–x1.5
- {id:"chatgpt",name:"CHATGPT",cost:2,description:"Infligge 10 danni. Potrebbe essere una soluzione.",effect:{type:"damage",amount:10}},
+ {id:"chatgpt",name:"CHATGPT",cost:2,description:"Infligge 8 danni. Potrebbe essere una soluzione.",effect:{type:"damage",amount:8}},
  {id:"jira",name:"JIRA",cost:1,description:"Infligge 7 danni.",effect:{type:"damage",amount:7}},
  {id:"google",name:"GOOGLE",cost:1,description:"Recupera 8 HP.",effect:{type:"heal",amount:8}},
  {id:"rubber-duck",name:"RUBBER DUCK",cost:0,description:"Riduce lo Stress di 6.",effect:{type:"removeStress",amount:6}},
@@ -49,7 +49,6 @@ export const rewardCards:Card[]=[
  {id:"emergency-hotfix",name:"HOTFIX D'EMERGENZA",cost:2,description:"Infligge 20 danni e recupera 5 HP.",effect:{type:"damage",amount:20}}
 ];
 
-// Reward tier is kept separate from Card so the existing card model stays simple.
 export const rewardCardTiers:Record<string,number>={
  chatgpt:1,jira:1,google:1,"rubber-duck":1,"stackoverflow-copy":1,"npm-install":1,"git-pull":1,"console-log":1,breakpoint:1,"rubber-duck-debug":1,"unit-test":1,sleep:1,documentation:1,"rubber-stamp":1,
  "git-push":2,"merge-conflict":2,regex:2,refactor:2,"legacy-patch":2,"stackoverflow-answer":2,"integration-test":2,hotfix:2,rollback:2,"meeting-cancel":2,"energy-drink-card":2,"ai-slop":2,
