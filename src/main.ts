@@ -51,3 +51,12 @@ game.startBattle = (enemy: Enemy) => {
 };
 
 render(game);
+
+// Nuzlocke starts from an overlay and intentionally stops the normal click chain.
+// Keep a tiny screen-change guard so any externally patched Game method still updates the UI.
+let lastScreen = game.screen;
+setInterval(() => {
+  if (game.screen === lastScreen) return;
+  lastScreen = game.screen;
+  render(game);
+}, 50);
