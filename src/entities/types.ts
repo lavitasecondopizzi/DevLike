@@ -2,6 +2,7 @@ export type Developer = {
   id: string;
   name: string;
   role: string;
+  description: string;
   hp: number;
   maxHp: number;
   stress: number;
@@ -40,7 +41,7 @@ export type Card = {
   effect: CardEffect;
 };
 
-export type MapNodeType = "battle" | "elite" | "event" | "rest" | "reward" | "boss";
+export type MapNodeType = "battle" | "elite" | "event" | "rest" | "reward" | "recruit" | "boss";
 
 export type MapNode = {
   id: string;
