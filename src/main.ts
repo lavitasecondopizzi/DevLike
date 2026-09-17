@@ -7,6 +7,7 @@ import "./nuzlocke.css";
 import "./map-ui-fix.css";
 import "./map-visual-fix.css";
 import "./deck-fix.css";
+import "./team-tools-fix.css";
 import "./nuzlocke-rules-ui";
 import "./nuzlocke-ui-fix.css";
 import "./nuzlocke-ui-fix";
@@ -21,6 +22,7 @@ import { setupFeatures, type FeatureGame } from "./ui/features";
 import { setupNuzlocke, type NuzlockeRule } from "./ui/nuzlocke";
 import { setupCodexFix } from "./codex-fix";
 import { setupDeckFix } from "./deck-fix";
+import { setupTeamToolsFix } from "./team-tools-fix";
 
 type NuzGame = Game & { nuzlockeActive:boolean; nuzlockeGraveyard:string[]; nuzlockeRules:NuzlockeRule[]; nuzlockeRecruitCount:number; nuzlockeConsumedCards:import("./entities/types").Card[] };
 const game = new Game() as NuzGame & FeatureGame;
@@ -43,6 +45,7 @@ setupCodexFix();
 setupFeatures(game);
 setupNuzlocke(game);
 setupDeckFix(game);
+setupTeamToolsFix(game);
 
 const originalStartBattle = game.startBattle.bind(game);
 game.startBattle = (enemy: Enemy) => {
