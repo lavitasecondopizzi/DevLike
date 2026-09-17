@@ -36,7 +36,9 @@ function addStarterDeckPreview() {
   grid.insertAdjacentElement("afterend", preview);
 }
 
-document.addEventListener("click", () => {
+document.addEventListener("click", event => {
+  const target = event.target as HTMLElement;
+  if (target.closest('[data-action="start"]')) game.nuzlockeActive = false;
   if (game.screen === "team") requestAnimationFrame(addStarterDeckPreview);
 });
 
