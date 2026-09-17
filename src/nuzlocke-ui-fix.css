@@ -1,0 +1,33 @@
+.nuzlocke-disabled,
+button.nuzlocke-disabled,
+button:disabled.nuzlocke-disabled {
+  opacity: .32 !important;
+  filter: grayscale(1) brightness(.72) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+.combat-actions button.nuzlocke-disabled {
+  border-color: #2a2e37 !important;
+  background: #0a0c10 !important;
+  color: #666b76 !important;
+}
+
+.hand .card.nuzlocke-disabled {
+  opacity: .28 !important;
+}
+
+.map-node.nuzlocke-disabled {
+  opacity: .25 !important;
+}
+
+.bench-dev.nuzlocke-disabled,
+.replace-target.nuzlocke-disabled,
+.assignment-card.nuzlocke-disabled,
+.backpack-item.nuzlocke-disabled,
+.bag-drop.nuzlocke-disabled {
+  opacity: .3 !important;
+  filter: grayscale(1) brightness(.65) !important;
+}
