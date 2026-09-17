@@ -8,14 +8,15 @@ import { Game } from "./game/Game";
 import { starterDeckForDeveloper } from "./data/cards";
 import { render } from "./ui/render";
 import { setupFeatures, type FeatureGame } from "./ui/features";
-import { setupNuzlocke } from "./ui/nuzlocke";
+import { setupNuzlocke, type NuzGame } from "./ui/nuzlocke";
 import { setupCodexFix } from "./codex-fix";
 
-const game = new Game() as FeatureGame & { nuzlockeRules: import("./ui/nuzlocke").NuzlockeRule[]; nuzlockeRecruitCount: number };
+const game = new Game() as NuzGame & FeatureGame;
 game.nuzlockeActive = false;
 game.nuzlockeGraveyard = [];
 game.nuzlockeRules = ["permadeath"];
 game.nuzlockeRecruitCount = 0;
+game.nuzlockeConsumedCards = [];
 
 const openEquipment = game.openEquipment.bind(game);
 game.openEquipment = () => { if (game.screen !== "equipment") game.equipmentReturnScreen = game.screen; openEquipment(); };
