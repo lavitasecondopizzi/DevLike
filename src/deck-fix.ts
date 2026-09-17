@@ -59,10 +59,10 @@ function renderModal(){
   const overlay=document.createElement("div");
   overlay.className="deck-overlay";
   overlay.innerHTML=`<section class="deck-modal">
-    <header class="deck-modal-header"><div><h2>MAZZO & COLLEZIONE</h2><p>${message}</p></div><button type="button" class="deck-close" data-deck-action="close">×</button></header>
+    <header class="deck-modal-header"><div><h2>MAZZO</h2><p>${message}</p></div><button type="button" class="deck-close" data-deck-action="close">×</button></header>
     <div class="deck-summary"><div><b>MAZZO</b><strong>${g.deck.length}/20</strong></div><div><b>CARTE POSSEDUTE</b><strong>${g.cardCollection!.length}</strong></div><div><b>SPAZIO MINIMO</b><strong>5</strong></div></div>
-    <div class="deck-columns"><section><div class="deck-section-title"><h3>MAZZO ATTIVO</h3><span>${g.deck.length} CARTE</span></div><div class="deck-grid">${deckCards || "<p class=\"deck-empty\">Il mazzo è vuoto.</p>"}</div></section><section><div class="deck-section-title"><h3>COLLEZIONE</h3><span>${collection.length} TIPI · ${g.cardCollection!.length} COPIE</span></div><div class="deck-grid">${collectionCards || "<p class=\"deck-empty\">Nessuna carta posseduta.</p>"}</div></section></div>
-    <footer class="deck-modal-footer"><span>Le carte rimosse restano nella collezione e possono essere reinserite.</span><button type="button" class="primary" data-deck-action="close">TORNA AL GIOCO</button></footer>
+    <div class="deck-columns"><section><div class="deck-section-title"><h3>MAZZO ATTIVO</h3><span>${g.deck.length} CARTE</span></div><div class="deck-grid">${deckCards || "<p class=\"deck-empty\">Il mazzo è vuoto.</p>"}</div></section><section><div class="deck-section-title"><h3>CARTE POSSEDUTE</h3><span>${collection.length} TIPI · ${g.cardCollection!.length} COPIE</span></div><div class="deck-grid">${collectionCards || "<p class=\"deck-empty\">Nessuna carta posseduta.</p>"}</div></section></div>
+    <footer class="deck-modal-footer"><span>Le carte rimosse restano tra le carte possedute e possono essere reinserite.</span><button type="button" class="primary" data-deck-action="close">TORNA AL GIOCO</button></footer>
   </section>`;
   document.body.appendChild(overlay);
 
@@ -94,7 +94,7 @@ function injectButton(){
   button.type="button";
   button.className="equipment-button deck-open-button";
   button.dataset.openDeck="true";
-  button.textContent=`COLLEZIONE · ${g.cardCollection?.length ?? g.deck.length}`;
+  button.textContent=`MAZZO · ${g.cardCollection?.length ?? g.deck.length}`;
   header.prepend(button);
 }
 
