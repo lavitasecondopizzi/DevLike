@@ -4,6 +4,7 @@ import "./extra2.css";
 import "./extra3.css";
 import "./codex-fix.css";
 import "./nuzlocke.css";
+import "./map-fix";
 import { Game } from "./game/Game";
 import type { Enemy } from "./entities/types";
 import { starterDeckForDeveloper } from "./data/cards";
