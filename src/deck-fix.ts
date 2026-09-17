@@ -106,6 +106,7 @@ function injectStarterDeckPreview(){
     preview.removeAttribute("data-developer");
     return;
   }
+  if(preview.dataset.developer===selected && preview.style.display!=="none")return;
   preview.style.display="block";
   preview.dataset.developer=selected;
   renderStarterDeckPreview(selected);
@@ -146,7 +147,13 @@ export function setupDeckFix(g:Game){
     const choice=(event.target as HTMLElement).closest<HTMLElement>(".developer-choice[data-dev]");
     if(choice&&game()?.screen==="team"){
       const developerId=choice.dataset.dev;
-      if(developerId)window.setTimeout(()=>renderStarterDeckPreview(developerId),0);
+      if(developerId){
+        window.setTimeout(()=>{
+          const current=game();
+          if(current?.screen==="team"&&current.selectedStartingId===developerId)renderStarterDeckPreview(developerId);
+          else if(current?.screen==="team")injectStarterDeckPreview();
+        },0);
+      }
     }
   });
   const observer=new MutationObserver(()=>{injectStarterDeckPreview();injectButton();});
