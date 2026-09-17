@@ -25,4 +25,17 @@ function addStarterDeckPreview(){const grid=document.querySelector<HTMLElement>(
 document.addEventListener("click",event=>{const target=event.target as HTMLElement;if(target.closest('[data-action="start"]'))game.nuzlockeActive=false;if(game.screen==="team")requestAnimationFrame(addStarterDeckPreview);});
 setupFeatures(game);
 setupNuzlocke(game);
+
+const originalStartBattle = game.startBattle.bind(game);
+game.startBattle = (enemy) => {
+  originalStartBattle(enemy);
+  if (!game.nuzlockeActive || !game.combat) return;
+  game.combat.nuzlockeRules = [...game.nuzlockeRules];
+  if (game.nuzlockeRules.includes("twoEnergy")) game.combat.energy = 2;
+  if (game.nuzlockeRules.includes("smallHand")) {
+    const excess = Math.max(0, game.combat.hand.length - 2);
+    if (excess) game.combat.discardPile.push(...game.combat.hand.splice(2, excess));
+  }
+};
+
 render(game);
