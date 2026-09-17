@@ -1,3 +1,4 @@
+import { startingDeck } from "./data/cards";
 import type { Card } from "./entities/types";
 import type { Game } from "./game/Game";
 
@@ -11,6 +12,32 @@ const esc = (value:string) => value.replaceAll("&","&amp;").replaceAll("<","&lt;
 
 function game():DeckGame|undefined {
   return (window as Window & { __devlikeGame?: DeckGame }).__devlikeGame;
+}
+
+const STARTER_DECKS_BY_DEVELOPER:Record<string,string[]>={
+  "michele-rinaldi":["git","coffee","quick-fix","wireframe","ctrl-z"],
+  "sara-bianchi":["git","ctrl-z","quick-fix","stack-overflow","terminal"],
+  "kevin-moretti":["docker","terminal","git","cache","monitor"],
+  "andrea-ferri":["git","script","docker","api-call","quick-fix"],
+  "gabriele-conti":["coffee","prototype","git","stack-overflow","quick-fix"],
+  "laura-neri":["git","monitor","stack-overflow","terminal","lint"],
+  "marco-valli":["exploit","grep","git","cache","ctrl-z"],
+  "elena-rossi":["wireframe","prototype","coffee","git","monitor"],
+  "davide-fabbri":["freelance-hustle","git","coffee","quick-fix","ctrl-z"],
+  "chiara-romani":["git","coffee","docker","quick-fix","grep"],
+  "paolo-sereni":["git","ctrl-z","terminal","script","stack-overflow"],
+  "francesca-lombardi":["docker","terminal","cache","git","stack-overflow"],
+  "luca-gentili":["git","script","api-call","docker","ctrl-z"],
+  "simone-pieri":["coffee","prototype","git","lint","quick-fix"],
+  "valentina-gori":["git","monitor","terminal","lint","wireframe"],
+  "tommaso-riva":["exploit","grep","cache","ctrl-z","terminal"],
+  "beatrice-falchi":["wireframe","prototype","coffee","monitor","lint"],
+  "nicola-de-santis":["freelance-hustle","git","quick-fix","script","stack-overflow"]
+};
+
+function starterDeckForDeveloper(developerId:string):Card[]{
+  const ids=STARTER_DECKS_BY_DEVELOPER[developerId] ?? ["git","coffee","docker","stack-overflow","ctrl-z"];
+  return ids.map(id=>startingDeck.find(card=>card.id===id)).filter((card):card is Card=>Boolean(card)).map(card=>({...card,tier:1}));
 }
 
 function ensureCollection(g:DeckGame){
@@ -40,21 +67,31 @@ function renderModal(){
   overlay.addEventListener("click",event=>{const target=(event.target as HTMLElement).closest<HTMLElement>("[data-deck-action]");if(!target)return;const action=target.dataset.deckAction;if(action==="close"){overlay.remove();return;}const index=Number(target.dataset.deckIndex);if(action==="remove"&&!noRemoval&&g.deck.length>5)g.deck.splice(index,1);if(action==="add"&&!deckLocked&&g.deck.length<20){const card=g.cardCollection![index];if(card){const owned=g.cardCollection!.filter(item=>item.id===card.id).length;const used=g.deck.filter(item=>item.id===card.id).length;if(used<owned)g.deck.push({...card});}}overlay.remove();renderModal();});
 }
 
+function injectStarterDeckPreview(){
+  const g=game();
+  if(!g||g.screen!=="team")return;
+  document.querySelectorAll<HTMLElement>(".developer-choice[data-dev]").forEach(choice=>{
+    if(choice.querySelector(".starter-deck-preview"))return;
+    const developerId=choice.dataset.dev;
+    if(!developerId)return;
+    const cards=starterDeckForDeveloper(developerId);
+    const preview=document.createElement("div");
+    preview.className="starter-deck-preview";
+    preview.innerHTML=`<div class="starter-deck-title">MAZZO BASE · 5 TOOL</div><div class="starter-deck-cards">${cards.map(card=>`<span class="starter-deck-card" title="${esc(card.description)}"><b>${esc(card.name)}</b><small>${card.cost} ⚡</small></span>`).join("")}</div>`;
+    choice.querySelector(".dev-card")?.insertAdjacentElement("afterend",preview);
+  });
+}
+
 function injectButton(){
   const g=game();
   if(!g||g.screen!=="map")return;
-
-  // The main renderer still creates its legacy header button. Remove it whenever
-  // the map DOM is rendered so the only team controls are the ones below.
   document.querySelectorAll<HTMLElement>('.header-right [data-action="open-equipment"]').forEach(el=>el.remove());
-
   const strip=document.querySelector<HTMLElement>(".team-strip");
   if(!strip)return;
   const parent=strip.parentElement;
   if(!parent)return;
   const oldControls=parent.querySelector<HTMLElement>(".team-controls");
   if(oldControls)return;
-
   const controls=document.createElement("div");
   controls.className="team-controls";
   controls.innerHTML=`<div class="team-controls-title">GESTIONE TEAM</div><div class="team-controls-buttons"><button type="button" class="equipment-button" data-action="open-equipment">ZAINO · ${g.inventory.length}</button><button type="button" class="equipment-button deck-open-button" data-open-deck="true">MAZZO · ${g.cardCollection?.length??g.deck.length}</button></div>`;
@@ -66,14 +103,17 @@ export function setupDeckFix(g:Game){
   const originalStart=g.start.bind(g);
   g.start=()=>{originalStart();ensureCollection(dg);};
   const originalConfirm=g.confirmStartingDeveloper.bind(g);
-  g.confirmStartingDeveloper=()=>{originalConfirm();dg.cardCollection=(dg.deck??[]).map(card=>({...card}));};
+  g.confirmStartingDeveloper=()=>{
+    originalConfirm();
+    const selected=dg.selectedStartingId;
+    if(selected)dg.deck=starterDeckForDeveloper(selected);
+    dg.cardCollection=(dg.deck??[]).map(card=>({...card}));
+  };
   const originalReward=g.chooseReward.bind(g);
   g.chooseReward=(index:number)=>{const before=dg.deck.length;originalReward(index);ensureCollection(dg);if(dg.deck.length>before){const added=dg.deck[dg.deck.length-1];if(added)dg.cardCollection!.push({...added});}};
   document.addEventListener("click",event=>{const target=(event.target as HTMLElement).closest<HTMLElement>("[data-open-deck]");if(!target)return;event.preventDefault();event.stopPropagation();renderModal();});
-
-  // The map can be re-rendered without changing g.screen. Keep the controls
-  // attached to the freshly-rendered map without creating duplicates.
-  const observer=new MutationObserver(()=>injectButton());
+  const observer=new MutationObserver(()=>{injectStarterDeckPreview();injectButton();});
   observer.observe(document.querySelector("#app") ?? document.body,{childList:true,subtree:true});
+  injectStarterDeckPreview();
   injectButton();
 }
