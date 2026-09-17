@@ -1,3 +1,11 @@
+export type Item = {
+  id: string;
+  name: string;
+  description: string;
+  codeBonus: number;
+  debugBonus: number;
+};
+
 export type Developer = {
   id: string;
   name: string;
@@ -9,6 +17,7 @@ export type Developer = {
   code: number;
   debug: number;
   passive: string;
+  items: Item[];
 };
 
 export type EnemyIntent = {
@@ -41,7 +50,7 @@ export type Card = {
   effect: CardEffect;
 };
 
-export type MapNodeType = "battle" | "elite" | "event" | "rest" | "reward" | "recruit" | "boss";
+export type MapNodeType = "battle" | "elite" | "event" | "rest" | "fullRest" | "reward" | "item" | "recruit" | "boss";
 
 export type MapNode = {
   id: string;
