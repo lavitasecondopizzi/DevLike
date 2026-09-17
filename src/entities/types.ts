@@ -9,6 +9,7 @@ export type Item = {
 export type Developer = {
   id: string;
   name: string;
+  classId: string;
   role: string;
   description: string;
   hp: number;
@@ -31,6 +32,7 @@ export type EnemyIntent = { label: string; damage: number; stress: number };
 export type Enemy = {
   id: string;
   name: string;
+  typeId: string;
   type: string;
   description: string;
   hp: number;
