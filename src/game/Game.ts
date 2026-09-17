@@ -1,11 +1,12 @@
 import { developers } from "../data/developers";
 import { enemies, boss } from "../data/enemies";
 import { rewardCards, startingDeck } from "../data/cards";
-import type { Card, Developer, Enemy, MapNode, MapNodeType } from "../entities/types";
+import { rewardItems } from "../data/items";
+import type { Card, Developer, Enemy, Item, MapNode, MapNodeType } from "../entities/types";
 import { Combat } from "./Combat";
 
-export type GameScreen = "menu" | "team" | "map" | "combat" | "reward" | "recruit" | "result";
-type NormalNodeType = Exclude<MapNodeType, "boss">;
+export type GameScreen = "menu" | "team" | "map" | "combat" | "reward" | "itemReward" | "recruit" | "result";
+type NormalNodeType = Exclude<MapNodeType, "boss" | "fullRest">;
 
 const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description: string }>> = {
   battle: [
@@ -29,6 +30,10 @@ const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description:
     { title: "TOOLBOX", description: "Un nuovo Tool entra nel tuo arsenale." },
     { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }
   ],
+  item: [
+    { title: "EQUIPMENT", description: "Hai trovato un oggetto utile. Scegli chi lo equipaggia." },
+    { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }
+  ],
   recruit: [
     { title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente un progetto." },
     { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }
@@ -44,12 +49,15 @@ export class Game {
   mapNodes: MapNode[] = [];
   currentMapNodeId: string | null = null;
   projectNumber = 1;
+  difficulty = 1;
   reward: Card | null = null;
+  itemReward: Item | null = null;
   startingCandidates: Developer[] = [];
   recruitCandidates: Developer[] = [];
   selectedStartingId: string | null = null;
   selectedRecruitIndex: number | null = null;
   recruitTargetIndex: number | null = null;
+  selectedItemTargetIndex: number | null = null;
   message = "";
 
   start() {
@@ -60,18 +68,21 @@ export class Game {
     this.mapNodes = [];
     this.currentMapNodeId = null;
     this.projectNumber = 1;
+    this.difficulty = 1;
     this.reward = null;
+    this.itemReward = null;
     this.selectedStartingId = null;
     this.recruitCandidates = [];
     this.selectedRecruitIndex = null;
     this.recruitTargetIndex = null;
+    this.selectedItemTargetIndex = null;
     this.startingCandidates = this.randomDevelopers(3);
     this.message = "Tre developer disponibili. Scegline UNO come protagonista.";
   }
 
   private randomDevelopers(count: number, excluded: string[] = []) {
     const pool = developers.filter(dev => !excluded.includes(dev.id));
-    return [...pool].sort(() => Math.random() - 0.5).slice(0, count).map(dev => ({ ...dev }));
+    return [...pool].sort(() => Math.random() - 0.5).slice(0, count).map(dev => ({ ...dev, items: dev.items.map(item => ({ ...item })) }));
   }
 
   selectStartingDeveloper(index: number) {
@@ -84,7 +95,7 @@ export class Game {
     if (!this.selectedStartingId) return;
     const candidate = this.startingCandidates.find(dev => dev.id === this.selectedStartingId);
     if (!candidate) return;
-    this.team = [{ ...candidate, hp: candidate.maxHp, stress: 0 }];
+    this.team = [{ ...candidate, hp: candidate.maxHp, stress: 0, items: [] }];
     this.generateMap();
     this.screen = "map";
     this.message = `${candidate.name} è il developer principale. Scegli il percorso.`;
@@ -97,12 +108,12 @@ export class Game {
 
   private randomType(row: number): NormalNodeType {
     const roll = Math.random();
-    if (row === 1) return roll < 0.55 ? "battle" : roll < 0.75 ? "recruit" : "event";
-    if (row >= 5) return roll < 0.38 ? "elite" : roll < 0.55 ? "recruit" : roll < 0.7 ? "battle" : "reward";
-    if (roll < 0.38) return "battle";
-    if (roll < 0.54) return "event";
-    if (roll < 0.67) return "rest";
-    if (roll < 0.84) return "reward";
+    if (row >= 5) return roll < 0.32 ? "elite" : roll < 0.48 ? "item" : roll < 0.62 ? "recruit" : roll < 0.76 ? "battle" : "reward";
+    if (roll < 0.34) return "battle";
+    if (roll < 0.50) return "event";
+    if (roll < 0.64) return "rest";
+    if (roll < 0.80) return "reward";
+    if (roll < 0.90) return "item";
     return "recruit";
   }
 
@@ -113,10 +124,25 @@ export class Game {
       description: "Il progetto parte. Per ora non è ancora esploso.", next: [], visited: true
     }];
 
-    for (let row = 1; row <= finalRow; row++) {
+    // La prima riga offre sempre una scorciatoia di recupero totale, ma non obbliga a prenderla.
+    nodes.push(
+      {
+        id: "full-rest", row: 1, col: 1, type: "fullRest", title: "RECUPERO TOTALE",
+        description: "Ricarica completamente HP e Stress di tutto il team. Puoi anche ignorarlo.", next: [], visited: false
+      },
+      ...[0, 2].map(col => {
+        const type = this.randomType(1);
+        const template = this.randomTemplate(type);
+        return { id: `r1c${col}`, row: 1, col, type, title: template.title, description: template.description, next: [], visited: false };
+      })
+    );
+
+    for (let row = 2; row <= finalRow; row++) {
       if (row === finalRow) {
-        nodes.push({ id: "boss", row, col: 1, type: "boss", title: "DEADLINE",
-          description: "DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.", next: [], visited: false });
+        nodes.push({
+          id: "boss", row, col: 1, type: "boss", title: "DEADLINE",
+          description: "DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.", next: [], visited: false
+        });
       } else {
         for (let col = 0; col < 3; col++) {
           const type = this.randomType(row);
@@ -129,7 +155,7 @@ export class Game {
 
     const row = (n: number) => nodes.filter(node => node.row === n);
     const start = row(0)[0];
-    if (start) start.next = row(1).sort(() => Math.random() - 0.5).slice(0, 2).map(n => n.id);
+    if (start) start.next = row(1).map(n => n.id);
 
     for (let r = 1; r < finalRow; r++) {
       const from = row(r);
@@ -179,7 +205,17 @@ export class Game {
       return;
     }
     if (node.type === "reward") return this.generateReward();
+    if (node.type === "item") return this.generateItemReward();
     if (node.type === "recruit") return this.openRecruitment();
+
+    if (node.type === "fullRest") {
+      this.team.forEach(dev => {
+        dev.hp = dev.maxHp;
+        dev.stress = 0;
+      });
+      this.message = "RECUPERO TOTALE: tutto il team è completamente guarito e senza Stress.";
+      return;
+    }
 
     if (node.type === "rest") {
       this.team.forEach(dev => {
@@ -225,7 +261,7 @@ export class Game {
     const candidate = this.recruitCandidates[this.selectedRecruitIndex];
     if (!candidate) return;
 
-    const fresh = { ...candidate, hp: candidate.maxHp, stress: 0 };
+    const fresh = { ...candidate, hp: candidate.maxHp, stress: 0, items: [] };
     if (this.team.length < 3) {
       this.team.push(fresh);
     } else {
@@ -243,11 +279,29 @@ export class Game {
   private randomEnemy(elite = false): Enemy {
     const pool = elite ? enemies.filter(enemy => enemy.id === "client" || enemy.id === "legacy") : enemies;
     const source = pool[Math.floor(Math.random() * pool.length)];
-    return { ...source, intent: { ...source.intent } };
+    return this.scaleEnemy({ ...source, intent: { ...source.intent } });
+  }
+
+  private scaleEnemy(enemy: Enemy): Enemy {
+    const multiplier = this.difficulty;
+    return {
+      ...enemy,
+      hp: Math.max(1, Math.round(enemy.maxHp * multiplier)),
+      maxHp: Math.max(1, Math.round(enemy.maxHp * multiplier)),
+      intent: {
+        ...enemy.intent,
+        damage: Math.max(1, Math.round(enemy.intent.damage * multiplier)),
+        stress: Math.max(1, Math.round(enemy.intent.stress * (1 + (multiplier - 1) * 0.5)))
+      }
+    };
   }
 
   enterRandomBattle() { this.startBattle(this.randomEnemy()); }
-  enterBoss() { this.startBattle({ ...boss, intent: { ...boss.intent } }); }
+
+  enterBoss() {
+    this.startBattle(this.scaleEnemy({ ...boss, intent: { ...boss.intent } }));
+  }
+
   startBattle(enemy: Enemy) {
     this.combat = new Combat(this.team, enemy, this.deck);
     this.screen = "combat";
@@ -266,6 +320,31 @@ export class Game {
     this.screen = "reward";
   }
 
+  generateItemReward() {
+    this.itemReward = { ...rewardItems[Math.floor(Math.random() * rewardItems.length)] };
+    this.selectedItemTargetIndex = null;
+    this.screen = "itemReward";
+    this.message = "Oggetto sbloccato. Scegli a quale developer consegnarlo.";
+  }
+
+  selectItemTarget(index: number) {
+    if (!this.team[index] || this.team[index].items.length >= 2 || !this.itemReward) return;
+    this.selectedItemTargetIndex = index;
+  }
+
+  confirmItemReward() {
+    if (!this.itemReward || this.selectedItemTargetIndex === null) return;
+    const target = this.team[this.selectedItemTargetIndex];
+    if (!target || target.items.length >= 2) return;
+    target.items.push({ ...this.itemReward });
+    const name = target.name;
+    const itemName = this.itemReward.name;
+    this.itemReward = null;
+    this.selectedItemTargetIndex = null;
+    this.screen = "map";
+    this.message = `${itemName} assegnato a ${name}. Oggetti: ${target.items.length}/2.`;
+  }
+
   updateTeamFromCombat() {
     if (this.combat) this.team = this.combat.team;
   }
@@ -274,8 +353,11 @@ export class Game {
     this.updateTeamFromCombat();
     if (this.combat?.result === "victory") {
       if (this.combat.enemy.id === "deadline") {
-        this.screen = "result";
-        this.message = "DEPLOY RIUSCITO.";
+        this.projectNumber += 1;
+        this.difficulty += 0.5;
+        this.generateMap();
+        this.screen = "map";
+        this.message = `MISSIONE COMPLETATA. Progetto #${this.projectNumber} · difficoltà x${this.difficulty.toFixed(1)}. Il ciclo continua.`;
       } else this.generateReward();
     } else if (this.combat?.result === "defeat") {
       this.screen = "result";
