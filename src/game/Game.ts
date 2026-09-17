@@ -6,17 +6,27 @@ import type { Card, Developer, Enemy, Item, MapNode, MapNodeType } from "../enti
 import { Combat } from "./Combat";
 
 export type GameScreen = "menu" | "team" | "map" | "battleSetup" | "combat" | "reward" | "itemReward" | "recruit" | "result";
-type NormalNodeType = Exclude<MapNodeType, "boss" | "fullRest">;
+type NormalNodeType = Exclude<MapNodeType, "boss">;
 
 const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description: string }>> = {
   battle: [{ title: "BUG", description: "Qualcosa funziona. Quindi sicuramente c'è un bug." }, { title: "MEETING", description: "Poteva essere una mail." }, { title: "LEGACY", description: "Non sai chi l'ha scritto. Non sai perché esiste." }],
   elite: [{ title: "CLIENTE", description: "Una piccola modifica. Solo 47 requisiti nuovi." }, { title: "PROD", description: "È venerdì pomeriggio. La produzione ha altri piani." }],
   event: [{ title: "EVENTO", description: "Una decisione discutibile potrebbe salvare il progetto." }, { title: "IMPREVISTO", description: "Il cliente ha detto 'non tocco niente'." }],
   rest: [{ title: "PAUSA", description: "Cinque minuti di pausa. Nessuno deve saperlo." }, { title: "CAFFÈ", description: "Il compilatore non si lamenta del caffè." }],
+  fullRest: [{ title: "RECUPERO TOTALE", description: "Ricarica completamente HP e Stress di tutto il team." }],
   reward: [{ title: "TOOLBOX", description: "Un nuovo Tool entra nel tuo arsenale." }, { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }],
   item: [{ title: "EQUIPMENT", description: "Hai trovato un oggetto utile. Scegli chi lo equipaggia." }, { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }],
   recruit: [{ title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente un progetto." }, { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }]
 };
+
+const MAP_SCHEMES: NormalNodeType[][] = [
+  ["battle", "battle", "battle"],
+  ["battle", "event", "recruit"],
+  ["reward", "rest", "item"],
+  ["battle", "elite", "battle"],
+  ["reward", "item", "fullRest"],
+  ["battle", "elite", "recruit"]
+];
 
 export class Game {
   screen: GameScreen = "menu";
@@ -61,23 +71,40 @@ export class Game {
   }
 
   private randomTemplate(type: NormalNodeType) { const list = NODE_TEMPLATES[type]; return list[Math.floor(Math.random() * list.length)]; }
-  private randomType(row: number): NormalNodeType {
-    const roll = Math.random();
-    if (row >= 5) return roll < .32 ? "elite" : roll < .48 ? "item" : roll < .62 ? "recruit" : roll < .76 ? "battle" : "reward";
-    if (roll < .34) return "battle"; if (roll < .50) return "event"; if (roll < .64) return "rest"; if (roll < .80) return "reward"; if (roll < .90) return "item"; return "recruit";
-  }
 
   private generateMap() {
     const finalRow = 7;
     const nodes: MapNode[] = [{ id: "start", row: 0, col: 1, type: "rest", title: "START", description: "Il progetto parte. Per ora non è ancora esploso.", next: [], visited: true }];
-    nodes.push({ id: "full-rest", row: 1, col: 1, type: "fullRest", title: "RECUPERO TOTALE", description: "Ricarica completamente HP e Stress di tutto il team. Puoi anche ignorarlo.", next: [], visited: false }, ...[0, 2].map(col => { const type = this.randomType(1); const template = this.randomTemplate(type); return { id: `r1c${col}`, row: 1, col, type, title: template.title, description: template.description, next: [], visited: false }; }));
-    for (let row = 2; row <= finalRow; row++) {
-      if (row === finalRow) nodes.push({ id: "boss", row, col: 1, type: "boss", title: "DEADLINE", description: "DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.", next: [], visited: false });
-      else for (let col = 0; col < 3; col++) { const type = this.randomType(row); const template = this.randomTemplate(type); nodes.push({ id: `r${row}c${col}`, row, col, type, title: template.title, description: template.description, next: [], visited: false }); }
+    for (let row = 1; row <= finalRow; row++) {
+      if (row === finalRow) {
+        nodes.push({ id: "boss", row, col: 1, type: "boss", title: "DEADLINE", description: "DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.", next: [], visited: false });
+        continue;
+      }
+      const scheme = MAP_SCHEMES[row - 1];
+      const shuffled = [...scheme].sort(() => Math.random() - 0.5);
+      shuffled.forEach((type, col) => {
+        const template = this.randomTemplate(type);
+        nodes.push({ id: `r${row}c${col}`, row, col, type, title: template.title, description: template.description, next: [], visited: false });
+      });
     }
+
     const row = (n: number) => nodes.filter(node => node.row === n);
     const start = row(0)[0]; if (start) start.next = row(1).map(n => n.id);
-    for (let r = 1; r < finalRow; r++) { const from = row(r), to = row(r + 1); from.forEach(node => { const nearby = to.filter(target => Math.abs(target.col - node.col) <= 1); const pool = nearby.length ? nearby : to; [...pool].sort(() => Math.random() - .5).slice(0, Math.random() < .6 ? 1 : 2).forEach(target => node.next.push(target.id)); }); to.forEach(target => { if (!nodes.some(node => node.next.includes(target.id))) { const source = from[Math.floor(Math.random() * from.length)]; if (source) source.next.push(target.id); } }); }
+    for (let r = 1; r < finalRow; r++) {
+      const from = row(r), to = row(r + 1);
+      from.forEach(node => {
+        const nearby = to.filter(target => Math.abs(target.col - node.col) <= 1);
+        const pool = nearby.length ? nearby : to;
+        const count = Math.random() < 0.65 ? 1 : Math.min(2, pool.length);
+        [...pool].sort(() => Math.random() - 0.5).slice(0, count).forEach(target => node.next.push(target.id));
+      });
+      to.forEach(target => {
+        if (!nodes.some(node => node.next.includes(target.id))) {
+          const source = from[Math.floor(Math.random() * from.length)];
+          if (source) source.next.push(target.id);
+        }
+      });
+    }
     row(finalRow - 1).forEach(node => node.next = ["boss"]);
     this.mapNodes = nodes; this.currentMapNodeId = "start"; this.currentNode = 0;
   }
@@ -97,7 +124,6 @@ export class Game {
   }
 
   private prepareBattle(enemy: Enemy) { this.pendingEnemy = enemy; this.selectedBattleStarterIndex = this.team.findIndex(dev => dev.hp > 0 && dev.stress < 100); if (this.selectedBattleStarterIndex < 0) this.selectedBattleStarterIndex = 0; this.screen = "battleSetup"; this.message = "Scegli chi manda in campo per primo. Trascinalo nello slot di combattimento."; }
-
   selectBattleStarter(index: number) { const dev = this.team[index]; if (dev && dev.hp > 0 && dev.stress < 100) this.selectedBattleStarterIndex = index; }
   moveBattleStarter(fromIndex: number) { const dev = this.team[fromIndex]; if (!dev || dev.hp <= 0 || dev.stress >= 100) return; const current = this.team.splice(fromIndex, 1)[0]; if (current) this.team.unshift(current); this.selectedBattleStarterIndex = 0; }
   confirmBattleStarter() { if (!this.pendingEnemy || !this.team[this.selectedBattleStarterIndex] || this.team[this.selectedBattleStarterIndex].hp <= 0 || this.team[this.selectedBattleStarterIndex].stress >= 100) return; const first = this.team.splice(this.selectedBattleStarterIndex, 1)[0]; if (first) this.team.unshift(first); this.startBattle(this.pendingEnemy); }
