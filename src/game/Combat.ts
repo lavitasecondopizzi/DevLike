@@ -14,7 +14,7 @@ export class Combat {
   log: string[] = [];
 
   constructor(team: Developer[], enemy: Enemy, deck: Card[]) {
-    this.team = team.map(d => ({ ...d }));
+    this.team = team.map(d => ({ ...d, items: d.items.map(item => ({ ...item })) }));
     this.enemy = { ...enemy, intent: { ...enemy.intent } };
     this.drawPile = this.shuffle([...deck]);
     this.log.push(`${this.active.name} entra in campo contro ${this.enemy.name}.`);
@@ -23,6 +23,14 @@ export class Combat {
 
   get active(): Developer {
     return this.team[this.activeIndex];
+  }
+
+  get itemCodeBonus(): number {
+    return this.active.items.reduce((total, item) => total + item.codeBonus, 0);
+  }
+
+  get itemDebugBonus(): number {
+    return this.active.items.reduce((total, item) => total + item.debugBonus, 0);
   }
 
   startTurn() {
@@ -90,7 +98,7 @@ export class Combat {
 
     if (action === "code") {
       this.energy -= 1;
-      let damage = this.active.code + 0;
+      let damage = this.active.code + this.itemCodeBonus;
       if (this.active.id === "senior") damage += 2;
       damage = Math.round(damage * (1 + this.codeBoost / 100));
       this.dealDamage(damage);
@@ -101,7 +109,7 @@ export class Combat {
     if (action === "debug") {
       if (this.energy < 2) return false;
       this.energy -= 2;
-      let debug = this.active.debug;
+      let debug = this.active.debug + this.itemDebugBonus;
       if (this.active.hp < this.active.maxHp * 0.5 && this.active.id === "junior") debug += 2;
       const damage = Math.round(debug * 1.5 * (1 + this.codeBoost / 100));
       this.dealDamage(damage);
@@ -122,7 +130,7 @@ export class Combat {
   }
 
   switchDeveloper(index: number): boolean {
-    if (this.energy < 1 || index === this.activeIndex || this.team[index].hp <= 0 || this.team[index].stress >= 100) return false;
+    if (this.energy < 1 || index === this.activeIndex || !this.team[index] || this.team[index].hp <= 0 || this.team[index].stress >= 100) return false;
     this.energy -= 1;
     this.activeIndex = index;
     this.log.push(`Cambio: entra ${this.active.name}.`);
