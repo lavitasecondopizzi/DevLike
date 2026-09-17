@@ -1,1 +1,42 @@
-/* Layout rules consolidated in style.css. */
+/* Map: the team is a vertical sidebar, never underneath the map. */
+.map-panel{display:grid;grid-template-columns:260px minmax(0,1fr);grid-template-rows:auto auto auto auto;gap:14px;align-items:start}
+.map-panel>.map-top,.map-panel>.roguelike-help{grid-column:1 / -1}
+.map-panel>.map-viewport{grid-column:2;grid-row:3 / span 2;min-width:0}
+.map-panel>.choice-panel{grid-column:2;grid-row:4}
+.map-panel>.team-strip{grid-column:1;grid-row:3 / span 2;display:flex;flex-direction:column;gap:10px;margin-top:0;min-width:0}
+.team-summary{width:100%;min-width:0}
+.team-summary .dev-card{width:100%;padding:12px}
+.team-summary .dev-description{display:none}
+.team-summary .ability{display:block;font-size:11px}
+.team-summary .matchup-grid{display:grid;grid-template-columns:1fr 1fr}
+.team-summary .equipment-slots{margin-top:9px}
+.team-summary .slot-row{grid-template-columns:1fr 1fr}
+
+/* Starting deck preview. */
+.starter-deck-preview{margin-top:18px;padding:18px;border:2px solid #334155;background:#0f172a;box-shadow:5px 5px 0 #050814}
+.starter-deck-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:14px}
+.starter-deck-heading h3{margin:0 0 8px;color:#67e8f9;font-size:10px}
+.starter-deck-heading p{margin:0;color:#94a3b8;font-family:system-ui,sans-serif;font-size:13px;line-height:1.45}
+.starter-deck-heading>span{flex:0 0 auto;border:1px solid #0891b2;background:#082f49;color:#67e8f9;padding:8px;font-size:7px}
+.starter-deck-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.starter-card{min-width:0;min-height:105px;padding:11px;border:2px solid #475569;background:#182238;display:flex;flex-direction:column;gap:10px}
+.starter-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:7px}
+.starter-card-top b{font-size:7px;line-height:1.5;color:#facc15;overflow-wrap:anywhere}
+.starter-card-top strong{font-size:7px;color:#67e8f9;white-space:nowrap}
+.starter-card p{margin:0;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:11px;line-height:1.4}
+
+@media(max-width:1000px){
+  .map-panel{grid-template-columns:220px minmax(0,1fr)}
+  .starter-deck-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:800px){
+  .map-panel{display:block}
+  .map-panel>.team-strip{display:flex;flex-direction:column;margin-top:14px}
+  .map-panel>.map-viewport,.map-panel>.choice-panel{margin-top:14px}
+  .starter-deck-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+  .starter-deck-cards{grid-template-columns:1fr}
+  .starter-deck-heading{flex-direction:column}
+  .team-summary .matchup-grid{grid-template-columns:1fr}
+}
