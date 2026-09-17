@@ -129,7 +129,7 @@ export class Game {
 
     const row = (n: number) => nodes.filter(node => node.row === n);
     const start = row(0)[0];
-    start.next = row(1).sort(() => Math.random() - 0.5).slice(0, 2).map(n => n.id);
+    if (start) start.next = row(1).sort(() => Math.random() - 0.5).slice(0, 2).map(n => n.id);
 
     for (let r = 1; r < finalRow; r++) {
       const from = row(r);
@@ -143,7 +143,7 @@ export class Game {
       to.forEach(target => {
         if (!nodes.some(node => node.next.includes(target.id))) {
           const source = from[Math.floor(Math.random() * from.length)];
-          source.next.push(target.id);
+          if (source) source.next.push(target.id);
         }
       });
     }
@@ -161,8 +161,9 @@ export class Game {
   get availableMapNodes(): MapNode[] {
     const current = this.currentMapNode;
     if (!current) return [];
-    return current.next.map(id => this.mapNodes.find(node => node.id === id))
-      .filter((node): node is MapNode => Boolean(node) && !node.visited);
+    return current.next
+      .map(id => this.mapNodes.find(node => node.id === id))
+      .filter((node): node is MapNode => node !== undefined && !node.visited);
   }
 
   selectMapNode(id: string) {
