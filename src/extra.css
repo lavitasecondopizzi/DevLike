@@ -1,20 +1,22 @@
 /* FINAL LAYOUT OVERRIDES */
 .codex-layout{display:block!important;height:auto!important;min-height:0!important}
-.codex-list{display:grid!important;grid-template-columns:repeat(auto-fill,150px)!important;grid-auto-rows:150px!important;grid-auto-flow:row!important;gap:12px!important;align-content:start!important;justify-content:start!important;max-height:46vh!important;overflow-y:auto!important;overflow-x:hidden!important;padding:14px!important;border-right:0!important;border-bottom:2px solid #343b4b!important}
-.codex-entry{width:150px!important;height:150px!important;min-height:150px!important;aspect-ratio:1!important;margin:0!important;padding:14px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;text-align:left!important;overflow:hidden!important}
+.codex-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:auto!important;grid-auto-flow:row!important;gap:12px!important;align-content:start!important;justify-content:stretch!important;max-height:46vh!important;overflow-y:auto!important;overflow-x:hidden!important;padding:14px!important;border-right:0!important;border-bottom:2px solid #343b4b!important}
+.codex-entry{width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:1!important;margin:0!important;padding:14px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;text-align:left!important;overflow:hidden!important}
 .codex-entry b{display:block!important;width:100%!important;font-size:9px!important;line-height:1.5!important;overflow-wrap:anywhere!important}
 .codex-entry small{display:block!important;width:100%!important;margin-top:8px!important;font-size:6px!important;line-height:1.5!important;overflow-wrap:anywhere!important}
 .codex-detail{min-width:0!important;max-height:40vh!important;overflow:auto!important;padding:24px 30px!important}
 
-.battle{display:grid!important;grid-template-columns:170px minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:auto auto auto auto auto auto!important;grid-template-areas:"bench heading enemy" "bench active enemy" "bench actions enemy" "energy energy energy" "hand hand hand" "end end end"!important;gap:14px!important;align-items:stretch!important;width:100%!important}
+.battle{display:grid!important;grid-template-columns:180px minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:auto auto auto auto auto auto!important;grid-template-areas:"bench heading enemy" "bench active enemy" "bench actions enemy" "energy energy energy" "hand hand hand" "end end end"!important;gap:14px!important;align-items:stretch!important;width:100%!important}
 .battle .combat-area{display:contents!important}
 .battle .active-dev{display:contents!important;min-width:0!important}
-.battle>.bench{grid-area:bench!important;min-width:0!important;align-self:stretch!important;margin:0!important;padding:14px!important;overflow:hidden!important}
+.battle .bench{grid-area:bench!important;min-width:0!important;align-self:stretch!important;margin:0!important;padding:14px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
 .battle>.enemy{grid-area:enemy!important;min-width:0!important;align-self:stretch!important;margin:0!important;padding:14px!important}
 .battle .combat-active-heading{grid-area:heading!important;min-width:0!important;align-self:start!important;margin:0!important;padding:14px 16px!important;border:2px solid #334155!important;background:#111827!important}
 .battle .active-dev>.dev-card{grid-area:active!important;min-width:0!important;align-self:stretch!important;margin:0!important}
 .battle .active-dev>.combat-actions{grid-area:actions!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;margin:0!important;align-self:stretch!important}
 .battle .combat-actions button{min-height:72px!important;font-size:9px!important}
+.battle .combat-actions button[data-action="code"]{font-size:0!important}
+.battle .combat-actions button[data-action="code"]::before{content:"CODICE";font-size:9px!important;display:block!important;line-height:1.5!important}
 .battle .active-dev>.energy{grid-area:energy!important;min-height:82px!important;margin:0!important;padding:16px 24px!important;border:3px solid #facc15!important;background:#2a2105!important;color:#facc15!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:20px!important;line-height:1.5!important;letter-spacing:4px!important;text-align:center!important}
 .battle .active-dev>.hand{grid-area:hand!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;min-width:0!important;margin:0!important}
 .battle .hand .card{min-width:0!important;min-height:145px!important;padding:14px!important}
@@ -31,6 +33,6 @@
 .battle .enemy-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 .battle .intent{margin-top:10px!important;padding:12px!important;border:2px solid #7f1d1d!important;background:#2a1014!important;font-size:7px!important;line-height:1.6!important}
 
-@media(max-width:1000px){.battle{grid-template-columns:150px minmax(0,1fr) minmax(0,1fr)!important}.codex-list{grid-template-columns:repeat(auto-fill,140px)!important;grid-auto-rows:140px!important}.codex-entry{width:140px!important;height:140px!important;min-height:140px!important}}
-@media(max-width:760px){.battle{display:grid!important;grid-template-columns:1fr!important;grid-template-areas:"heading" "active" "actions" "enemy" "bench" "energy" "hand" "end"!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}.battle .enemy-team-card{min-height:0!important}.codex-list{grid-template-columns:repeat(2,140px)!important;grid-auto-rows:140px!important;max-height:42vh!important}}
-@media(max-width:500px){.codex-list{grid-template-columns:140px!important}.battle .active-dev>.combat-actions{grid-template-columns:1fr!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}}
+@media(max-width:1000px){.battle{grid-template-columns:150px minmax(0,1fr) minmax(0,1fr)!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.codex-entry{width:100%!important;height:auto!important;min-height:0!important}}
+@media(max-width:760px){.battle{display:grid!important;grid-template-columns:1fr!important;grid-template-areas:"heading" "active" "actions" "enemy" "bench" "energy" "hand" "end"!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}.battle .enemy-team-card{min-height:0!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:42vh!important}}
+@media(max-width:500px){.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.battle .active-dev>.combat-actions{grid-template-columns:1fr!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}}
