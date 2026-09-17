@@ -19,7 +19,7 @@ export const rewardCards:Card[]=[
  {id:"stackoverflow-copy",name:"STACK OVERFLOW DUPLICATO",cost:0,description:"Recupera 6 HP.",effect:{type:"heal",amount:6}},
  {id:"npm-install",name:"NPM INSTALL",cost:1,description:"Infligge 6 danni.",effect:{type:"damage",amount:6}},
  {id:"git-pull",name:"GIT PULL",cost:1,description:"Riduce lo Stress di 5.",effect:{type:"removeStress",amount:5}},
- {id:"console-log",name:"CONSOLE.LOG",cost:0,description:"Infligge 4 danni.",effect:{type:"damage",amount:4}},
+ {id:"console-log",name:"CONSOLE.LOG",cost:1,description:"Infligge 4 danni.",effect:{type:"damage",amount:4}},
  {id:"breakpoint",name:"BREAKPOINT",cost:1,description:"Blocca 7 danni.",effect:{type:"block",amount:7}},
  {id:"rubber-duck-debug",name:"DEBUG A PAPERA",cost:1,description:"Riduce lo Stress di 6.",effect:{type:"removeStress",amount:6}},
  {id:"unit-test",name:"UNIT TEST",cost:1,description:"Blocca 6 danni.",effect:{type:"block",amount:6}},
