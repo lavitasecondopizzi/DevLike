@@ -29,10 +29,11 @@ function showDeveloperPopup(index: number) {
 function install() {
   document.addEventListener("click", event => {
     const target = event.target as HTMLElement;
-    const card = target.closest<HTMLElement>(".team-strip [data-team-detail]");
+    const cards = Array.from(document.querySelectorAll<HTMLElement>(".team-strip .team-summary"));
+    const card = target.closest<HTMLElement>(".team-strip .team-summary");
     if (!card) return;
-    const index = Number(card.dataset.teamDetail);
-    if (Number.isInteger(index)) showDeveloperPopup(index);
+    const index = cards.indexOf(card);
+    if (index >= 0) showDeveloperPopup(index);
   });
 }
 
