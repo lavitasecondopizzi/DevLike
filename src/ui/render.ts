@@ -14,14 +14,14 @@ function equipmentSlots(dev:Developer) {
 }
 
 function devCard(dev:Developer, selected=false, compact=false) {
-  const advantages = dev.advantages.map(x=>`<span>+ ${esc(x)}</span>`).join("");
-  const weaknesses = dev.weaknesses.map(x=>`<span>− ${esc(x)}</span>`).join("");
+  const advantages = dev.advantages.map(x=>`<span>${esc(x)}</span>`).join("");
+  const weaknesses = dev.weaknesses.map(x=>`<span>${esc(x)}</span>`).join("");
   return `<div class="dev-card ${selected?"selected":""} ${compact?"compact":""}"><div class="dev-head"><b>${esc(dev.name)}</b><span>${esc(dev.role)}</span></div><p class="dev-description">${esc(dev.description)}</p><div class="stat-line"><span>HP</span><b>${dev.hp}/${dev.maxHp}</b></div><div class="bar"><i style="width:${pct(dev.hp,dev.maxHp)}%"></i></div><div class="stat-line"><span>STRESS</span><b>${dev.stress}/100</b></div><div class="stress"><i style="width:${dev.stress}%"></i></div><div class="stat-grid"><span>CODICE <b>${dev.code}</b></span><span>DEBUG <b>${dev.debug}</b></span></div><div class="ability"><strong>ABILITÀ</strong><br>${esc(dev.passive)}</div><div class="matchup-grid"><div><strong>VANTAGGI</strong>${advantages}</div><div><strong>DEBOLEZZE</strong>${weaknesses}</div></div>${equipmentSlots(dev)}</div>`;
 }
 
 function enemyCard(enemy:Enemy) {
-  const advantages = enemy.advantages.map(x=>`<span>+ ${esc(x)}</span>`).join("");
-  const weaknesses = enemy.weaknesses.map(x=>`<span>− ${esc(x)}</span>`).join("");
+  const advantages = enemy.advantages.map(x=>`<span>${esc(x)}</span>`).join("");
+  const weaknesses = enemy.weaknesses.map(x=>`<span>${esc(x)}</span>`).join("");
   return `<div class="enemy-team-card"><div class="enemy-head"><div><div class="enemy-type">${esc(enemy.type)}</div><div class="enemy-name">${esc(enemy.name)}</div></div><span class="enemy-badge">NEMICO</span></div><p class="enemy-description">${esc(enemy.description)}</p><div class="big-hp">${enemy.hp}/${enemy.maxHp} HP</div><div class="bar"><i style="width:${pct(enemy.hp,enemy.maxHp)}%"></i></div><div class="enemy-stat-grid"><span>CODICE <b>${enemy.code}</b></span><span>DEBUG <b>${enemy.debug}</b></span><span>DMG <b>${enemy.intent.damage}</b></span><span>STRESS <b>+${enemy.intent.stress}</b></span></div><div class="enemy-ability"><strong>ABILITÀ</strong><br>${esc(enemy.passive)}</div><div class="matchup-grid enemy-matchup"><div><strong>VANTAGGI</strong>${advantages}</div><div><strong>DEBOLEZZE</strong>${weaknesses}</div></div></div>`;
 }
 
