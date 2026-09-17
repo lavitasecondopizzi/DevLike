@@ -1,4 +1,3 @@
-import { starterDeckForDeveloper } from "./data/cards";
 import type { Card } from "./entities/types";
 import type { Game } from "./game/Game";
 
@@ -46,9 +45,9 @@ function renderModal(){
   const deckLocked=locked(g);
   const noRemoval=removalLocked(g);
   const deckCards=g.deck.map((card,index)=>cardHtml(card,"remove",index,noRemoval || g.deck.length<=5)).join("");
-  const collectionCards=collection.map(({card,owned,used},index)=>{
+  const collectionCards=collection.map(({card,owned,used})=>{
     const canAdd=!deckLocked && g.deck.length<20 && used<owned;
-    const sourceIndex=g.cardCollection!.findIndex(item=>item.id===card.id && g.deck.filter(x=>x.id===card.id).length < owned);
+    const sourceIndex=g.cardCollection!.findIndex(item=>item.id===card.id);
     return `<article class="deck-card collection-card ${!canAdd?"disabled":""}">
       <div class="deck-card-head"><b>${esc(card.name)}</b><strong>${card.cost} ⚡</strong></div>
       <div class="deck-card-meta"><span>TIER ${card.tier??1}</span><span>POSSEDUTE ${owned}</span><span>MAZZO ${used}</span></div>
@@ -95,8 +94,7 @@ function injectButton(){
   button.type="button";
   button.className="equipment-button deck-open-button";
   button.dataset.openDeck="true";
-  button.textContent=`MAZZO · ${g.deck.length}`;
-  button.onclick=()=>renderModal();
+  button.textContent=`COLLEZIONE · ${g.cardCollection?.length ?? g.deck.length}`;
   header.prepend(button);
 }
 
@@ -108,7 +106,15 @@ export function setupDeckFix(g:Game){
   g.confirmStartingDeveloper=()=>{originalConfirm();dg.cardCollection=(dg.deck??[]).map(card=>({...card}));};
   const originalReward=g.chooseReward.bind(g);
   g.chooseReward=(index:number)=>{const before=dg.deck.length;originalReward(index);ensureCollection(dg);if(dg.deck.length>before){const added=dg.deck[dg.deck.length-1];if(added)dg.cardCollection!.push({...added});}};
-  const observer=new MutationObserver(()=>injectButton());
-  observer.observe(document.body,{childList:true,subtree:true});
+
+  document.addEventListener("click",event=>{
+    const target=(event.target as HTMLElement).closest<HTMLElement>("[data-open-deck]");
+    if(!target)return;
+    event.preventDefault();
+    event.stopPropagation();
+    renderModal();
+  });
+
   injectButton();
+  setInterval(injectButton,100);
 }
