@@ -5,8 +5,9 @@ import { rewardItems } from "../data/items";
 import type { Card, Developer, Enemy, Item, MapNode, MapNodeType } from "../entities/types";
 import { Combat } from "./Combat";
 
-export type GameScreen = "menu" | "team" | "map" | "battleSetup" | "combat" | "reward" | "itemReward" | "recruit" | "result";
+export type GameScreen = "menu" | "team" | "map" | "battleSetup" | "combat" | "reward" | "itemReward" | "recruit" | "equipment" | "result";
 type NormalNodeType = Exclude<MapNodeType, "boss">;
+type EquipmentSource = { zone: "dev" | "bag"; devIndex: number; itemIndex: number };
 
 const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description: string }>> = {
   battle: [{ title: "BUG", description: "Qualcosa funziona. Quindi sicuramente c'è un bug." }, { title: "MEETING", description: "Poteva essere una mail." }, { title: "LEGACY", description: "Non sai chi l'ha scritto. Non sai perché esiste." }],
@@ -15,23 +16,25 @@ const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description:
   rest: [{ title: "PAUSA", description: "Cinque minuti di pausa. Nessuno deve saperlo." }, { title: "CAFFÈ", description: "Il compilatore non si lamenta del caffè." }],
   fullRest: [{ title: "RECUPERO TOTALE", description: "Ricarica completamente HP e Stress di tutto il team." }],
   reward: [{ title: "TOOLBOX", description: "Un nuovo Tool entra nel tuo arsenale." }, { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }],
-  item: [{ title: "EQUIPMENT", description: "Hai trovato un oggetto utile. Scegli chi lo equipaggia." }, { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }],
+  item: [{ title: "EQUIPMENT", description: "Hai trovato un oggetto utile. Puoi equipaggiarlo o conservarlo nello zaino." }, { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }],
   recruit: [{ title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente un progetto." }, { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }]
 };
 
+// Il primo bivio è sempre COMBATTIMENTO + RECLUTAMENTO + OGGETTO.
 const MAP_SCHEMES: NormalNodeType[][] = [
-  ["battle", "battle", "battle"],
-  ["battle", "event", "recruit"],
+  ["battle", "recruit", "item"],
+  ["battle", "event", "battle"],
   ["reward", "rest", "item"],
   ["battle", "elite", "battle"],
-  ["reward", "item", "fullRest"],
-  ["battle", "elite", "recruit"]
+  ["rest", "reward", "recruit"],
+  ["battle", "elite", "battle"]
 ];
 
 export class Game {
   screen: GameScreen = "menu";
   team: Developer[] = [];
   deck: Card[] = [];
+  inventory: Item[] = [];
   combat: Combat | null = null;
   pendingEnemy: Enemy | null = null;
   currentNode = 0;
@@ -48,62 +51,60 @@ export class Game {
   recruitTargetIndex: number | null = null;
   selectedItemTargetIndex: number | null = null;
   selectedBattleStarterIndex = 0;
+  equipmentSource: EquipmentSource | null = null;
+  equipmentReturnScreen: GameScreen = "map";
   message = "";
 
   start() {
-    this.screen = "team"; this.team = []; this.deck = [...startingDeck]; this.currentNode = 0; this.mapNodes = []; this.currentMapNodeId = null;
-    this.projectNumber = 1; this.difficulty = 1; this.reward = null; this.itemReward = null; this.combat = null; this.pendingEnemy = null;
-    this.selectedStartingId = null; this.recruitCandidates = []; this.selectedRecruitIndex = null; this.recruitTargetIndex = null; this.selectedItemTargetIndex = null; this.selectedBattleStarterIndex = 0;
+    this.screen = "team"; this.team = []; this.deck = [...startingDeck]; this.inventory = [];
+    this.currentNode = 0; this.mapNodes = []; this.currentMapNodeId = null;
+    this.projectNumber = 1; this.difficulty = 1; this.reward = null; this.itemReward = null;
+    this.combat = null; this.pendingEnemy = null; this.selectedStartingId = null;
+    this.recruitCandidates = []; this.selectedRecruitIndex = null; this.recruitTargetIndex = null;
+    this.selectedItemTargetIndex = null; this.selectedBattleStarterIndex = 0; this.equipmentSource = null;
     this.startingCandidates = this.randomDevelopers(3); this.message = "Tre developer disponibili. Scegline UNO come protagonista.";
   }
 
-  private randomDevelopers(count: number, excluded: string[] = []) {
-    const pool = developers.filter(dev => !excluded.includes(dev.id));
-    return [...pool].sort(() => Math.random() - 0.5).slice(0, count).map(dev => ({ ...dev, items: dev.items.map(item => ({ ...item })) }));
-  }
+  private cloneItem(item: Item): Item { return { ...item }; }
+  private cloneDeveloper(dev: Developer): Developer { return { ...dev, items: dev.items.map(item => this.cloneItem(item)) }; }
+  private randomDevelopers(count: number, excluded: string[] = []) { const pool = developers.filter(dev => !excluded.includes(dev.id)); return [...pool].sort(() => Math.random() - 0.5).slice(0, count).map(dev => this.cloneDeveloper(dev)); }
 
   selectStartingDeveloper(index: number) { const candidate = this.startingCandidates[index]; if (candidate) this.selectedStartingId = candidate.id; }
 
   confirmStartingDeveloper() {
     if (!this.selectedStartingId) return;
     const candidate = this.startingCandidates.find(dev => dev.id === this.selectedStartingId); if (!candidate) return;
-    this.team = [{ ...candidate, hp: candidate.maxHp, stress: 0, items: [] }]; this.generateMap(); this.screen = "map"; this.message = `${candidate.name} è il developer principale. Scegli il percorso.`;
+    this.team = [{ ...this.cloneDeveloper(candidate), hp: candidate.maxHp, stress: 0, items: [] }];
+    this.generateMap(); this.screen = "map";
+    this.message = `${candidate.name} è il developer principale. Il primo bivio offre sempre combattimento, reclutamento e oggetto.`;
   }
 
   private randomTemplate(type: NormalNodeType) { const list = NODE_TEMPLATES[type]; return list[Math.floor(Math.random() * list.length)]; }
+  private enemyForNode(type: "battle" | "elite") { const pool = type === "elite" ? enemies.filter(enemy => enemy.id === "client" || enemy.id === "legacy") : enemies; return pool[Math.floor(Math.random() * pool.length)] ?? enemies[0]; }
 
   private generateMap() {
     const finalRow = 7;
-    const nodes: MapNode[] = [{ id: "start", row: 0, col: 1, type: "rest", title: "START", description: "Il progetto parte. Per ora non è ancora esploso.", next: [], visited: true }];
+    const nodes: MapNode[] = [{ id: "start", row: 0, col: 1, type: "rest", title: "START", description: "Il progetto parte. Per ora non è ancora esploso.", next: [], visited: true, hiddenEncounter: false }];
     for (let row = 1; row <= finalRow; row++) {
-      if (row === finalRow) {
-        nodes.push({ id: "boss", row, col: 1, type: "boss", title: "DEADLINE", description: "DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.", next: [], visited: false });
-        continue;
-      }
+      if (row === finalRow) { nodes.push({ id: "boss", row, col: 1, type: "boss", title: "DEADLINE", description: "DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.", next: [], visited: false, hiddenEncounter: false, enemyId: "deadline" }); continue; }
       const scheme = MAP_SCHEMES[row - 1];
-      const shuffled = [...scheme].sort(() => Math.random() - 0.5);
+      const shuffled = row === 1 ? [...scheme] : [...scheme].sort(() => Math.random() - 0.5);
       shuffled.forEach((type, col) => {
         const template = this.randomTemplate(type);
-        nodes.push({ id: `r${row}c${col}`, row, col, type, title: template.title, description: template.description, next: [], visited: false });
+        const isBattle = type === "battle" || type === "elite";
+        const sourceEnemy = isBattle ? this.enemyForNode(type) : undefined;
+        const hiddenEncounter = isBattle ? Math.random() < 0.38 : false;
+        const title = sourceEnemy && !hiddenEncounter ? `${sourceEnemy.type.toUpperCase()} · ${sourceEnemy.name}` : template.title;
+        const description = sourceEnemy && !hiddenEncounter ? sourceEnemy.description : hiddenEncounter ? "L'incontro è sconosciuto. Potrebbe essere un problema grosso." : template.description;
+        nodes.push({ id: `r${row}c${col}`, row, col, type, title, description, next: [], visited: false, hiddenEncounter, ...(sourceEnemy ? { enemyId: sourceEnemy.id } : {}) });
       });
     }
-
     const row = (n: number) => nodes.filter(node => node.row === n);
     const start = row(0)[0]; if (start) start.next = row(1).map(n => n.id);
     for (let r = 1; r < finalRow; r++) {
       const from = row(r), to = row(r + 1);
-      from.forEach(node => {
-        const nearby = to.filter(target => Math.abs(target.col - node.col) <= 1);
-        const pool = nearby.length ? nearby : to;
-        const count = Math.random() < 0.65 ? 1 : Math.min(2, pool.length);
-        [...pool].sort(() => Math.random() - 0.5).slice(0, count).forEach(target => node.next.push(target.id));
-      });
-      to.forEach(target => {
-        if (!nodes.some(node => node.next.includes(target.id))) {
-          const source = from[Math.floor(Math.random() * from.length)];
-          if (source) source.next.push(target.id);
-        }
-      });
+      from.forEach(node => { const nearby = to.filter(target => Math.abs(target.col - node.col) <= 1); const pool = nearby.length ? nearby : to; const count = Math.random() < 0.65 ? 1 : Math.min(2, pool.length); [...pool].sort(() => Math.random() - 0.5).slice(0, count).forEach(target => node.next.push(target.id)); });
+      to.forEach(target => { if (!nodes.some(node => node.next.includes(target.id))) { const source = from[Math.floor(Math.random() * from.length)]; if (source) source.next.push(target.id); } });
     }
     row(finalRow - 1).forEach(node => node.next = ["boss"]);
     this.mapNodes = nodes; this.currentMapNodeId = "start"; this.currentNode = 0;
@@ -116,8 +117,10 @@ export class Game {
     const node = this.mapNodes.find(candidate => candidate.id === id); if (!node || node.visited || !this.availableMapNodes.some(candidate => candidate.id === id)) return;
     this.currentMapNodeId = id; this.currentNode = node.row; node.visited = true;
     if (node.type === "boss") return this.prepareBattle(this.scaleEnemy({ ...boss, intent: { ...boss.intent } }));
-    if (node.type === "battle" || node.type === "elite") return this.prepareBattle(this.randomEnemy(node.type === "elite"));
-    if (node.type === "reward") return this.generateReward(); if (node.type === "item") return this.generateItemReward(); if (node.type === "recruit") return this.openRecruitment();
+    if (node.type === "battle" || node.type === "elite") { const source = enemies.find(enemy => enemy.id === node.enemyId) ?? this.enemyForNode(node.type); return this.prepareBattle(this.scaleEnemy({ ...source, intent: { ...source.intent } })); }
+    if (node.type === "reward") return this.generateReward();
+    if (node.type === "item") return this.generateItemReward();
+    if (node.type === "recruit") return this.openRecruitment();
     if (node.type === "fullRest") { this.team.forEach(dev => { dev.hp = dev.maxHp; dev.stress = 0; }); this.message = "RECUPERO TOTALE: tutto il team è completamente guarito e senza Stress."; return; }
     if (node.type === "rest") { this.team.forEach(dev => { dev.hp = Math.min(dev.maxHp, dev.hp + 14); dev.stress = Math.max(0, dev.stress - 10); }); this.message = "PAUSA RIUSCITA: +14 HP e -10 STRESS al team."; return; }
     if (Math.random() < .5) { this.team.forEach(dev => dev.stress = Math.max(0, dev.stress - 8)); this.message = "EVENTO: hai trovato una soluzione su Stack Overflow. -8 STRESS."; } else { this.team.forEach(dev => dev.stress = Math.min(100, dev.stress + 5)); this.message = "EVENTO: 'facciamo una call veloce'. +5 STRESS."; }
@@ -133,7 +136,7 @@ export class Game {
   selectRecruitTarget(index: number) { if (this.team.length < 3 || !this.team[index]) return; this.recruitTargetIndex = index; }
   confirmRecruitment() { if (this.selectedRecruitIndex === null) return; const candidate = this.recruitCandidates[this.selectedRecruitIndex]; if (!candidate) return; const fresh = { ...candidate, hp: candidate.maxHp, stress: 0, items: [] }; if (this.team.length < 3) this.team.push(fresh); else { if (this.recruitTargetIndex === null) return; this.team[this.recruitTargetIndex] = fresh; } this.selectedRecruitIndex = null; this.recruitTargetIndex = null; this.recruitCandidates = []; this.screen = "map"; this.message = `${candidate.name} entra nel team. Scegli il prossimo nodo.`; }
 
-  private randomEnemy(elite = false): Enemy { const pool = elite ? enemies.filter(enemy => enemy.id === "client" || enemy.id === "legacy") : enemies; const source = pool[Math.floor(Math.random() * pool.length)]; if (!source) return this.scaleEnemy({ ...enemies[0], intent: { ...enemies[0].intent } }); return this.scaleEnemy({ ...source, intent: { ...source.intent } }); }
+  private randomEnemy(elite = false): Enemy { const pool = elite ? enemies.filter(enemy => enemy.id === "client" || enemy.id === "legacy") : enemies; const source = pool[Math.floor(Math.random() * pool.length)] ?? enemies[0]; return this.scaleEnemy({ ...source, intent: { ...source.intent } }); }
   private scaleEnemy(enemy: Enemy): Enemy { const multiplier = this.difficulty; return { ...enemy, hp: Math.max(1, Math.round(enemy.maxHp * multiplier)), maxHp: Math.max(1, Math.round(enemy.maxHp * multiplier)), intent: { ...enemy.intent, damage: Math.max(1, Math.round(enemy.intent.damage * multiplier)), stress: Math.max(1, Math.round(enemy.intent.stress * (1 + (multiplier - 1) * .5))) } }; }
   startBattle(enemy: Enemy) { this.combat = new Combat(this.team, enemy, this.deck); this.screen = "combat"; this.pendingEnemy = null; }
   enterRandomBattle() { this.prepareBattle(this.randomEnemy()); }
@@ -141,10 +144,51 @@ export class Game {
 
   chooseReward(_cardIndex: number) { if (!this.reward) return; this.deck.push({ ...this.reward }); this.reward = null; this.screen = "map"; this.message = "Tool acquisito. Scegli il prossimo nodo."; }
   generateReward() { const reward = rewardCards[Math.floor(Math.random() * rewardCards.length)]; if (reward) this.reward = { ...reward }; this.screen = "reward"; }
-  generateItemReward() { const item = rewardItems[Math.floor(Math.random() * rewardItems.length)]; if (!item) return; this.itemReward = { ...item }; this.selectedItemTargetIndex = null; this.screen = "itemReward"; this.message = "Oggetto sbloccato. Scegli a quale developer consegnarlo."; }
+  generateItemReward() { const item = rewardItems[Math.floor(Math.random() * rewardItems.length)]; if (!item) return; this.itemReward = this.cloneItem(item); this.selectedItemTargetIndex = null; this.screen = "itemReward"; this.message = "Oggetto sbloccato. Puoi equipaggiarlo subito oppure metterlo nello zaino."; }
   selectItemTarget(index: number) { if (!this.team[index] || this.team[index].items.length >= 2 || !this.itemReward) return; this.selectedItemTargetIndex = index; }
-  confirmItemReward() { if (!this.itemReward || this.selectedItemTargetIndex === null) return; const target = this.team[this.selectedItemTargetIndex]; if (!target || target.items.length >= 2) return; target.items.push({ ...this.itemReward }); const name = target.name, itemName = this.itemReward.name; this.itemReward = null; this.selectedItemTargetIndex = null; this.screen = "map"; this.message = `${itemName} assegnato a ${name}. Oggetti: ${target.items.length}/2.`; }
+  confirmItemReward() { if (!this.itemReward || this.selectedItemTargetIndex === null) return; const target = this.team[this.selectedItemTargetIndex]; if (!target || target.items.length >= 2) return; target.items.push(this.cloneItem(this.itemReward)); const name = target.name, itemName = this.itemReward.name; this.itemReward = null; this.selectedItemTargetIndex = null; this.screen = "map"; this.message = `${itemName} equipaggiato su ${name}. Puoi spostarlo in seguito da EQUIPMENT.`; }
+  storeItemReward() { if (!this.itemReward) return; const itemName = this.itemReward.name; this.inventory.push(this.cloneItem(this.itemReward)); this.itemReward = null; this.selectedItemTargetIndex = null; this.screen = "map"; this.message = `${itemName} messo nello ZAINO. Puoi equipaggiarlo quando vuoi.`; }
+
+  get equipmentTeam(): Developer[] { return this.combat ? this.combat.team : this.team; }
+  openEquipment() { if (this.screen === "equipment") return; this.equipmentReturnScreen = this.screen === "combat" ? "combat" : "map"; this.equipmentSource = null; this.screen = "equipment"; }
+  closeEquipment() { this.equipmentSource = null; this.screen = this.equipmentReturnScreen; }
+  selectEquipmentSource(zone: "dev" | "bag", itemIndex: number, devIndex = -1) { const team = this.equipmentTeam; const item = zone === "bag" ? this.inventory[itemIndex] : team[devIndex]?.items[itemIndex]; if (!item) return; this.equipmentSource = { zone, itemIndex, devIndex }; }
+
+  moveSelectedEquipment(targetZone: "dev" | "bag", targetDevIndex = -1, targetItemIndex = -1) {
+    const source = this.equipmentSource; if (!source) return;
+    const team = this.equipmentTeam; const sourceItems = source.zone === "bag" ? this.inventory : team[source.devIndex]?.items;
+    if (!sourceItems || !sourceItems[source.itemIndex]) return;
+    if (targetZone === "dev") {
+      const targetItems = team[targetDevIndex]?.items; if (!targetItems || targetItemIndex < 0 || targetItemIndex > 1) return;
+      if (source.zone === "dev" && source.devIndex === targetDevIndex && source.itemIndex === targetItemIndex) return;
+      const sourceItem = sourceItems[source.itemIndex]; const targetItem = targetItems[targetItemIndex];
+      if (source.zone === "dev" && source.devIndex === targetDevIndex) {
+        [targetItems[targetItemIndex], targetItems[source.itemIndex]] = [targetItems[source.itemIndex], targetItems[targetItemIndex]];
+      } else {
+        if (targetItem) sourceItems[source.itemIndex] = targetItem; else sourceItems.splice(source.itemIndex, 1);
+        targetItems[targetItemIndex] = sourceItem;
+      }
+    } else if (source.zone === "bag") {
+      if (targetItemIndex >= 0 && targetItemIndex < this.inventory.length) [this.inventory[source.itemIndex], this.inventory[targetItemIndex]] = [this.inventory[targetItemIndex], this.inventory[source.itemIndex]];
+    } else {
+      this.inventory.push(sourceItems[source.itemIndex]); sourceItems.splice(source.itemIndex, 1);
+    }
+    this.equipmentSource = null;
+  }
+
   updateTeamFromCombat() { if (this.combat) this.team = this.combat.team; }
-  onCombatFinished() { this.updateTeamFromCombat(); if (this.combat?.result === "victory") { if (this.combat.enemy.id === "deadline") { this.projectNumber += 1; this.difficulty += .5; this.generateMap(); this.screen = "map"; this.message = `MISSIONE COMPLETATA. Progetto #${this.projectNumber} · difficoltà x${this.difficulty.toFixed(1)}. Il ciclo continua.`; } else this.generateReward(); } else if (this.combat?.result === "defeat") { this.screen = "result"; this.message = "PROJECT FAILED."; } }
+  onCombatFinished() {
+    this.updateTeamFromCombat();
+    if (this.combat?.result === "victory") {
+      if (this.combat.enemy.id === "deadline") {
+        this.team.forEach(dev => { dev.hp = dev.maxHp; });
+        this.projectNumber += 1; this.difficulty += .5; this.generateMap(); this.screen = "map";
+        this.message = `MISSIONE COMPLETATA. Tutto il team è stato curato. Progetto #${this.projectNumber} · difficoltà x${this.difficulty.toFixed(1)}.`;
+      } else {
+        const winner = this.team.find(dev => dev.id === "freelancer"); if (winner) winner.hp = Math.min(winner.maxHp, winner.hp + 5);
+        this.generateReward();
+      }
+    } else if (this.combat?.result === "defeat") { this.screen = "result"; this.message = "PROJECT FAILED."; }
+  }
   restart() { this.start(); }
 }
