@@ -10,7 +10,7 @@
 .battle .combat-area{display:contents!important}
 .battle .active-dev{display:contents!important;min-width:0!important}
 .battle .bench{grid-area:bench!important;min-width:0!important;align-self:stretch!important;margin:0!important;padding:14px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
-.battle>.enemy{grid-area:enemy!important;min-width:0!important;align-self:stretch!important;margin:0!important;padding:14px!important}
+.battle>.enemy{grid-area:enemy!important;min-width:0!important;align-self:start!important;height:auto!important;margin:0!important;padding:12px!important;overflow:visible!important}
 .battle .combat-active-heading{grid-area:heading!important;min-width:0!important;align-self:start!important;margin:0!important;padding:14px 16px!important;border:2px solid #334155!important;background:#111827!important}
 .battle .active-dev>.dev-card{grid-area:active!important;min-width:0!important;align-self:stretch!important;margin:0!important}
 .battle .active-dev>.combat-actions{grid-area:actions!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;margin:0!important;align-self:stretch!important}
@@ -20,18 +20,24 @@
 .battle .active-dev>.energy{grid-area:energy!important;min-height:82px!important;margin:0!important;padding:16px 24px!important;border:3px solid #facc15!important;background:#2a2105!important;color:#facc15!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:20px!important;line-height:1.5!important;letter-spacing:4px!important;text-align:center!important}
 .battle .active-dev>.hand{grid-area:hand!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;min-width:0!important;margin:0!important}
 .battle .hand .card{min-width:0!important;min-height:145px!important;padding:14px!important}
-.battle .hand .card b{font-size:9px!important;line-height:1.5!important}
-.battle .hand .card span{font-size:7px!important}
-.battle .hand .card small{font-size:12px!important;line-height:1.5!important}
+.battle .hand .card b{font-size:10px!important;line-height:1.5!important}
+.battle .hand .card span{font-size:8px!important}
+.battle .hand .card small{font-size:14px!important;line-height:1.5!important}
 .battle .active-dev>.end{grid-area:end!important;width:100%!important;min-height:62px!important;margin:0!important;font-size:10px!important}
-.battle .bench h3{font-size:8px!important;margin:0 0 10px!important}
-.battle .bench-dev{width:100%!important;min-height:48px!important;margin-bottom:8px!important;padding:10px!important;font-size:6px!important;line-height:1.5!important;text-align:left!important}
-.battle .log{max-height:360px!important;min-height:180px!important;overflow:auto!important;padding-top:10px!important;font-size:6px!important;line-height:1.7!important}
-.battle .enemy-team-card{height:100%!important;min-height:520px!important}
-.battle .enemy-name{font-size:12px!important}
-.battle .enemy-description{font-size:12px!important}
-.battle .enemy-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-.battle .intent{margin-top:10px!important;padding:12px!important;border:2px solid #7f1d1d!important;background:#2a1014!important;font-size:7px!important;line-height:1.6!important}
+.battle .bench h3{font-size:9px!important;margin:0 0 10px!important}
+.battle .bench-dev{width:100%!important;min-height:52px!important;margin-bottom:8px!important;padding:10px!important;font-size:8px!important;line-height:1.5!important;text-align:left!important}
+.battle .log{max-height:360px!important;min-height:180px!important;overflow:auto!important;padding-top:10px!important;font-size:8px!important;line-height:1.7!important}
+.battle .enemy-team-card{height:auto!important;min-height:0!important;padding:12px!important}
+.battle .enemy-name{font-size:11px!important;margin-bottom:8px!important}
+.battle .enemy-description{font-size:11px!important;line-height:1.4!important;margin:0 0 8px!important}
+.battle .big-hp{font-size:8px!important;margin:8px 0 5px!important}
+.battle .enemy-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important;margin-top:8px!important}
+.battle .enemy-stat-grid span{padding:6px!important;font-size:5px!important}
+.battle .enemy-stat-grid b{font-size:8px!important;margin-top:4px!important}
+.battle .enemy-ability{margin-top:7px!important;padding:7px!important;font-size:10px!important;line-height:1.4!important}
+.battle .enemy-matchup{margin-top:7px!important}
+.battle .enemy-matchup span{font-size:9px!important}
+.battle .intent{margin-top:8px!important;padding:9px!important;border:2px solid #7f1d1d!important;background:#2a1014!important;font-size:7px!important;line-height:1.5!important}
 
 @media(max-width:1000px){.battle{grid-template-columns:150px minmax(0,1fr) minmax(0,1fr)!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.codex-entry{width:100%!important;height:auto!important;min-height:0!important}}
 @media(max-width:760px){.battle{display:grid!important;grid-template-columns:1fr!important;grid-template-areas:"heading" "active" "actions" "enemy" "bench" "energy" "hand" "end"!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}.battle .enemy-team-card{min-height:0!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:42vh!important}}
