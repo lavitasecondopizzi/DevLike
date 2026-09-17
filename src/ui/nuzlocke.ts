@@ -16,7 +16,18 @@ const groups:[string,NuzlockeRule[]][]=[
 ];
 const descriptions:Record<NuzlockeRule,string>={permadeath:"Un Developer a 0 HP viene perso definitivamente.",noHealing:"PAUSA e RECUPERO non curano HP.",noRecruit:"Dopo la scelta iniziale non puoi reclutare Developer.",limitedRecruit:"Puoi reclutare o sostituire un solo Developer per progetto.",noBurnoutRecovery:"Un Developer che raggiunge BURNOUT resta a 100 Stress durante i recuperi.",noStressRecovery:"PAUSA e RECUPERO non riducono lo Stress.",noReplacement:"Con 3 Developer non puoi sostituirne nessuno.",firstPick:"Il Developer scelto all'inizio non può essere sostituito.",noSwitch:"L'azione CAMBIO non è disponibile.",noBackpack:"Gli oggetti non possono essere conservati nello ZAINO.",oneEquipment:"Ogni Developer ha un solo slot Equipment.",noCardRemoval:"Le carte non possono essere rimosse dal mazzo.",deckLock:"Il mazzo non può essere modificato durante il progetto, eccetto le ricompense.",noRest:"I nodi PAUSA e RECUPERO sono vietati.",randomPath:"La scelta del nodo viene effettuata casualmente tra quelli disponibili.",eliteMandatory:"Se è disponibile un ELITE, devi affrontarlo.",noCode:"L'azione CODICE è vietata.",noDebug:"L'azione DEBUG è vietata.",noDefense:"L'azione DIFESA è vietata.",noBattleSwitch:"Non puoi cambiare Developer durante un combattimento.",twoEnergy:"Ogni turno hai solo 2 Energia.",smallHand:"Peschi 2 carte invece di 3.",oneTool:"Puoi giocare un solo Tool per turno.",noDuplicates:"Non puoi aggiungere una carta già presente nel mazzo.",noCoffee:"Le carte con CAFFÈ nel nome non possono essere utilizzate.",noAI:"Le carte AI/CHATGPT non possono essere utilizzate.",noGit:"Le carte GIT non possono essere utilizzate."};
 const allRules=groups.flatMap(([,rules])=>rules);
-const incompatible:NuzlockeRule[][]=[["noRecruit","limitedRecruit"]];
+const incompatible:NuzlockeRule[][]=[
+ ["noRecruit","limitedRecruit"],
+ ["noRecruit","noReplacement"],
+ ["noRecruit","firstPick"],
+ ["noReplacement","firstPick"],
+ ["noSwitch","noBattleSwitch"],
+ ["noRest","noHealing"],
+ ["noRest","noStressRecovery"],
+ ["noRest","noBurnoutRecovery"],
+ ["noStressRecovery","noBurnoutRecovery"],
+ ["deckLock","noCardRemoval"]
+];
 function randomRules(count=7):NuzlockeRule[]{const target=Math.max(2,Math.min(count,allRules.length));const result:NuzlockeRule[]=["permadeath"];const pool=[...allRules.filter(r=>r!=="permadeath")].sort(()=>Math.random()-.5);for(const rule of pool){if(result.length>=target)break;if(incompatible.some(pair=>pair.includes(rule)&&pair.some(other=>other!==rule&&result.includes(other))))continue;result.push(rule);}return result;}
 function selectedRules(){return [...document.querySelectorAll<HTMLInputElement>("[data-nuz-rule]:checked")].map(x=>x.dataset.nuzRule as NuzlockeRule);}
 function syncRuleConflicts(){const selected=selectedRules();document.querySelectorAll<HTMLInputElement>("[data-nuz-rule]").forEach(input=>{const rule=input.dataset.nuzRule as NuzlockeRule;const blocked=!input.checked&&incompatible.some(pair=>pair.includes(rule)&&pair.some(other=>other!==rule&&selected.includes(other)));input.disabled=blocked;const option=input.closest<HTMLElement>(".nuzlocke-option");option?.classList.toggle("disabled",blocked);option?.setAttribute("aria-disabled",String(blocked));});}
