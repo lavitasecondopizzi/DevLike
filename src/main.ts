@@ -4,6 +4,7 @@ import "./extra2.css";
 import "./extra3.css";
 import "./codex-fix.css";
 import "./nuzlocke.css";
+import "./map-ui-fix.css";
 import "./map-fix";
 import { Game } from "./game/Game";
 import type { Enemy } from "./entities/types";
@@ -15,6 +16,7 @@ import { setupCodexFix } from "./codex-fix";
 
 type NuzGame = Game & { nuzlockeActive:boolean; nuzlockeGraveyard:string[]; nuzlockeRules:NuzlockeRule[]; nuzlockeRecruitCount:number; nuzlockeConsumedCards:import("./entities/types").Card[] };
 const game = new Game() as NuzGame & FeatureGame;
+(window as Window & { __devlikeGame?: Game }).__devlikeGame = game;
 game.nuzlockeActive = false;
 game.nuzlockeGraveyard = [];
 game.nuzlockeRules = ["permadeath"];
