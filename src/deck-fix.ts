@@ -43,12 +43,18 @@ function renderModal(){
 function injectButton(){
   const g=game();
   if(!g||g.screen!=="map")return;
-  if(document.querySelector("[data-open-deck]"))return;
+
+  // The main renderer still creates its legacy equipment button in the header.
+  // Remove it so team management exists only above the map team list.
+  document.querySelectorAll<HTMLElement>('.header-right [data-action="open-equipment"]').forEach(el=>el.remove());
+
   const strip=document.querySelector<HTMLElement>(".team-strip");
   if(!strip)return;
+  const oldControls=strip.parentElement?.querySelector<HTMLElement>(".team-controls");
+  if(oldControls)oldControls.remove();
   const controls=document.createElement("div");
   controls.className="team-controls";
-  controls.innerHTML=`<button type="button" class="equipment-button" data-action="open-equipment">EQUIPMENT · ZAINO ${g.inventory.length}</button><button type="button" class="equipment-button deck-open-button" data-open-deck="true">MAZZO · ${g.cardCollection?.length??g.deck.length}</button>`;
+  controls.innerHTML=`<div class="team-controls-title">GESTIONE TEAM</div><div class="team-controls-buttons"><button type="button" class="equipment-button" data-action="open-equipment">ZAINO · ${g.inventory.length}</button><button type="button" class="equipment-button deck-open-button" data-open-deck="true">MAZZO · ${g.cardCollection?.length??g.deck.length}</button></div>`;
   strip.parentElement?.insertBefore(controls,strip);
 }
 
