@@ -1,10 +1,36 @@
 import { developers } from "../data/developers";
 import { enemies, boss } from "../data/enemies";
 import { rewardCards, startingDeck } from "../data/cards";
-import type { Card, Developer, Enemy } from "../entities/types";
+import type { Card, Developer, Enemy, MapNode, MapNodeType } from "../entities/types";
 import { Combat } from "./Combat";
 
 export type GameScreen = "menu" | "team" | "map" | "combat" | "reward" | "result";
+
+type NormalNodeType = Exclude<MapNodeType, "boss">;
+
+const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description: string }>> = {
+  battle: [
+    { title: "BUG", description: "Qualcosa funziona. Quindi sicuramente c'è un bug." },
+    { title: "MEETING", description: "Poteva essere una mail." },
+    { title: "LEGACY", description: "Non sai chi l'ha scritto. Non sai perché esiste." }
+  ],
+  elite: [
+    { title: "CLIENTE", description: "Una piccola modifica. Solo 47 requisiti nuovi." },
+    { title: "PROD", description: "È venerdì pomeriggio. La produzione ha altri piani." }
+  ],
+  event: [
+    { title: "EVENTO", description: "Una decisione discutibile potrebbe salvare il progetto." },
+    { title: "IMPREVISTO", description: "Il cliente ha detto 'non tocco niente'." }
+  ],
+  rest: [
+    { title: "PAUSA", description: "Cinque minuti di pausa. Nessuno deve saperlo." },
+    { title: "CAFFÈ", description: "Il compilatore non si lamenta del caffè." }
+  ],
+  reward: [
+    { title: "TOOLBOX", description: "Un nuovo Tool entra nel tuo arsenale." },
+    { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }
+  ]
+};
 
 export class Game {
   screen: GameScreen = "menu";
@@ -12,8 +38,9 @@ export class Game {
   deck: Card[] = [];
   combat: Combat | null = null;
   currentNode = 0;
-  normalBattles = 0;
-  maxNormalBattles = 3;
+  mapNodes: MapNode[] = [];
+  currentMapNodeId: string | null = null;
+  projectNumber = 1;
   reward: Card | null = null;
   selectedDeveloper = 0;
   message = "";
@@ -22,57 +49,163 @@ export class Game {
     this.screen = "team";
     this.team = [];
     this.deck = [...startingDeck];
-    this.normalBattles = 0;
     this.currentNode = 0;
+    this.mapNodes = [];
+    this.currentMapNodeId = null;
+    this.projectNumber = 1;
     this.reward = null;
     this.message = "Scegli fino a 3 developer.";
   }
 
   toggleDeveloper(index: number) {
     const existing = this.team.findIndex(d => d.id === developers[index].id);
-    if (existing >= 0) {
-      this.team.splice(existing, 1);
-    } else if (this.team.length < 3) {
-      this.team.push({ ...developers[index] });
-    }
+    if (existing >= 0) this.team.splice(existing, 1);
+    else if (this.team.length < 3) this.team.push({ ...developers[index] });
   }
 
   confirmTeam() {
     if (this.team.length === 0) return;
+    this.generateMap();
     this.screen = "map";
-    this.message = "Progetto avviato.";
+    this.message = "Progetto avviato. Scegli il prossimo percorso.";
   }
 
-  enterRandomBattle() {
-    const source = enemies[Math.floor(Math.random() * enemies.length)];
-    this.startBattle(source);
+  private randomTemplate(type: NormalNodeType) {
+    const list = NODE_TEMPLATES[type];
+    return list[Math.floor(Math.random() * list.length)];
   }
 
-  enterBoss() {
-    this.startBattle(boss);
+  private randomType(row: number): NormalNodeType {
+    const roll = Math.random();
+    if (row === 1) return roll < 0.65 ? "battle" : "event";
+    if (row >= 5) return roll < 0.5 ? "elite" : roll < 0.7 ? "battle" : "reward";
+    if (roll < 0.45) return "battle";
+    if (roll < 0.62) return "event";
+    if (roll < 0.78) return "rest";
+    return "reward";
   }
 
+  private generateMap() {
+    const finalRow = 7;
+    const nodes: MapNode[] = [{
+      id: "start", row: 0, col: 1, type: "rest", title: "START",
+      description: "Il progetto parte. Per ora non è ancora esploso.", next: [], visited: true
+    }];
+
+    for (let row = 1; row <= finalRow; row++) {
+      if (row === finalRow) {
+        nodes.push({ id: "boss", row, col: 1, type: "boss", title: "DEADLINE",
+          description: "DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.", next: [], visited: false });
+      } else {
+        for (let col = 0; col < 3; col++) {
+          const type = this.randomType(row);
+          const template = this.randomTemplate(type);
+          nodes.push({ id: `r${row}c${col}`, row, col, type, title: template.title,
+            description: template.description, next: [], visited: false });
+        }
+      }
+    }
+
+    const row = (n: number) => nodes.filter(node => node.row === n);
+    const start = row(0)[0];
+    start.next = row(1).sort(() => Math.random() - 0.5).slice(0, 2).map(n => n.id);
+
+    for (let r = 1; r < finalRow; r++) {
+      const from = row(r);
+      const to = row(r + 1);
+      from.forEach(node => {
+        const nearby = to.filter(target => Math.abs(target.col - node.col) <= 1);
+        const pool = nearby.length ? nearby : to;
+        const shuffled = [...pool].sort(() => Math.random() - 0.5);
+        shuffled.slice(0, Math.random() < 0.6 ? 1 : 2).forEach(target => node.next.push(target.id));
+      });
+      to.forEach(target => {
+        if (!nodes.some(node => node.next.includes(target.id))) {
+          const source = from[Math.floor(Math.random() * from.length)];
+          source.next.push(target.id);
+        }
+      });
+    }
+
+    row(finalRow - 1).forEach(node => { node.next = ["boss"]; });
+    this.mapNodes = nodes;
+    this.currentMapNodeId = "start";
+    this.currentNode = 0;
+  }
+
+  get currentMapNode(): MapNode | null {
+    return this.mapNodes.find(node => node.id === this.currentMapNodeId) ?? null;
+  }
+
+  get availableMapNodes(): MapNode[] {
+    const current = this.currentMapNode;
+    if (!current) return [];
+    return current.next
+      .map(id => this.mapNodes.find(node => node.id === id))
+      .filter((node): node is MapNode => Boolean(node) && !node.visited);
+  }
+
+  selectMapNode(id: string) {
+    const node = this.mapNodes.find(candidate => candidate.id === id);
+    if (!node || node.visited || !this.availableMapNodes.some(candidate => candidate.id === id)) return;
+
+    this.currentMapNodeId = id;
+    this.currentNode = node.row;
+    node.visited = true;
+
+    if (node.type === "boss") return this.enterBoss();
+    if (node.type === "battle" || node.type === "elite") {
+      this.startBattle(this.randomEnemy(node.type === "elite"));
+      return;
+    }
+    if (node.type === "reward") return this.generateReward();
+
+    if (node.type === "rest") {
+      this.team.forEach(dev => {
+        dev.hp = Math.min(dev.maxHp, dev.hp + 14);
+        dev.stress = Math.max(0, dev.stress - 10);
+      });
+      this.message = "PAUSA RIUSCITA: +14 HP e -10 STRESS al team.";
+      return;
+    }
+
+    if (Math.random() < 0.5) {
+      this.team.forEach(dev => dev.stress = Math.max(0, dev.stress - 8));
+      this.message = "EVENTO: hai trovato una soluzione su Stack Overflow. -8 STRESS.";
+    } else {
+      this.team.forEach(dev => dev.stress = Math.min(100, dev.stress + 5));
+      this.message = "EVENTO: 'facciamo una call veloce'. +5 STRESS.";
+    }
+  }
+
+  private randomEnemy(elite = false): Enemy {
+    const pool = elite ? enemies.filter(enemy => enemy.id === "client" || enemy.id === "legacy") : enemies;
+    const source = pool[Math.floor(Math.random() * pool.length)];
+    return { ...source, intent: { ...source.intent } };
+  }
+
+  enterRandomBattle() { this.startBattle(this.randomEnemy()); }
+  enterBoss() { this.startBattle({ ...boss, intent: { ...boss.intent } }); }
   startBattle(enemy: Enemy) {
     this.combat = new Combat(this.team, enemy, this.deck);
     this.screen = "combat";
   }
 
-  chooseReward(cardIndex: number) {
+  chooseReward(_cardIndex: number) {
     if (!this.reward) return;
     this.deck.push({ ...this.reward });
     this.reward = null;
-    this.normalBattles++;
     this.screen = "map";
+    this.message = "Tool acquisito. Scegli il prossimo nodo.";
   }
 
   generateReward() {
-    this.reward = rewardCards[Math.floor(Math.random() * rewardCards.length)];
+    this.reward = { ...rewardCards[Math.floor(Math.random() * rewardCards.length)] };
     this.screen = "reward";
   }
 
   updateTeamFromCombat() {
-    if (!this.combat) return;
-    this.team = this.combat.team;
+    if (this.combat) this.team = this.combat.team;
   }
 
   onCombatFinished() {
@@ -81,16 +214,12 @@ export class Game {
       if (this.combat.enemy.id === "deadline") {
         this.screen = "result";
         this.message = "DEPLOY RIUSCITO.";
-      } else {
-        this.generateReward();
-      }
+      } else this.generateReward();
     } else if (this.combat?.result === "defeat") {
       this.screen = "result";
       this.message = "PROJECT FAILED.";
     }
   }
 
-  restart() {
-    this.start();
-  }
+  restart() { this.start(); }
 }

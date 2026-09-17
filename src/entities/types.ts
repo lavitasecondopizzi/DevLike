@@ -40,4 +40,17 @@ export type Card = {
   effect: CardEffect;
 };
 
+export type MapNodeType = "battle" | "elite" | "event" | "rest" | "reward" | "boss";
+
+export type MapNode = {
+  id: string;
+  row: number;
+  col: number;
+  type: MapNodeType;
+  title: string;
+  description: string;
+  next: string[];
+  visited: boolean;
+};
+
 export type BattleResult = "ongoing" | "victory" | "defeat";

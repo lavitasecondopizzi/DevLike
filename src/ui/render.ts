@@ -1,11 +1,11 @@
 import { Game } from "../game/Game";
-import type { Developer } from "../entities/types";
+import type { Developer, MapNode } from "../entities/types";
 import { developers } from "../data/developers";
 
 const root = document.querySelector<HTMLDivElement>("#app")!;
 
 function pct(value: number, max: number) {
-  return Math.round((value / max) * 100);
+  return Math.max(0, Math.min(100, Math.round((value / max) * 100)));
 }
 
 function devCard(dev: Developer, selected = false, selectable = false) {
@@ -21,15 +21,45 @@ function devCard(dev: Developer, selected = false, selectable = false) {
   `;
 }
 
+const nodeIcon: Record<MapNode["type"], string> = {
+  battle: "⚔", elite: "☠", event: "?", rest: "+", reward: "◆", boss: "☠"
+};
+
+function nodeClass(node: MapNode, game: Game) {
+  const available = game.availableMapNodes.some(candidate => candidate.id === node.id);
+  const current = game.currentMapNodeId === node.id;
+  return ["map-node", `type-${node.type}`, node.visited ? "visited" : "", available ? "available" : "", current ? "current" : ""].filter(Boolean).join(" ");
+}
+
+function renderMapNode(node: MapNode, game: Game) {
+  const available = game.availableMapNodes.some(candidate => candidate.id === node.id);
+  const tag = node.row === 0 ? "PARTENZA" : node.type.toUpperCase();
+  return `
+    <button class="${nodeClass(node, game)}" data-map-node="${node.id}" ${available ? "" : "disabled"} title="${node.description}">
+      <span class="node-icon">${nodeIcon[node.type]}</span>
+      <b>${node.title}</b>
+      <small>${tag}</small>
+    </button>
+  `;
+}
+
+function mapRow(row: number, game: Game) {
+  return `
+    <div class="map-row">
+      <div class="row-label">${row === 0 ? "START" : row === 7 ? "FINE" : `FASE ${row}`}</div>
+      <div class="map-lane">
+        ${game.mapNodes.filter(node => node.row === row).map(node => renderMapNode(node, game)).join("")}
+      </div>
+    </div>
+  `;
+}
+
 export function render(game: Game) {
   root.innerHTML = `
     <main class="game-shell">
       <header>
-        <div>
-          <div class="logo">DEV<span>LIKE</span></div>
-          <small>SHIP IT OR BURN OUT.</small>
-        </div>
-        <div class="header-stat">NODI ${game.currentNode}</div>
+        <div><div class="logo">DEV<span>LIKE</span></div><small>SHIP IT OR BURN OUT.</small></div>
+        <div class="header-stat">NODO ${game.currentNode}/7</div>
       </header>
       ${screen(game)}
     </main>
@@ -38,192 +68,96 @@ export function render(game: Game) {
 }
 
 function screen(game: Game) {
-  if (game.screen === "menu") {
-    return `
-      <section class="panel center">
-        <div class="pixel-icon">⌨</div>
-        <h1>DEVLIKE</h1>
-        <p>Un roguelike dove il vero boss è il cliente.</p>
-        <button class="primary" data-action="start">NUOVO PROGETTO</button>
-      </section>
-    `;
-  }
+  if (game.screen === "menu") return `
+    <section class="panel center"><div class="pixel-icon">⌨</div><h1>DEVLIKE</h1>
+      <p>Un roguelike dove il vero boss è il cliente.</p><button class="primary" data-action="start">NUOVO PROGETTO</button>
+    </section>`;
 
-  if (game.screen === "team") {
-    return `
-      <section class="panel">
-        <h2>ASSEMBLA IL TEAM</h2>
-        <p>Scegli massimo 3 developer.</p>
-        <div class="grid dev-grid">
-          ${game.team.length === 0 ? "" : game.team.map(d => devCard(d, true)).join("")}
-        </div>
-        <div class="grid dev-grid">
-          ${developers.map((d, i) => devCard(
-            d,
-            game.team.some(member => member.id === d.id),
-            true
-          )).join("")}
-        </div>
-        <div class="actions">
-          <button class="primary" data-action="confirm-team" ${game.team.length === 0 ? "disabled" : ""}>INIZIA IL PROGETTO</button>
-        </div>
-      </section>
-    `;
-  }
+  if (game.screen === "team") return `
+    <section class="panel"><h2>ASSEMBLA IL TEAM</h2><p>Scegli massimo 3 developer.</p>
+      <div class="grid dev-grid">${game.team.length === 0 ? "" : game.team.map(d => devCard(d, true)).join("")}</div>
+      <div class="grid dev-grid">${developers.map((d, i) => devCard(d, game.team.some(member => member.id === d.id), true)).join("")}</div>
+      <div class="actions"><button class="primary" data-action="confirm-team" ${game.team.length === 0 ? "disabled" : ""}>INIZIA IL PROGETTO</button></div>
+    </section>`;
 
   if (game.screen === "map") {
+    const current = game.currentMapNode;
+    const choices = game.availableMapNodes;
     return `
-      <section class="panel">
+      <section class="panel map-panel">
         <div class="map-top">
-          <div><b>PROGETTO #${game.normalBattles + 1}</b><br><small>Deadline in ${12 - game.normalBattles} nodi</small></div>
-          <div class="deadline">DEADLINE<br><b>${"█".repeat(Math.max(0, 6-game.normalBattles))}${"░".repeat(Math.min(6,game.normalBattles))}</b></div>
+          <div><b>PROGETTO #${game.projectNumber}</b><br><small>${current?.title === "START" ? "Scegli il primo percorso." : game.message || "Scegli il prossimo nodo."}</small></div>
+          <div class="map-progress">DEADLINE<br><b>${"█".repeat(Math.max(0, game.currentNode))}${"░".repeat(Math.max(0, 7 - game.currentNode))}</b></div>
         </div>
-        <div class="path">
-          <div class="node current">START</div>
-          <div class="connector"></div>
-          <div class="node">⚔ BUG</div>
-          <div class="connector"></div>
-          <div class="node">❓ EVENTO</div>
-          <div class="connector"></div>
-          <div class="node">⚔ CLIENTE</div>
-          <div class="connector"></div>
-          <div class="node boss">☠ DEADLINE</div>
+        <div class="roguelike-help"><span>● ATTUALE</span><span>◆ DISPONIBILE</span><span>⚔ COMBATTIMENTO</span><span>◆ RICOMPENSA</span><span>+ PAUSA</span><span>? EVENTO</span><span>☠ ELITE / BOSS</span></div>
+        <div class="map-scroll"><div class="map-grid">${Array.from({ length: 8 }, (_, row) => mapRow(row, game)).join("")}</div></div>
+        <div class="choice-panel">
+          <div><b>${choices.length ? `SCEGLI IL PROSSIMO NODO · ${choices.length} STRADE` : "PERCORSO CONCLUSO"}</b>
+          <small>${choices.length ? choices.map(node => `${nodeIcon[node.type]} ${node.title} — ${node.description}`).join("<br>") : "La Deadline è vicina."}</small></div>
         </div>
         <div class="team-strip">${game.team.map(d => devCard(d)).join("")}</div>
-        <div class="actions">
-          ${game.normalBattles < game.maxNormalBattles
-            ? `<button class="primary" data-action="battle">AFFRONTA IL PROSSIMO PROBLEMA</button>`
-            : `<button class="danger" data-action="boss">AFFRONTA LA DEADLINE</button>`}
-        </div>
-      </section>
-    `;
+      </section>`;
   }
 
   if (game.screen === "combat" && game.combat) {
     const c = game.combat;
-    return `
-      <section class="battle">
-        <div class="enemy panel">
-          <div class="enemy-name">${c.enemy.name}</div>
-          <div class="big-hp">${c.enemy.hp}/${c.enemy.maxHp} HP</div>
-          <div class="bar"><i style="width:${pct(c.enemy.hp,c.enemy.maxHp)}%"></i></div>
-          <div class="intent">INTENT: ${c.enemy.intent.label} · ${c.enemy.intent.damage} DMG · +${c.enemy.intent.stress} STRESS</div>
-        </div>
-
-        <div class="combat-area">
-          <div class="active-dev panel">
-            ${devCard(c.active, true)}
-            <div class="energy">ENERGIA: ${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</div>
-            <div class="combat-actions">
-              <button data-action="code">CODA<br><small>1 ⚡</small></button>
-              <button data-action="debug">DEBUG<br><small>2 ⚡</small></button>
-              <button data-action="defend">DIFESA<br><small>1 ⚡</small></button>
-            </div>
-            <div class="hand">
-              ${c.hand.map((card, i) => `
-                <button class="card" data-card="${i}" ${card.cost > c.energy ? "disabled" : ""}>
-                  <b>${card.name}</b>
-                  <span>${card.cost} ⚡</span>
-                  <small>${card.description}</small>
-                </button>
-              `).join("")}
-            </div>
-            <button class="end" data-action="end-turn">FINE TURNO</button>
-          </div>
-
-          <aside class="bench panel">
-            <h3>PANCHINA</h3>
-            ${c.team.map((d,i) => `
-              <button class="bench-dev ${i===c.activeIndex ? "active":""}" data-switch="${i}" ${i===c.activeIndex || d.hp<=0 || d.stress>=100 ? "disabled":""}>
-                ${d.name} · HP ${d.hp} · S ${d.stress}
-              </button>
-            `).join("")}
-            <h3>LOG</h3>
-            <div class="log">${c.log.slice(-8).reverse().map(x => `<div>${x}</div>`).join("")}</div>
-          </aside>
-        </div>
-      </section>
-    `;
+    return `<section class="battle">
+      <div class="enemy panel"><div class="enemy-name">${c.enemy.name}</div><div class="big-hp">${c.enemy.hp}/${c.enemy.maxHp} HP</div>
+        <div class="bar"><i style="width:${pct(c.enemy.hp,c.enemy.maxHp)}%"></i></div>
+        <div class="intent">INTENT: ${c.enemy.intent.label} · ${c.enemy.intent.damage} DMG · +${c.enemy.intent.stress} STRESS</div>
+      </div>
+      <div class="combat-area"><div class="active-dev panel">${devCard(c.active, true)}
+        <div class="energy">ENERGIA: ${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</div>
+        <div class="combat-actions"><button data-action="code">CODA<br><small>1 ⚡</small></button><button data-action="debug">DEBUG<br><small>2 ⚡</small></button><button data-action="defend">DIFESA<br><small>1 ⚡</small></button></div>
+        <div class="hand">${c.hand.map((card, i) => `<button class="card" data-card="${i}" ${card.cost > c.energy ? "disabled" : ""}><b>${card.name}</b><span>${card.cost} ⚡</span><small>${card.description}</small></button>`).join("")}</div>
+        <button class="end" data-action="end-turn">FINE TURNO</button>
+      </div><aside class="bench panel"><h3>PANCHINA</h3>${c.team.map((d,i) => `<button class="bench-dev ${i===c.activeIndex ? "active":""}" data-switch="${i}" ${i===c.activeIndex || d.hp<=0 || d.stress>=100 ? "disabled":""}>${d.name} · HP ${d.hp} · S ${d.stress}</button>`).join("")}
+        <h3>LOG</h3><div class="log">${c.log.slice(-8).reverse().map(x => `<div>${x}</div>`).join("")}</div></aside></div>
+    </section>`;
   }
 
   if (game.screen === "reward") {
     const card = game.reward!;
-    return `
-      <section class="panel center">
-        <h2>RICOMPENSA</h2>
-        <p>Il progetto è quasi in fiamme. Scegli un Tool.</p>
-        <button class="reward-card" data-action="reward">
-          <b>${card.name}</b>
-          <span>${card.cost} ⚡</span>
-          <small>${card.description}</small>
-        </button>
-        <button data-action="map">CONTINUA</button>
-      </section>
-    `;
+    return `<section class="panel center"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi un Tool al deck.</p>
+      <button class="reward-card" data-action="reward"><b>${card.name}</b><span>${card.cost} ⚡</span><small>${card.description}</small></button></section>`;
   }
 
-  return `
-    <section class="panel center result">
-      <div class="pixel-icon">${game.message.includes("RIUSCITO") ? "✓" : "☠"}</div>
-      <h1>${game.message}</h1>
-      <p>${game.message.includes("RIUSCITO") ? "Il cliente non ha ancora chiesto una modifica." : "Il progetto è andato in produzione. Da qualche parte."}</p>
-      <button class="primary" data-action="restart">NUOVO PROGETTO</button>
-    </section>
-  `;
+  return `<section class="panel center result"><div class="pixel-icon">${game.message.includes("RIUSCITO") ? "✓" : "☠"}</div><h1>${game.message}</h1>
+    <p>${game.message.includes("RIUSCITO") ? "Il cliente non ha ancora chiesto una modifica." : "Il progetto è andato in produzione. Da qualche parte."}</p>
+    <button class="primary" data-action="restart">NUOVO PROGETTO</button></section>`;
 }
 
 function bind(game: Game) {
-  root.querySelectorAll<HTMLElement>("[data-action]").forEach(el => {
-    el.onclick = () => {
-      const action = el.dataset.action;
-      if (action === "start") game.start();
-      if (action === "confirm-team") game.confirmTeam();
-      if (action === "battle") game.enterRandomBattle();
-      if (action === "boss") game.enterBoss();
-      if (action === "code") game.combat?.basicAction("code");
-      if (action === "debug") game.combat?.basicAction("debug");
-      if (action === "defend") game.combat?.basicAction("defend");
-      if (action === "end-turn") game.combat?.endTurn();
-      if (action === "reward") game.chooseReward(0);
-      if (action === "restart") game.restart();
-      render(game);
-      if (game.screen === "combat" && game.combat?.result !== "ongoing") {
-        game.onCombatFinished();
-        render(game);
-      }
-    };
-  });
-
-  root.querySelectorAll<HTMLElement>("[data-dev]").forEach(el => {
-    el.onclick = () => {
-      const id = el.dataset.dev!;
-      const ids = ["junior","senior","devops"];
-      const index = ids.indexOf(id);
-      if (index >= 0) game.toggleDeveloper(index);
-      render(game);
-    };
-  });
-
-  root.querySelectorAll<HTMLElement>("[data-card]").forEach(el => {
-    el.onclick = () => {
-      game.combat?.playCard(Number(el.dataset.card));
-      render(game);
-      if (game.combat?.result !== "ongoing") {
-        game.onCombatFinished();
-        render(game);
-      }
-    };
-  });
-
-  root.querySelectorAll<HTMLElement>("[data-switch]").forEach(el => {
-    el.onclick = () => {
-      game.combat?.switchDeveloper(Number(el.dataset.switch));
-      render(game);
-    };
-  });
-
-  root.querySelector<HTMLElement>('[data-action="map"]')?.addEventListener("click", () => {
-    game.screen = "map";
+  root.querySelectorAll<HTMLElement>("[data-action]").forEach(el => el.onclick = () => {
+    const action = el.dataset.action;
+    if (action === "start") game.start();
+    if (action === "confirm-team") game.confirmTeam();
+    if (action === "code") game.combat?.basicAction("code");
+    if (action === "debug") game.combat?.basicAction("debug");
+    if (action === "defend") game.combat?.basicAction("defend");
+    if (action === "end-turn") game.combat?.endTurn();
+    if (action === "reward") game.chooseReward(0);
+    if (action === "restart") game.restart();
     render(game);
+    if (game.screen === "combat" && game.combat?.result !== "ongoing") { game.onCombatFinished(); render(game); }
+  });
+
+  root.querySelectorAll<HTMLElement>("[data-dev]").forEach(el => el.onclick = () => {
+    const index = ["junior","senior","devops"].indexOf(el.dataset.dev!);
+    if (index >= 0) game.toggleDeveloper(index);
+    render(game);
+  });
+
+  root.querySelectorAll<HTMLElement>("[data-card]").forEach(el => el.onclick = () => {
+    game.combat?.playCard(Number(el.dataset.card)); render(game);
+    if (game.combat?.result !== "ongoing") { game.onCombatFinished(); render(game); }
+  });
+
+  root.querySelectorAll<HTMLElement>("[data-switch]").forEach(el => el.onclick = () => {
+    game.combat?.switchDeveloper(Number(el.dataset.switch)); render(game);
+  });
+
+  root.querySelectorAll<HTMLElement>("[data-map-node]").forEach(el => el.onclick = () => {
+    game.selectMapNode(el.dataset.mapNode!); render(game);
   });
 }
