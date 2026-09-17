@@ -1,11 +1,16 @@
 import "./style.css";
 import "./extra.css";
 import "./extra2.css";
+import "./extra3.css";
 import { Game } from "./game/Game";
 import { starterDeckForDeveloper } from "./data/cards";
 import { render } from "./ui/render";
+import { setupFeatures, type FeatureGame } from "./ui/features";
 
-const game = new Game();
+const game = new Game() as FeatureGame;
+game.nuzlockeActive = false;
+game.nuzlockeGraveyard = [];
+
 const openEquipment = game.openEquipment.bind(game);
 game.openEquipment = () => {
   if (game.screen !== "equipment") game.equipmentReturnScreen = game.screen;
@@ -35,4 +40,5 @@ document.addEventListener("click", () => {
   if (game.screen === "team") requestAnimationFrame(addStarterDeckPreview);
 });
 
+setupFeatures(game);
 render(game);
