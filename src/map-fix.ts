@@ -72,15 +72,14 @@ function createNode(game: Game, row: number, col: number, type: Exclude<MapNodeT
 }
 
 /**
- * Map rules:
- * - START + the first three nodes are always present.
- * - Rows 2-6 contain a random 1-3 nodes, choosing only columns reachable
- *   from at least one node in the previous row.
- * - A node can move only to the same column or an adjacent column below it.
- *   Left -> left/center, center -> left/center/right, right -> center/right.
- * - DEADLINE is always the final node.
+ * Replaces the map generator at runtime without intersecting Game's private
+ * generateMap declaration at compile time.
  */
-(Game.prototype as Game & { generateMap?: () => void }).generateMap = function(this: Game) {
+const GamePrototype = Game.prototype as unknown as {
+  generateMap: () => void;
+};
+
+GamePrototype.generateMap = function(this: Game) {
   const finalRow = 7;
   const nodes: MapNode[] = [{
     id: "start",
@@ -96,11 +95,9 @@ function createNode(game: Game, row: number, col: number, type: Exclude<MapNodeT
 
   const rowNodes = (row: number) => nodes.filter(node => node.row === row);
 
-  // The first three choices are fixed and always exist.
   const firstRowTypes: Exclude<MapNodeType, "boss">[] = ["battle", "recruit", "item"];
   firstRowTypes.forEach((type, col) => nodes.push(createNode(this, 1, col, type)));
 
-  // Intermediate rows are random, but every generated node remains reachable.
   for (let row = 2; row < finalRow; row++) {
     const previous = rowNodes(row - 1);
     const reachableCols = [...new Set(
@@ -131,7 +128,6 @@ function createNode(game: Game, row: number, col: number, type: Exclude<MapNodeT
     enemyId: boss.id
   });
 
-  // Every node exposes every valid adjacent node directly below it.
   for (let row = 0; row < finalRow; row++) {
     const from = rowNodes(row);
     const to = rowNodes(row + 1);
