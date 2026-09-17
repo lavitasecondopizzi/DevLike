@@ -67,20 +67,20 @@ export class Combat {
 
   private damageMultiplier(dev: Developer, action: "code" | "debug" | "card"): number {
     let multiplier = 1;
-    if (dev.advantageEnemyIds.includes(this.enemy.id)) multiplier *= 1.15;
-    if (dev.weaknessEnemyIds.includes(this.enemy.id)) multiplier *= 0.85;
+    if (dev.advantageEnemyIds.includes(this.enemy.typeId)) multiplier *= 1.15;
+    if (dev.weaknessEnemyIds.includes(this.enemy.typeId)) multiplier *= 0.85;
     if (dev.advantageConditions.some(c => this.conditionMatches(c, dev))) multiplier *= 1.10;
     if (dev.weaknessConditions.some(c => this.conditionMatches(c, dev))) multiplier *= 0.90;
-    if (this.enemy.weaknessDeveloperIds.includes(dev.id)) multiplier *= 1.15;
-    if (this.enemy.advantageDeveloperIds.includes(dev.id)) multiplier *= 0.90;
-    if (action === "debug" && this.enemy.id === "client" && dev.id === "hacker") multiplier *= 1.20;
+    if (this.enemy.weaknessDeveloperIds.includes(dev.classId)) multiplier *= 1.15;
+    if (this.enemy.advantageDeveloperIds.includes(dev.classId)) multiplier *= 0.90;
+    if (action === "debug" && this.enemy.typeId === "client" && dev.classId === "hacker") multiplier *= 1.20;
     return multiplier;
   }
 
   private incomingMultiplier(dev: Developer): number {
     let multiplier = 1;
-    if (this.enemy.advantageDeveloperIds.includes(dev.id)) multiplier *= 1.15;
-    if (this.enemy.weaknessDeveloperIds.includes(dev.id)) multiplier *= 0.85;
+    if (this.enemy.advantageDeveloperIds.includes(dev.classId)) multiplier *= 1.15;
+    if (this.enemy.weaknessDeveloperIds.includes(dev.classId)) multiplier *= 0.85;
     if (this.enemy.advantageConditions.some(c => this.conditionMatches(c, dev))) multiplier *= 1.10;
     if (this.enemy.weaknessConditions.some(c => this.conditionMatches(c, dev))) multiplier *= 0.90;
     return multiplier;
@@ -88,7 +88,7 @@ export class Combat {
 
   private dealDamage(amount: number, action: "code" | "debug" | "card") {
     let adjusted = amount;
-    if (this.enemy.id === "legacy" && action === "debug") adjusted = Math.max(0, adjusted - 2);
+    if (this.enemy.typeId === "legacy" && action === "debug") adjusted = Math.max(0, adjusted - 2);
     adjusted = Math.max(0, Math.round(adjusted * this.damageMultiplier(this.active, action)));
     this.enemy.hp = Math.max(0, this.enemy.hp - adjusted);
     return adjusted;
@@ -97,7 +97,7 @@ export class Combat {
   playCard(index: number): boolean {
     const card = this.hand[index];
     if (!card || this.result !== "ongoing") return false;
-    const costReduction = this.active.id === "designer" && !this.firstCardPlayed ? 1 : 0;
+    const costReduction = this.active.classId === "designer" && !this.firstCardPlayed ? 1 : 0;
     const effectiveCost = Math.max(0, card.cost - costReduction);
     if (effectiveCost > this.energy) return false;
 
@@ -132,7 +132,7 @@ export class Combat {
         break;
     }
 
-    this.temporaryCodeBonus = this.active.id === "fullstack" ? 1 : 0;
+    this.temporaryCodeBonus = this.active.classId === "fullstack" ? 1 : 0;
     this.checkBurnout();
     this.checkVictory();
     return true;
@@ -144,19 +144,19 @@ export class Combat {
     if (action === "code") {
       this.energy -= 1;
       let damage = this.active.code + this.itemCodeBonus + this.temporaryCodeBonus;
-      if (this.active.id === "senior") damage += 2;
+      if (this.active.classId === "senior") damage += 2;
       damage = Math.round(damage * (1 + this.codeBoost / 100));
       const dealt = this.dealDamage(damage, "code");
       this.active.stress = Math.min(100, this.active.stress + 3);
-      this.log.push(`CODA: ${dealt} danni, +3 Stress.`);
+      this.log.push(`CODICE: ${dealt} danni, +3 Stress.`);
     }
 
     if (action === "debug") {
       if (this.energy < 2) return false;
       this.energy -= 2;
       let debug = this.active.debug + this.itemDebugBonus;
-      if (this.active.hp < this.active.maxHp * 0.5 && this.active.id === "junior") debug += 2;
-      if (this.active.id === "hacker" && this.enemy.id === "client") debug += 3;
+      if (this.active.hp < this.active.maxHp * 0.5 && this.active.classId === "junior") debug += 2;
+      if (this.active.classId === "hacker" && this.enemy.typeId === "client") debug += 3;
       const damage = Math.round(debug * 1.5 * (1 + this.codeBoost / 100));
       const dealt = this.dealDamage(damage, "debug");
       this.active.stress = Math.min(100, this.active.stress + 5);
@@ -164,10 +164,10 @@ export class Combat {
     }
 
     if (action === "defend") {
-      const freeDefense = this.active.id === "architect" && !this.firstDefenseUsed;
+      const freeDefense = this.active.classId === "architect" && !this.firstDefenseUsed;
       if (!freeDefense) this.energy -= 1;
       this.firstDefenseUsed = true;
-      this.block += this.active.id === "devops" ? 15 : 10;
+      this.block += this.active.classId === "devops" ? 15 : 10;
       this.active.stress = Math.max(0, this.active.stress - 3);
       this.log.push(`DIFESA: ${this.block} danni bloccati, -3 Stress${freeDefense ? " (GRATIS)" : ""}.`);
     }
@@ -199,10 +199,10 @@ export class Combat {
   private enemyAttack() {
     let raw = this.enemy.intent.damage;
     let stress = this.enemy.intent.stress;
-    if (this.enemy.id === "bug") { this.enemyScaling += 1; stress += this.enemyScaling; }
-    if (this.enemy.id === "meeting" && this.active.stress >= 50) stress += 3;
-    if (this.enemy.id === "client" && this.turn % 2 === 0) stress += 2;
-    if (this.enemy.id === "deadline") { raw += this.turn * 2; stress += this.turn * 2; }
+    if (this.enemy.typeId === "bug") { this.enemyScaling += 1; stress += this.enemyScaling; }
+    if (this.enemy.typeId === "meeting" && this.active.stress >= 50) stress += 3;
+    if (this.enemy.typeId === "client" && this.turn % 2 === 0) stress += 2;
+    if (this.enemy.typeId === "deadline") { raw += this.turn * 2; stress += this.turn * 2; }
 
     raw = Math.max(0, Math.round(raw * this.incomingMultiplier(this.active)));
     const damage = Math.max(0, raw - this.block);
@@ -210,7 +210,7 @@ export class Combat {
     this.active.hp = Math.max(0, this.active.hp - damage);
     const stressBefore = this.active.stress;
     this.active.stress = Math.min(100, this.active.stress + stress);
-    if (this.active.id === "intern" && stressBefore < 75 && this.active.stress >= 75) this.active.stress = Math.max(0, this.active.stress - 10);
+    if (this.active.classId === "intern" && stressBefore < 75 && this.active.stress >= 75) this.active.stress = Math.max(0, this.active.stress - 10);
     this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${stress} Stress.`);
   }
 
