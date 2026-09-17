@@ -62,21 +62,28 @@ function codexMarkup() {
 }
 
 function tutorialMarkup() {
-  return `<div class="feature-overlay" data-feature-overlay="tutorial"><div class="feature-window tutorial-window"><div class="feature-titlebar"><div><span class="codex-kicker">MANUALE OPERATIVO</span><h2>TUTORIAL</h2></div><button type="button" class="feature-close" data-feature-close>CHIUDI ×</button></div><div class="tutorial-content">
-    <section class="tutorial-section"><span class="tutorial-number">01</span><div><h3>OBIETTIVO</h3><p>Arriva alla DEADLINE e sconfiggila. Una run è una sequenza di nodi: combattimenti, reclutamenti, ricompense, oggetti, eventi e pause.</p></div></section>
-    <section class="tutorial-section"><span class="tutorial-number">02</span><div><h3>TEAM</h3><p>Parti scegliendo 1 Developer tra 3 candidati. Durante la run puoi arrivare a 3 membri. Solo 1 è attivo in combattimento; gli altri sono in panchina e puoi cambiare strategia tra gli scontri.</p></div></section>
-    <section class="tutorial-section"><span class="tutorial-number">03</span><div><h3>ENERGIA E CARTE</h3><p>Ogni turno hai 3 Energia e peschi 3 Tool. Ogni carta ha un costo. Usa CODA per attaccare, DEBUG per gestire i problemi, DIFESA per proteggerti e CAMBIO per cambiare Developer quando previsto dal combattimento.</p></div></section>
-    <section class="tutorial-section"><span class="tutorial-number">04</span><div><h3>HP E STRESS</h3><p>HP a 0 significa ESAUSTO: quel Developer non può essere usato finché non viene recuperato. Lo Stress va da 0 a 100: 50–74 aumenta il danno del 10%, 75–99 aumenta il danno del 20% ma anche il danno subito del 10%, 100 provoca BURNOUT.</p></div></section>
-    <section class="tutorial-section"><span class="tutorial-number">05</span><div><h3>CODICE E DEBUG</h3><p>CODICE rappresenta la potenza delle azioni offensive basate sul codice; DEBUG è la capacità di affrontare e correggere i problemi. I matchup VANTAGGI/DEBOLEZZE modificano l'efficacia contro determinati nemici e condizioni.</p></div></section>
-    <section class="tutorial-section"><span class="tutorial-number">06</span><div><h3>EQUIPMENT</h3><p>Ogni Developer ha 2 slot. Gli oggetti forniscono bonus permanenti a CODICE e/o DEBUG. Gli oggetti extra finiscono nello ZAINO e possono essere spostati liberamente.</p></div></section>
-    <section class="tutorial-section"><span class="tutorial-number">07</span><div><h3>MAPPA</h3><p>Le strade si ramificano e il percorso viene generato a ogni progetto. I combattimenti possono essere nascosti: un nodo "?" rivela il nemico solo quando lo affronti.</p></div></section>
-    <section class="tutorial-section"><span class="tutorial-number">08</span><div><h3>RICOMPENSE E RECLUTAMENTO</h3><p>I nodi TOOL aggiungono carte al mazzo. I nodi EQUIPMENT danno oggetti. I nodi RECLUTAMENTO aggiungono un Developer; con 3 membri puoi sostituirne uno.</p></div></section>
-    <section class="tutorial-section"><span class="tutorial-number">09</span><div><h3>BURNOUT ED ESAUSTO</h3><p>BURNOUT significa Stress 100 e impedisce di mandare quel Developer in campo. ESAUSTO significa HP 0. Gestire la rotazione del team e lo Stress è parte fondamentale della run.</p></div></section>
+  return `<div class="feature-overlay" data-feature-overlay="tutorial"><div class="feature-window tutorial-window"><div class="feature-titlebar"><div><span class="codex-kicker">MANUALE OPERATIVO</span><h2>TUTORIAL COMPLETO</h2><small>Dalla scelta del Developer alla DEADLINE.</small></div><button type="button" class="feature-close" data-feature-close>CHIUDI ×</button></div><div class="tutorial-content">
+    <section class="tutorial-section"><span class="tutorial-number">01</span><div><h3>OBIETTIVO DELLA RUN</h3><p>Parti con un Developer, attraversa la mappa e arriva alla DEADLINE. Sconfiggere la DEADLINE completa il progetto, ripristina il team e genera il progetto successivo con difficoltà aumentata.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">02</span><div><h3>SCELTA DEL DEVELOPER</h3><p>All'inizio vengono proposti 3 Developer casuali. Scegline uno in base a HP, CODICE, DEBUG, abilità, vantaggi e debolezze. Ogni Developer appartiene a una classe con una passiva specifica.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">03</span><div><h3>IL TEAM</h3><p>Il team può contenere fino a 3 Developer. Durante un combattimento ne hai 1 attivo e gli altri restano in panchina. I Developer possono essere cambiati quando usi CAMBIO. Un Developer ESAUSTO non può essere utilizzato finché non viene recuperato.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">04</span><div><h3>LA MAPPA</h3><p>La run è composta da una sequenza di righe e bivi. Ogni nodo rappresenta una scelta di percorso. Puoi incontrare COMBATTIMENTO, ELITE, EVENTO, RECLUTAMENTO, TOOL, EQUIPMENT, PAUSA, RECUPERO COMPLETO e nodi nascosti. Il nodo DEADLINE è lo scontro finale del progetto.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">05</span><div><h3>IL TURNO DI COMBATTIMENTO</h3><p>All'inizio del turno hai 3 Energia e peschi 3 carte. Puoi giocare i Tool compatibili con l'Energia disponibile e usare le azioni base. Quando termini il turno, la mano viene scartata e il nemico esegue l'azione indicata dalla sua intenzione. Poi inizia il turno successivo.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">06</span><div><h3>AZIONI BASE</h3><p><b>CODICE</b> costa 1 Energia e infligge danni aumentando lo Stress. <b>DEBUG</b> costa 2 Energia e infligge più danni ma aumenta ulteriormente lo Stress. <b>DIFESA</b> costa 1 Energia e prepara una protezione. <b>CAMBIO</b> costa 1 Energia e permette di passare a un altro Developer disponibile.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">07</span><div><h3>TOOL, PESCA E SCARTI</h3><p>I Tool sono le carte del mazzo. Ogni carta indica costo ed effetto. Le carte giocate finiscono negli scarti; alla fine del turno anche la mano viene scartata. Quando il mazzo termina, gli scarti vengono rimescolati per creare un nuovo mazzo.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">08</span><div><h3>HP ED ESAUSTO</h3><p>Gli HP rappresentano la resistenza del Developer. Quando arrivano a 0, il Developer è <b>ESAUSTO</b> e non può continuare a combattere. I nodi di recupero e alcune carte possono ripristinare HP secondo le regole della run.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">09</span><div><h3>STRESS</h3><p>Lo Stress va da 0 a 100. A <b>50–74</b> lo Stress aumenta del 10% il danno inflitto. A <b>75–99</b> aumenta del 20% il danno inflitto e del 10% il danno subito. A <b>100</b> scatta il BURNOUT.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">10</span><div><h3>BURNOUT</h3><p>Con Stress 100 il Developer va in <b>BURNOUT</b> e non può restare attivo. Se esiste un altro Developer utilizzabile, il gioco può effettuare il cambio previsto dalle regole del combattimento; se non c'è nessuno disponibile, la situazione può portare alla sconfitta.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">11</span><div><h3>CODICE, DEBUG E MATCHUP</h3><p>CODICE e DEBUG sono le statistiche principali usate dalle azioni di combattimento. Ogni Developer ha vantaggi e debolezze verso specifici tipi di nemico o condizioni. Prima di uno scontro controlla il matchup nel Codex e scegli chi mandare in campo.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">12</span><div><h3>EQUIPMENT</h3><p>Gli oggetti sono equipaggiabili sui Developer e forniscono bonus a CODICE e/o DEBUG. Ogni Developer dispone di 2 slot equipaggiamento; gli oggetti non equipaggiati rimangono nello ZAINO e possono essere gestiti dalla schermata Equipment.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">13</span><div><h3>RECLUTAMENTO</h3><p>Nei nodi RECLUTAMENTO puoi scegliere un nuovo Developer tra i candidati disponibili. Se hai meno di 3 membri, il nuovo Developer entra nel team. Se hai già 3 membri, devi scegliere chi sostituire. Il nuovo membro entra fresco, con HP e Stress iniziali.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">14</span><div><h3>RICOMPENSE</h3><p>I combattimenti possono ricompensarti con Tool. I nodi TOOL permettono di aggiungere carte al mazzo, mentre i nodi EQUIPMENT forniscono oggetti. Costruire un mazzo efficace significa aggiungere strumenti utili senza perdere coerenza.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">15</span><div><h3>EVENTI E RECUPERO</h3><p>Gli EVENTI possono modificare temporaneamente o permanentemente le condizioni della run. PAUSA e RECUPERO permettono di gestire le risorse del team. Usa questi nodi per controllare HP e Stress invece di arrivare allo scontro successivo già in difficoltà.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">16</span><div><h3>ELITE E NEMICI</h3><p>Gli Elite sono combattimenti più impegnativi e possono avere ricompense migliori. I nemici appartengono a categorie diverse e hanno intenzioni, passivi, vantaggi e debolezze differenti. Osserva sempre l'intenzione mostrata in combattimento per capire cosa sta per succedere.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">17</span><div><h3>DEADLINE E NUOVO PROGETTO</h3><p>La DEADLINE è il boss del progetto. Dopo averla sconfitta, il team viene completamente ripristinato, il numero di progetto aumenta e la difficoltà cresce. Il ciclo ricomincia con una nuova mappa e nuovi scontri più impegnativi.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">18</span><div><h3>NUZLOCKE</h3><p>La modalità Nuzlocke aggiunge regole speciali selezionabili prima della run. Tra queste ci sono PERMADEATH, NIENTE GUARIGIONE, TEAM BLOCCATO, UN SOLO RECLUTAMENTO e altre restrizioni. Le regole attive vengono applicate alla singola run e rendono la gestione del team più importante.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">19</span><div><h3>ESEMPIO DI TURNO</h3><p>Hai 3 Energia e 3 Tool in mano. Puoi spendere 1 Energia per CODICE e usare l'Energia rimanente per un altro Tool, oppure conservare risorse e usare DIFESA. Se il Developer è troppo stressato, valuta CAMBIO o una carta che riduce Stress. Prima di chiudere il turno controlla sempre HP, Stress e intenzione del nemico.</p></div></section>
+    <section class="tutorial-section"><span class="tutorial-number">20</span><div><h3>PRIMA DI INIZIARE</h3><p>Leggi le statistiche dei 3 candidati. Controlla il Codex per conoscere matchup, carte e oggetti. Durante la run non pensare solo al danno: conserva HP, controlla lo Stress, costruisci un mazzo coerente e usa il cambio del Developer per sfruttare i matchup favorevoli.</p></div></section>
   </div></div></div>`;
-}
-
-function nuzlockeMarkup() {
-  return `<div class="feature-overlay" data-feature-overlay="nuzlocke"><div class="feature-window nuzlocke-window"><div class="feature-titlebar"><div><span class="codex-kicker">MODALITÀ SPECIALE</span><h2>NUZLOCKE</h2></div><button type="button" class="feature-close" data-feature-close>ANNULLA ×</button></div><div class="nuzlocke-rules"><h3>REGOLE DEL PROGETTO</h3><p><b>ESAUSTO = FUORI RUN.</b> Se un Developer arriva a 0 HP, viene rimosso definitivamente dal team quando termina il combattimento.</p><p>Un Developer perso non può essere recuperato, anche durante i nodi di cura. Il resto delle regole di DevLike rimane invariato.</p><p>Se tutto il team viene perso, il progetto termina immediatamente.</p></div><button type="button" class="primary nuzlocke-start" data-action="start-nuzlocke">INIZIA NUZLOCKE</button></div></div>`;
 }
 
 function codexRefresh(category: string, selectedId?: string) {
@@ -103,15 +110,6 @@ function injectMenuButtons(game: FeatureGame) {
 export function setupFeatures(game: FeatureGame) {
   const originalStart = game.start.bind(game);
   game.start = () => { originalStart(); game.nuzlockeGraveyard = []; };
-  const originalCombatFinished = game.onCombatFinished.bind(game);
-  game.onCombatFinished = () => {
-    originalCombatFinished();
-    if (!game.nuzlockeActive) return;
-    const lost = game.team.filter(d => d.hp <= 0);
-    lost.forEach(d => { if (!game.nuzlockeGraveyard.includes(d.id)) game.nuzlockeGraveyard.push(d.id); });
-    if (lost.length) game.team = game.team.filter(d => d.hp > 0);
-    if (!game.team.length) { game.screen = "result"; game.message = "NUZLOCKE FAILED · TUTTO IL TEAM È ESAUSTO."; }
-  };
 
   const observer = new MutationObserver(() => injectMenuButtons(game));
   observer.observe(document.getElementById("app")!, { childList: true, subtree: true });
@@ -127,7 +125,6 @@ export function setupFeatures(game: FeatureGame) {
       const kind = open.dataset.featureOpen;
       if (kind === "codex") { document.querySelector<HTMLElement>(".game-shell")?.insertAdjacentHTML("beforeend", codexMarkup()); codexRefresh("developers"); }
       if (kind === "tutorial") document.querySelector<HTMLElement>(".game-shell")?.insertAdjacentHTML("beforeend", tutorialMarkup());
-      if (kind === "nuzlocke") document.querySelector<HTMLElement>(".game-shell")?.insertAdjacentHTML("beforeend", nuzlockeMarkup());
       return;
     }
     if (close) { event.preventDefault(); event.stopPropagation(); overlay?.remove(); return; }
@@ -135,13 +132,6 @@ export function setupFeatures(game: FeatureGame) {
     if (category) { event.preventDefault(); event.stopPropagation(); codexRefresh(category.dataset.codexCategory ?? "developers"); return; }
     const entry = target.closest<HTMLButtonElement>("[data-codex-entry]");
     if (entry) { event.preventDefault(); event.stopPropagation(); const current = document.querySelector<HTMLButtonElement>("[data-codex-category].active")?.dataset.codexCategory ?? "developers"; codexRefresh(current, entry.dataset.codexEntry); return; }
-    if (target.closest("[data-action=\"start-nuzlocke\"]")) {
-      event.preventDefault(); event.stopPropagation();
-      game.nuzlockeActive = true;
-      game.nuzlockeGraveyard = [];
-      originalStart();
-      return;
-    }
   }, true);
 
   injectMenuButtons(game);
