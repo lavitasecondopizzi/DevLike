@@ -5,6 +5,7 @@ import "./extra3.css";
 import "./codex-fix.css";
 import "./nuzlocke.css";
 import "./map-ui-fix.css";
+import "./map-visual-fix.css";
 import "./map-fix";
 import "./map-ui-fix";
 import { Game } from "./game/Game";
