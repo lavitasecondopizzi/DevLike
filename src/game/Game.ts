@@ -4,8 +4,7 @@ import { rewardCards, startingDeck } from "../data/cards";
 import type { Card, Developer, Enemy, MapNode, MapNodeType } from "../entities/types";
 import { Combat } from "./Combat";
 
-export type GameScreen = "menu" | "team" | "map" | "combat" | "reward" | "result";
-
+export type GameScreen = "menu" | "team" | "map" | "combat" | "reward" | "recruit" | "result";
 type NormalNodeType = Exclude<MapNodeType, "boss">;
 
 const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description: string }>> = {
@@ -29,6 +28,10 @@ const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description:
   reward: [
     { title: "TOOLBOX", description: "Un nuovo Tool entra nel tuo arsenale." },
     { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }
+  ],
+  recruit: [
+    { title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente un progetto." },
+    { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }
   ]
 };
 
@@ -42,7 +45,11 @@ export class Game {
   currentMapNodeId: string | null = null;
   projectNumber = 1;
   reward: Card | null = null;
-  selectedDeveloper = 0;
+  startingCandidates: Developer[] = [];
+  recruitCandidates: Developer[] = [];
+  selectedStartingId: string | null = null;
+  selectedRecruitIndex: number | null = null;
+  recruitTargetIndex: number | null = null;
   message = "";
 
   start() {
@@ -54,20 +61,33 @@ export class Game {
     this.currentMapNodeId = null;
     this.projectNumber = 1;
     this.reward = null;
-    this.message = "Scegli fino a 3 developer.";
+    this.selectedStartingId = null;
+    this.recruitCandidates = [];
+    this.selectedRecruitIndex = null;
+    this.recruitTargetIndex = null;
+    this.startingCandidates = this.randomDevelopers(3);
+    this.message = "Tre developer disponibili. Scegline UNO come protagonista.";
   }
 
-  toggleDeveloper(index: number) {
-    const existing = this.team.findIndex(d => d.id === developers[index].id);
-    if (existing >= 0) this.team.splice(existing, 1);
-    else if (this.team.length < 3) this.team.push({ ...developers[index] });
+  private randomDevelopers(count: number, excluded: string[] = []) {
+    const pool = developers.filter(dev => !excluded.includes(dev.id));
+    return [...pool].sort(() => Math.random() - 0.5).slice(0, count).map(dev => ({ ...dev }));
   }
 
-  confirmTeam() {
-    if (this.team.length === 0) return;
+  selectStartingDeveloper(index: number) {
+    const candidate = this.startingCandidates[index];
+    if (!candidate) return;
+    this.selectedStartingId = candidate.id;
+  }
+
+  confirmStartingDeveloper() {
+    if (!this.selectedStartingId) return;
+    const candidate = this.startingCandidates.find(dev => dev.id === this.selectedStartingId);
+    if (!candidate) return;
+    this.team = [{ ...candidate, hp: candidate.maxHp, stress: 0 }];
     this.generateMap();
     this.screen = "map";
-    this.message = "Progetto avviato. Scegli il prossimo percorso.";
+    this.message = `${candidate.name} è il developer principale. Scegli il percorso.`;
   }
 
   private randomTemplate(type: NormalNodeType) {
@@ -77,12 +97,13 @@ export class Game {
 
   private randomType(row: number): NormalNodeType {
     const roll = Math.random();
-    if (row === 1) return roll < 0.65 ? "battle" : "event";
-    if (row >= 5) return roll < 0.5 ? "elite" : roll < 0.7 ? "battle" : "reward";
-    if (roll < 0.45) return "battle";
-    if (roll < 0.62) return "event";
-    if (roll < 0.78) return "rest";
-    return "reward";
+    if (row === 1) return roll < 0.55 ? "battle" : roll < 0.75 ? "recruit" : "event";
+    if (row >= 5) return roll < 0.38 ? "elite" : roll < 0.55 ? "recruit" : roll < 0.7 ? "battle" : "reward";
+    if (roll < 0.38) return "battle";
+    if (roll < 0.54) return "event";
+    if (roll < 0.67) return "rest";
+    if (roll < 0.84) return "reward";
+    return "recruit";
   }
 
   private generateMap() {
@@ -140,15 +161,13 @@ export class Game {
   get availableMapNodes(): MapNode[] {
     const current = this.currentMapNode;
     if (!current) return [];
-    return current.next
-      .map(id => this.mapNodes.find(node => node.id === id))
+    return current.next.map(id => this.mapNodes.find(node => node.id === id))
       .filter((node): node is MapNode => Boolean(node) && !node.visited);
   }
 
   selectMapNode(id: string) {
     const node = this.mapNodes.find(candidate => candidate.id === id);
     if (!node || node.visited || !this.availableMapNodes.some(candidate => candidate.id === id)) return;
-
     this.currentMapNodeId = id;
     this.currentNode = node.row;
     node.visited = true;
@@ -159,6 +178,7 @@ export class Game {
       return;
     }
     if (node.type === "reward") return this.generateReward();
+    if (node.type === "recruit") return this.openRecruitment();
 
     if (node.type === "rest") {
       this.team.forEach(dev => {
@@ -176,6 +196,47 @@ export class Game {
       this.team.forEach(dev => dev.stress = Math.min(100, dev.stress + 5));
       this.message = "EVENTO: 'facciamo una call veloce'. +5 STRESS.";
     }
+  }
+
+  private openRecruitment() {
+    this.recruitCandidates = this.randomDevelopers(3, this.team.map(dev => dev.id));
+    this.selectedRecruitIndex = null;
+    this.recruitTargetIndex = this.team.length >= 3 ? null : 0;
+    this.screen = "recruit";
+    this.message = this.team.length >= 3
+      ? "Hai già 3 developer. Scegli un candidato e poi chi sostituire."
+      : "Scegli un nuovo developer da aggiungere al team.";
+  }
+
+  selectRecruitCandidate(index: number) {
+    if (!this.recruitCandidates[index]) return;
+    this.selectedRecruitIndex = index;
+    if (this.team.length < 3) this.confirmRecruitment();
+  }
+
+  selectRecruitTarget(index: number) {
+    if (this.team.length < 3 || !this.team[index]) return;
+    this.recruitTargetIndex = index;
+  }
+
+  confirmRecruitment() {
+    if (this.selectedRecruitIndex === null) return;
+    const candidate = this.recruitCandidates[this.selectedRecruitIndex];
+    if (!candidate) return;
+
+    const fresh = { ...candidate, hp: candidate.maxHp, stress: 0 };
+    if (this.team.length < 3) {
+      this.team.push(fresh);
+    } else {
+      if (this.recruitTargetIndex === null) return;
+      this.team[this.recruitTargetIndex] = fresh;
+    }
+
+    this.selectedRecruitIndex = null;
+    this.recruitTargetIndex = null;
+    this.recruitCandidates = [];
+    this.screen = "map";
+    this.message = `${candidate.name} entra nel team. Scegli il prossimo nodo.`;
   }
 
   private randomEnemy(elite = false): Enemy {
