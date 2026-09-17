@@ -5,12 +5,14 @@ import "./extra3.css";
 import "./codex-fix.css";
 import "./nuzlocke.css";
 import { Game } from "./game/Game";
+import type { Enemy } from "./entities/types";
 import { starterDeckForDeveloper } from "./data/cards";
 import { render } from "./ui/render";
 import { setupFeatures, type FeatureGame } from "./ui/features";
-import { setupNuzlocke, type NuzGame } from "./ui/nuzlocke";
+import { setupNuzlocke, type NuzlockeRule } from "./ui/nuzlocke";
 import { setupCodexFix } from "./codex-fix";
 
+type NuzGame = Game & { nuzlockeActive:boolean; nuzlockeGraveyard:string[]; nuzlockeRules:NuzlockeRule[]; nuzlockeRecruitCount:number; nuzlockeConsumedCards:import("./entities/types").Card[] };
 const game = new Game() as NuzGame & FeatureGame;
 game.nuzlockeActive = false;
 game.nuzlockeGraveyard = [];
@@ -31,7 +33,7 @@ setupFeatures(game);
 setupNuzlocke(game);
 
 const originalStartBattle = game.startBattle.bind(game);
-game.startBattle = (enemy) => {
+game.startBattle = (enemy: Enemy) => {
   originalStartBattle(enemy);
   if (!game.nuzlockeActive || !game.combat) return;
   game.combat.nuzlockeRules = [...game.nuzlockeRules];
