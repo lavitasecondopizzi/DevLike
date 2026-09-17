@@ -57,7 +57,7 @@ export type CardEffect =
   | { type: "block"; amount: number }
   | { type: "removeStress"; amount: number };
 
-export type Card = { id: string; name: string; cost: number; description: string; effect: CardEffect };
+export type Card = { id: string; name: string; cost: number; description: string; effect: CardEffect; tier?: number };
 
 export type MapNodeType = "battle" | "elite" | "event" | "rest" | "fullRest" | "reward" | "item" | "recruit" | "boss";
 export type MapNode = {
