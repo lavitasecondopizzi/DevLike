@@ -1,4 +1,5 @@
 import "./style.css";
+import "./extra.css";
 import { Game } from "./game/Game";
 import { render } from "./ui/render";
 
