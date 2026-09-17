@@ -7,11 +7,17 @@ export class Combat {
   energy = 3;
   block = 0;
   codeBoost = 0;
+  temporaryCodeBonus = 0;
   drawPile: Card[];
   discardPile: Card[] = [];
   hand: Card[] = [];
   result: BattleResult = "ongoing";
   log: string[] = [];
+  turn = 1;
+  firstDefenseUsed = false;
+  firstCardPlayed = false;
+  toolPlayedThisTurn = false;
+  enemyScaling = 0;
 
   constructor(team: Developer[], enemy: Enemy, deck: Card[]) {
     this.team = team.map(d => ({ ...d, items: d.items.map(item => ({ ...item })) }));
@@ -21,29 +27,20 @@ export class Combat {
     this.startTurn();
   }
 
-  get active(): Developer {
-    return this.team[this.activeIndex];
-  }
-
-  get itemCodeBonus(): number {
-    return this.active.items.reduce((total, item) => total + item.codeBonus, 0);
-  }
-
-  get itemDebugBonus(): number {
-    return this.active.items.reduce((total, item) => total + item.debugBonus, 0);
-  }
+  get active(): Developer { return this.team[this.activeIndex]; }
+  get itemCodeBonus(): number { return this.active.items.reduce((total, item) => total + item.codeBonus, 0); }
+  get itemDebugBonus(): number { return this.active.items.reduce((total, item) => total + item.debugBonus, 0); }
 
   startTurn() {
     if (this.result !== "ongoing") return;
     this.energy = 3;
     this.block = 0;
     this.codeBoost = 0;
+    this.temporaryCodeBonus = 0;
+    this.firstCardPlayed = false;
+    this.toolPlayedThisTurn = false;
     this.drawCards(3);
-    this.log.push(`Turno ${this.turnNumber}. ${this.active.name} ha 3 Energia.`);
-  }
-
-  get turnNumber(): number {
-    return Math.max(1, this.discardPile.length + this.hand.length > 0 ? Math.floor((this.discardPile.length + this.hand.length) / 3) : 1);
+    this.log.push(`Turno ${this.turn}. ${this.active.name} ha 3 Energia.`);
   }
 
   drawCards(count: number) {
@@ -57,19 +54,65 @@ export class Combat {
     }
   }
 
+  private conditionMatches(condition: string, dev: Developer): boolean {
+    if (condition === "lowHp") return dev.hp < dev.maxHp * 0.5;
+    if (condition === "highStress") return dev.stress >= 50;
+    if (condition === "fullHp") return dev.hp >= dev.maxHp;
+    if (condition === "highEnergy") return this.energy >= 2;
+    if (condition === "defending") return this.block > 0;
+    if (condition === "afterTool") return this.toolPlayedThisTurn;
+    if (condition === "everyTwoTurns") return this.turn % 2 === 0;
+    return false;
+  }
+
+  private damageMultiplier(dev: Developer, action: "code" | "debug" | "card"): number {
+    let multiplier = 1;
+    if (dev.advantageEnemyIds.includes(this.enemy.id)) multiplier *= 1.15;
+    if (dev.weaknessEnemyIds.includes(this.enemy.id)) multiplier *= 0.85;
+    if (dev.advantageConditions.some(c => this.conditionMatches(c, dev))) multiplier *= 1.10;
+    if (dev.weaknessConditions.some(c => this.conditionMatches(c, dev))) multiplier *= 0.90;
+    if (this.enemy.weaknessDeveloperIds.includes(dev.id)) multiplier *= 1.15;
+    if (this.enemy.advantageDeveloperIds.includes(dev.id)) multiplier *= 0.90;
+    if (action === "debug" && this.enemy.id === "client" && dev.id === "hacker") multiplier *= 1.20;
+    return multiplier;
+  }
+
+  private incomingMultiplier(dev: Developer): number {
+    let multiplier = 1;
+    if (this.enemy.advantageDeveloperIds.includes(dev.id)) multiplier *= 1.15;
+    if (this.enemy.weaknessDeveloperIds.includes(dev.id)) multiplier *= 0.85;
+    if (this.enemy.advantageConditions.some(c => this.conditionMatches(c, dev))) multiplier *= 1.10;
+    if (this.enemy.weaknessConditions.some(c => this.conditionMatches(c, dev))) multiplier *= 0.90;
+    return multiplier;
+  }
+
+  private dealDamage(amount: number, action: "code" | "debug" | "card") {
+    let adjusted = amount;
+    if (this.enemy.id === "legacy" && action === "debug") adjusted = Math.max(0, adjusted - 2);
+    adjusted = Math.max(0, Math.round(adjusted * this.damageMultiplier(this.active, action)));
+    this.enemy.hp = Math.max(0, this.enemy.hp - adjusted);
+    return adjusted;
+  }
+
   playCard(index: number): boolean {
     const card = this.hand[index];
-    if (!card || card.cost > this.energy || this.result !== "ongoing") return false;
+    if (!card || this.result !== "ongoing") return false;
+    const costReduction = this.active.id === "designer" && !this.firstCardPlayed ? 1 : 0;
+    const effectiveCost = Math.max(0, card.cost - costReduction);
+    if (effectiveCost > this.energy) return false;
 
-    this.energy -= card.cost;
+    this.energy -= effectiveCost;
     this.hand.splice(index, 1);
     this.discardPile.push(card);
+    this.firstCardPlayed = true;
+    this.toolPlayedThisTurn = true;
 
     switch (card.effect.type) {
-      case "damage":
-        this.dealDamage(Math.round(card.effect.amount * (1 + this.codeBoost / 100)));
-        this.log.push(`${card.name}: ${card.effect.amount} danni.`);
+      case "damage": {
+        const damage = this.dealDamage(Math.round(card.effect.amount * (1 + this.codeBoost / 100)), "card");
+        this.log.push(`${card.name}: ${damage} danni.`);
         break;
+      }
       case "heal":
         this.active.hp = Math.min(this.active.maxHp, this.active.hp + card.effect.amount);
         this.log.push(`${card.name}: +${card.effect.amount} HP.`);
@@ -89,6 +132,8 @@ export class Combat {
         break;
     }
 
+    this.temporaryCodeBonus = this.active.id === "fullstack" ? 1 : 0;
+    this.checkBurnout();
     this.checkVictory();
     return true;
   }
@@ -98,12 +143,12 @@ export class Combat {
 
     if (action === "code") {
       this.energy -= 1;
-      let damage = this.active.code + this.itemCodeBonus;
+      let damage = this.active.code + this.itemCodeBonus + this.temporaryCodeBonus;
       if (this.active.id === "senior") damage += 2;
       damage = Math.round(damage * (1 + this.codeBoost / 100));
-      this.dealDamage(damage);
+      const dealt = this.dealDamage(damage, "code");
       this.active.stress = Math.min(100, this.active.stress + 3);
-      this.log.push(`CODA: ${damage} danni, +3 Stress.`);
+      this.log.push(`CODA: ${dealt} danni, +3 Stress.`);
     }
 
     if (action === "debug") {
@@ -111,17 +156,20 @@ export class Combat {
       this.energy -= 2;
       let debug = this.active.debug + this.itemDebugBonus;
       if (this.active.hp < this.active.maxHp * 0.5 && this.active.id === "junior") debug += 2;
+      if (this.active.id === "hacker" && this.enemy.id === "client") debug += 3;
       const damage = Math.round(debug * 1.5 * (1 + this.codeBoost / 100));
-      this.dealDamage(damage);
+      const dealt = this.dealDamage(damage, "debug");
       this.active.stress = Math.min(100, this.active.stress + 5);
-      this.log.push(`DEBUG: ${damage} danni, +5 Stress.`);
+      this.log.push(`DEBUG: ${dealt} danni, +5 Stress.`);
     }
 
     if (action === "defend") {
-      this.energy -= 1;
+      const freeDefense = this.active.id === "architect" && !this.firstDefenseUsed;
+      if (!freeDefense) this.energy -= 1;
+      this.firstDefenseUsed = true;
       this.block += this.active.id === "devops" ? 15 : 10;
       this.active.stress = Math.max(0, this.active.stress - 3);
-      this.log.push(`DIFESA: ${this.block} danni bloccati, -3 Stress.`);
+      this.log.push(`DIFESA: ${this.block} danni bloccati, -3 Stress${freeDefense ? " (GRATIS)" : ""}.`);
     }
 
     this.checkBurnout();
@@ -142,20 +190,28 @@ export class Combat {
     this.discardPile.push(...this.hand.splice(0));
     this.enemyAttack();
     this.checkBurnout();
-    if (this.result === "ongoing") this.startTurn();
+    if (this.result === "ongoing") {
+      this.turn += 1;
+      this.startTurn();
+    }
   }
 
   private enemyAttack() {
-    const raw = this.enemy.intent.damage;
+    let raw = this.enemy.intent.damage;
+    let stress = this.enemy.intent.stress;
+    if (this.enemy.id === "bug") { this.enemyScaling += 1; stress += this.enemyScaling; }
+    if (this.enemy.id === "meeting" && this.active.stress >= 50) stress += 3;
+    if (this.enemy.id === "client" && this.turn % 2 === 0) stress += 2;
+    if (this.enemy.id === "deadline") { raw += this.turn * 2; stress += this.turn * 2; }
+
+    raw = Math.max(0, Math.round(raw * this.incomingMultiplier(this.active)));
     const damage = Math.max(0, raw - this.block);
     this.block = Math.max(0, this.block - raw);
     this.active.hp = Math.max(0, this.active.hp - damage);
-    this.active.stress = Math.min(100, this.active.stress + this.enemy.intent.stress);
-    this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${this.enemy.intent.stress} Stress.`);
-  }
-
-  private dealDamage(amount: number) {
-    this.enemy.hp = Math.max(0, this.enemy.hp - amount);
+    const stressBefore = this.active.stress;
+    this.active.stress = Math.min(100, this.active.stress + stress);
+    if (this.active.id === "intern" && stressBefore < 75 && this.active.stress >= 75) this.active.stress = Math.max(0, this.active.stress - 10);
+    this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${stress} Stress.`);
   }
 
   private checkVictory() {
