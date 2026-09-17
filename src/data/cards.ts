@@ -68,3 +68,20 @@ export const rewardCards: Card[] = [
     effect: { type: "removeStress", amount: 15 }
   }
 ];
+
+const starterIds: Record<string, string[]> = {
+  junior: ["git", "coffee", "stack-overflow", "ctrl-z", "docker"],
+  senior: ["git", "docker", "ctrl-z", "ai", "stack-overflow"],
+  devops: ["docker", "git", "coffee", "ctrl-z", "ai"],
+  fullstack: ["git", "coffee", "docker", "stack-overflow", "ai"],
+  intern: ["coffee", "git", "stack-overflow", "docker", "ctrl-z"],
+  architect: ["git", "docker", "stack-overflow", "ai", "ctrl-z"],
+  hacker: ["ctrl-z", "ai", "git", "docker", "coffee"],
+  designer: ["coffee", "stack-overflow", "git", "ctrl-z", "docker"],
+  freelancer: ["ctrl-z", "git", "coffee", "ai", "stack-overflow"]
+};
+
+export function starterDeckForDeveloper(developerId: string): Card[] {
+  const ids = starterIds[developerId] ?? starterIds.junior;
+  return ids.map(id => startingDeck.find(card => card.id === id)).filter((card): card is Card => Boolean(card)).map(card => ({ ...card }));
+}
