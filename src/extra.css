@@ -14,14 +14,16 @@
 .battle .combat-active-heading{grid-area:heading!important;min-width:0!important;align-self:start!important;margin:0!important;padding:14px 16px!important;border:2px solid #334155!important;background:#111827!important}
 .battle .active-dev>.dev-card{grid-area:active!important;min-width:0!important;align-self:stretch!important;margin:0!important}
 .battle .active-dev>.combat-actions{grid-area:actions!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;margin:0!important;align-self:stretch!important}
-.battle .combat-actions button{min-height:72px!important;font-size:9px!important}
+.battle .combat-actions button{min-height:72px!important;font-size:11px!important;line-height:1.5!important;font-weight:bold!important}
 .battle .combat-actions button[data-action="code"]{font-size:0!important}
-.battle .combat-actions button[data-action="code"]::before{content:"CODICE";font-size:9px!important;display:block!important;line-height:1.5!important}
+.battle .combat-actions button[data-action="code"]::before{content:"CODICE";font-size:11px!important;display:block!important;line-height:1.5!important}
+.battle .combat-actions button small{display:block!important;font-size:10px!important;line-height:1.5!important;margin-top:4px!important}
+.battle .combat-actions button[data-action="code"] small{font-size:10px!important}
 .battle .active-dev>.energy{grid-area:energy!important;min-height:82px!important;margin:0!important;padding:16px 24px!important;border:3px solid #facc15!important;background:#2a2105!important;color:#facc15!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:20px!important;line-height:1.5!important;letter-spacing:4px!important;text-align:center!important}
 .battle .active-dev>.hand{grid-area:hand!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;min-width:0!important;margin:0!important}
 .battle .hand .card{min-width:0!important;min-height:145px!important;padding:14px!important}
 .battle .hand .card b{font-size:10px!important;line-height:1.5!important}
-.battle .hand .card span{font-size:8px!important}
+.battle .hand .card span{font-size:12px!important;line-height:1.5!important;font-weight:bold!important;color:#67e8f9!important;letter-spacing:.5px!important}
 .battle .hand .card small{font-size:14px!important;line-height:1.5!important}
 .battle .active-dev>.end{grid-area:end!important;width:100%!important;min-height:62px!important;margin:0!important;font-size:10px!important}
 .battle .bench h3{font-size:9px!important;margin:0 0 10px!important}
