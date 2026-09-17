@@ -67,18 +67,48 @@ function renderModal(){
   overlay.addEventListener("click",event=>{const target=(event.target as HTMLElement).closest<HTMLElement>("[data-deck-action]");if(!target)return;const action=target.dataset.deckAction;if(action==="close"){overlay.remove();return;}const index=Number(target.dataset.deckIndex);if(action==="remove"&&!noRemoval&&g.deck.length>5)g.deck.splice(index,1);if(action==="add"&&!deckLocked&&g.deck.length<20){const card=g.cardCollection![index];if(card){const owned=g.cardCollection!.filter(item=>item.id===card.id).length;const used=g.deck.filter(item=>item.id===card.id).length;if(used<owned)g.deck.push({...card});}}overlay.remove();renderModal();});
 }
 
+function cardEffectText(card:Card){
+  const effect=card.effect as Card["effect"] & {amount?:number};
+  const amount=effect.amount;
+  switch(effect.type){
+    case "damage": return amount!==undefined?`DANNO · ${amount}`:"DANNO";
+    case "heal": return amount!==undefined?`CURA · ${amount} HP`:"CURA";
+    case "block": return amount!==undefined?`DIFESA · ${amount}`:"DIFESA";
+    case "removeStress": return amount!==undefined?`STRESS · -${amount}`:"RIDUCE STRESS";
+    case "codeBoost": return amount!==undefined?`BOOST · +${amount}% DANNI`:"BOOST DANNI";
+    default: return String(effect.type).toUpperCase();
+  }
+}
+
+function renderStarterDeckPreview(developerId:string){
+  const container=document.querySelector<HTMLElement>(".starter-deck-preview");
+  if(!container)return;
+  const cards=starterDeckForDeveloper(developerId);
+  container.innerHTML=`<div class="starter-deck-title">MAZZO BASE · ${cards.length} TOOL</div><div class="starter-deck-cards starter-deck-full-cards">${cards.map(card=>`<article class="starter-deck-card"><div class="starter-deck-card-head"><b>${esc(card.name)}</b><strong>${card.cost} ⚡</strong></div><div class="starter-deck-card-meta"><span>TIER ${card.tier??1}</span><span>${esc(card.effect.type.toUpperCase())}</span></div><p>${esc(card.description)}</p><div class="starter-deck-card-effect">${esc(cardEffectText(card))}</div></article>`).join("")}</div>`;
+}
+
 function injectStarterDeckPreview(){
   const g=game();
   if(!g||g.screen!=="team")return;
   const grid=document.querySelector<HTMLElement>(".developer-choice-grid");
-  if(!grid||grid.parentElement?.querySelector(".starter-deck-preview"))return;
-  const selectedId=g.selectedStartingId??g.startingCandidates[0]?.id;
-  if(!selectedId)return;
-  const cards=starterDeckForDeveloper(selectedId);
-  const preview=document.createElement("div");
-  preview.className="starter-deck-preview";
-  preview.innerHTML=`<div class="starter-deck-title">MAZZO BASE · 5 TOOL</div><div class="starter-deck-cards">${cards.map(card=>`<span class="starter-deck-card" title="${esc(card.description)}"><b>${esc(card.name)}</b><small>${card.cost} ⚡</small></span>`).join("")}</div>`;
-  grid.insertAdjacentElement("afterend",preview);
+  if(!grid)return;
+  document.querySelectorAll<HTMLElement>(".developer-choice .starter-deck-preview").forEach(el=>el.remove());
+  let preview=document.querySelector<HTMLElement>(".starter-deck-preview");
+  if(!preview){
+    preview=document.createElement("div");
+    preview.className="starter-deck-preview";
+    grid.insertAdjacentElement("afterend",preview);
+  }
+  const selected=g.selectedStartingId;
+  if(!selected){
+    preview.style.display="none";
+    preview.innerHTML="";
+    preview.removeAttribute("data-developer");
+    return;
+  }
+  preview.style.display="block";
+  preview.dataset.developer=selected;
+  renderStarterDeckPreview(selected);
 }
 
 function injectButton(){
@@ -110,7 +140,15 @@ export function setupDeckFix(g:Game){
   };
   const originalReward=g.chooseReward.bind(g);
   g.chooseReward=(index:number)=>{const before=dg.deck.length;originalReward(index);ensureCollection(dg);if(dg.deck.length>before){const added=dg.deck[dg.deck.length-1];if(added)dg.cardCollection!.push({...added});}};
-  document.addEventListener("click",event=>{const target=(event.target as HTMLElement).closest<HTMLElement>("[data-open-deck]");if(!target)return;event.preventDefault();event.stopPropagation();renderModal();});
+  document.addEventListener("click",event=>{
+    const target=(event.target as HTMLElement).closest<HTMLElement>("[data-open-deck]");
+    if(target){event.preventDefault();event.stopPropagation();renderModal();return;}
+    const choice=(event.target as HTMLElement).closest<HTMLElement>(".developer-choice[data-dev]");
+    if(choice&&game()?.screen==="team"){
+      const developerId=choice.dataset.dev;
+      if(developerId)window.setTimeout(()=>renderStarterDeckPreview(developerId),0);
+    }
+  });
   const observer=new MutationObserver(()=>{injectStarterDeckPreview();injectButton();});
   observer.observe(document.querySelector("#app") ?? document.body,{childList:true,subtree:true});
   injectStarterDeckPreview();
