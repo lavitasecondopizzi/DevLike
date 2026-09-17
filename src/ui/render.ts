@@ -1,11 +1,15 @@
 import { Game } from "../game/Game";
 import type { Developer, MapNode } from "../entities/types";
-import { developers } from "../data/developers";
 
 const root = document.querySelector<HTMLDivElement>("#app")!;
 
 function pct(value: number, max: number) {
   return Math.max(0, Math.min(100, Math.round((value / max) * 100)));
+}
+
+function itemList(dev: Developer) {
+  if (!dev.items.length) return `<div class="items-empty">OGGETTI 0/2</div>`;
+  return `<div class="items"><strong>OGGETTI ${dev.items.length}/2</strong>${dev.items.map(item => `<span title="${item.description}">${item.name}</span>`).join("")}</div>`;
 }
 
 function devCard(dev: Developer, selected = false, selectable = false, compact = false) {
@@ -19,12 +23,13 @@ function devCard(dev: Developer, selected = false, selectable = false, compact =
       <div class="stress"><i style="width:${dev.stress}%"></i></div>
       <div class="stat-grid"><span>CODICE <b>${dev.code}</b></span><span>DEBUG <b>${dev.debug}</b></span></div>
       <div class="ability"><strong>ABILITÀ</strong><br>${dev.passive}</div>
+      ${itemList(dev)}
     </button>
   `;
 }
 
 const nodeIcon: Record<MapNode["type"], string> = {
-  battle: "⚔", elite: "☠", event: "?", rest: "+", reward: "◆", recruit: "👤", boss: "☠"
+  battle: "⚔", elite: "☠", event: "?", rest: "+", fullRest: "♥", reward: "◆", item: "🔧", recruit: "👤", boss: "☠"
 };
 
 function nodeClass(node: MapNode, game: Game) {
@@ -60,7 +65,7 @@ function renderMap(game: Game) {
 
 export function render(game: Game) {
   root.innerHTML = `<main class="game-shell">
-    <header><div><div class="logo">DEV<span>LIKE</span></div><small>SHIP IT OR BURN OUT.</small></div><div class="header-stat">NODO ${game.currentNode}/7</div></header>
+    <header><div><div class="logo">DEV<span>LIKE</span></div><small>SHIP IT OR BURN OUT.</small></div><div class="header-stat">MISSIONE ${game.projectNumber} · NODO ${game.currentNode}/7 · DIFFICOLTÀ x${game.difficulty.toFixed(1)}</div></header>
     ${screen(game)}
   </main>`;
   bind(game);
@@ -76,11 +81,10 @@ function screen(game: Game) {
   </section>`;
 
   if (game.screen === "map") {
-    const current = game.currentMapNode;
     const choices = game.availableMapNodes;
     return `<section class="panel map-panel">
-      <div class="map-top"><div><b>PROGETTO #${game.projectNumber}</b><br><small>${game.message || "Scegli il prossimo nodo."}</small></div><div class="map-progress">DEADLINE<br><b>${"█".repeat(Math.max(0, game.currentNode))}${"░".repeat(Math.max(0, 7 - game.currentNode))}</b></div></div>
-      <div class="roguelike-help"><span>● ATTUALE</span><span>⚔ COMBATTIMENTO</span><span>☠ ELITE</span><span>◆ TOOL</span><span>👤 RECLUTA</span><span>+ PAUSA</span><span>? EVENTO</span><span>☠ DEADLINE</span></div>
+      <div class="map-top"><div><b>MISSIONE #${game.projectNumber}</b><br><small>${game.message || "Scegli il prossimo nodo."}</small></div><div class="map-progress">DIFFICOLTÀ x${game.difficulty.toFixed(1)}<br><b>${"█".repeat(Math.max(0, game.currentNode))}${"░".repeat(Math.max(0, 7 - game.currentNode))}</b></div></div>
+      <div class="roguelike-help"><span>● ATTUALE</span><span>⚔ COMBATTIMENTO</span><span>☠ ELITE</span><span>◆ TOOL</span><span>🔧 OGGETTO</span><span>👤 RECLUTA</span><span>+ PAUSA</span><span>♥ CURA TOTALE</span><span>? EVENTO</span><span>☠ DEADLINE</span></div>
       ${renderMap(game)}
       <div class="choice-panel"><b>${choices.length ? `SCEGLI IL PROSSIMO NODO · ${choices.length} STRADE` : "PERCORSO CONCLUSO"}</b><small>${choices.length ? choices.map(node => `${nodeIcon[node.type]} ${node.title} — ${node.description}`).join("<br>") : "La Deadline è vicina."}</small></div>
       <div class="team-strip">${game.team.map((d, i) => `<div class="team-member ${i === 0 ? "main-member" : ""}">${devCard(d, i === 0, false, true)}</div>`).join("")}</div>
@@ -90,19 +94,29 @@ function screen(game: Game) {
   if (game.screen === "recruit") return `<section class="panel selection-panel">
     <div class="selection-heading"><div><h2>RECLUTAMENTO</h2><p>${game.message}</p></div><span class="random-badge">3 CANDIDATI</span></div>
     <div class="developer-choice-grid">${game.recruitCandidates.map((dev, i) => devCard(dev, game.selectedRecruitIndex === i, false)).join("")}</div>
-    ${game.team.length >= 3 ? `<div class="replacement-box"><h3>SOSTITUISCI UN MEMBRO</h3><p>Hai già 3 developer. Seleziona prima il membro da mandare via.</p><div class="replacement-team">${game.team.map((dev, i) => `<button class="replace-target ${game.recruitTargetIndex === i ? "selected" : ""}" data-target="${i}">${dev.name}<small>${dev.role} · HP ${dev.hp}</small></button>`).join("")}</div><button class="primary" data-action="confirm-recruit" ${game.selectedRecruitIndex !== null && game.recruitTargetIndex !== null ? "" : "disabled"}>SOSTITUISCI MEMBRO</button></div>` : `<p class="recruit-note">Scegli un candidato: entrerà immediatamente nel team.</p>`}
+    ${game.team.length >= 3 ? `<div class="replacement-box"><h3>SOSTITUISCI UN MEMBRO</h3><p>Hai già 3 developer. Seleziona prima il membro da mandare via.</p><div class="replacement-team">${game.team.map((dev, i) => `<button class="replace-target ${game.recruitTargetIndex === i ? "selected" : ""}" data-target="${i}">${dev.name}<small>${dev.role} · HP ${dev.hp} · Oggetti ${dev.items.length}/2</small></button>`).join("")}</div><button class="primary" data-action="confirm-recruit" ${game.selectedRecruitIndex !== null && game.recruitTargetIndex !== null ? "" : "disabled"}>SOSTITUISCI MEMBRO</button></div>` : `<p class="recruit-note">Scegli un candidato: entrerà immediatamente nel team.</p>`}
   </section>`;
+
+  if (game.screen === "itemReward" && game.itemReward) {
+    return `<section class="panel selection-panel">
+      <div class="selection-heading"><div><h2>OGGETTO SBLOCCATO</h2><p>${game.itemReward.description}</p></div><span class="random-badge">EQUIPAGGIAMENTO</span></div>
+      <div class="item-reward-card"><h2>${game.itemReward.name}</h2><p>${game.itemReward.description}</p><div class="item-bonus">+${game.itemReward.codeBonus} CODICE · +${game.itemReward.debugBonus} DEBUG</div></div>
+      <h3 class="assign-title">A QUALE DEVELOPER CONSEGNARLO?</h3>
+      <div class="assignment-grid">${game.team.map((dev, i) => `<button class="assignment-card ${game.selectedItemTargetIndex === i ? "selected" : ""}" data-item-target="${i}" ${dev.items.length >= 2 ? "disabled" : ""}><b>${dev.name}</b><span>${dev.role}</span><small>Oggetti: ${dev.items.length}/2</small>${dev.items.length >= 2 ? "<em>INVENTARIO PIENO</em>" : "<em>DISPONIBILE</em>"}</button>`).join("")}</div>
+      <div class="selection-footer"><div class="selection-hint">${game.selectedItemTargetIndex === null ? "Ogni developer può avere massimo 2 oggetti." : `Consegnerai ${game.itemReward.name} a ${game.team[game.selectedItemTargetIndex]?.name}.`}</div><button class="primary" data-action="confirm-item" ${game.selectedItemTargetIndex !== null ? "" : "disabled"}>EQUIPAGGIA OGGETTO</button></div>
+    </section>`;
+  }
 
   if (game.screen === "combat" && game.combat) {
     const c = game.combat;
     return `<section class="battle"><div class="enemy panel"><div class="enemy-name">${c.enemy.name}</div><div class="big-hp">${c.enemy.hp}/${c.enemy.maxHp} HP</div><div class="bar"><i style="width:${pct(c.enemy.hp,c.enemy.maxHp)}%"></i></div><div class="intent">INTENT: ${c.enemy.intent.label} · ${c.enemy.intent.damage} DMG · +${c.enemy.intent.stress} STRESS</div></div>
       <div class="combat-area"><div class="active-dev panel">${devCard(c.active, true)}<div class="energy">ENERGIA: ${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</div><div class="combat-actions"><button data-action="code">CODA<br><small>1 ⚡</small></button><button data-action="debug">DEBUG<br><small>2 ⚡</small></button><button data-action="defend">DIFESA<br><small>1 ⚡</small></button></div><div class="hand">${c.hand.map((card, i) => `<button class="card" data-card="${i}" ${card.cost > c.energy ? "disabled" : ""}><b>${card.name}</b><span>${card.cost} ⚡</span><small>${card.description}</small></button>`).join("")}</div><button class="end" data-action="end-turn">FINE TURNO</button></div>
-      <aside class="bench panel"><h3>PANCHINA</h3>${c.team.map((d,i) => `<button class="bench-dev ${i===c.activeIndex ? "active":""}" data-switch="${i}" ${i===c.activeIndex || d.hp<=0 || d.stress>=100 ? "disabled":""}>${d.name} · HP ${d.hp} · S ${d.stress}</button>`).join("")}<h3>LOG</h3><div class="log">${c.log.slice(-8).reverse().map(x => `<div>${x}</div>`).join("")}</div></aside></div></section>`;
+      <aside class="bench panel"><h3>PANCHINA</h3>${c.team.map((d,i) => `<button class="bench-dev ${i===c.activeIndex ? "active":""}" data-switch="${i}" ${i===c.activeIndex || d.hp<=0 || d.stress>=100 ? "disabled":""}>${d.name} · HP ${d.hp} · S ${d.stress} · O ${d.items.length}/2</button>`).join("")}<h3>LOG</h3><div class="log">${c.log.slice(-8).reverse().map(x => `<div>${x}</div>`).join("")}</div></aside></div></section>`;
   }
 
   if (game.screen === "reward") { const card = game.reward!; return `<section class="panel center"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi un Tool al deck.</p><button class="reward-card" data-action="reward"><b>${card.name}</b><span>${card.cost} ⚡</span><small>${card.description}</small></button></section>`; }
 
-  return `<section class="panel center result"><div class="pixel-icon">${game.message.includes("RIUSCITO") ? "✓" : "☠"}</div><h1>${game.message}</h1><p>${game.message.includes("RIUSCITO") ? "Il cliente non ha ancora chiesto una modifica." : "Il progetto è andato in produzione. Da qualche parte."}</p><button class="primary" data-action="restart">NUOVO PROGETTO</button></section>`;
+  return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${game.message}</h1><p>Il progetto è andato in produzione. Da qualche parte.</p><button class="primary" data-action="restart">NUOVO PROGETTO</button></section>`;
 }
 
 function bind(game: Game) {
@@ -116,6 +130,7 @@ function bind(game: Game) {
     if (action === "end-turn") game.combat?.endTurn();
     if (action === "reward") game.chooseReward(0);
     if (action === "confirm-recruit") game.confirmRecruitment();
+    if (action === "confirm-item") game.confirmItemReward();
     if (action === "restart") game.restart();
     render(game);
     if (game.screen === "combat" && game.combat?.result !== "ongoing") { game.onCombatFinished(); render(game); }
@@ -137,9 +152,11 @@ function bind(game: Game) {
   root.querySelectorAll<HTMLElement>("[data-switch]").forEach(el => el.onclick = () => { game.combat?.switchDeveloper(Number(el.dataset.switch)); render(game); });
   root.querySelectorAll<HTMLElement>("[data-map-node]").forEach(el => el.onclick = () => { game.selectMapNode(el.dataset.mapNode!); render(game); });
 
-  root.querySelectorAll<HTMLElement>(".recruit .dev-card, [data-recruit]").forEach(el => el.onclick = () => {});
   if (game.screen === "recruit") {
     root.querySelectorAll<HTMLElement>(".developer-choice-grid .dev-card").forEach((el, index) => el.onclick = () => { game.selectRecruitCandidate(index); render(game); });
   }
   root.querySelectorAll<HTMLElement>("[data-target]").forEach(el => el.onclick = () => { game.selectRecruitTarget(Number(el.dataset.target)); render(game); });
+  if (game.screen === "itemReward") {
+    root.querySelectorAll<HTMLElement>("[data-item-target]").forEach(el => el.onclick = () => { game.selectItemTarget(Number(el.dataset.itemTarget)); render(game); });
+  }
 }
