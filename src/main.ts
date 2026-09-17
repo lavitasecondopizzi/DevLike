@@ -19,6 +19,7 @@ import { render } from "./ui/render";
 import { setupFeatures, type FeatureGame } from "./ui/features";
 import { setupNuzlocke, type NuzlockeRule } from "./ui/nuzlocke";
 import { setupCodexFix } from "./codex-fix";
+import { setupDeckFix } from "./deck-fix";
 
 type NuzGame = Game & { nuzlockeActive:boolean; nuzlockeGraveyard:string[]; nuzlockeRules:NuzlockeRule[]; nuzlockeRecruitCount:number; nuzlockeConsumedCards:import("./entities/types").Card[] };
 const game = new Game() as NuzGame & FeatureGame;
@@ -40,6 +41,7 @@ document.addEventListener("click",event=>{const target=event.target as HTMLEleme
 setupCodexFix();
 setupFeatures(game);
 setupNuzlocke(game);
+setupDeckFix(game);
 
 const originalStartBattle = game.startBattle.bind(game);
 game.startBattle = (enemy: Enemy) => {
