@@ -7,6 +7,8 @@ import "./nuzlocke.css";
 import "./map-ui-fix.css";
 import "./map-visual-fix.css";
 import "./nuzlocke-rules-ui";
+import "./nuzlocke-ui-fix.css";
+import "./nuzlocke-ui-fix";
 import "./map-fix";
 import "./map-ui-fix";
 import "./balance-fix";
