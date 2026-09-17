@@ -44,18 +44,21 @@ function injectButton(){
   const g=game();
   if(!g||g.screen!=="map")return;
 
-  // The main renderer still creates its legacy equipment button in the header.
-  // Remove it so team management exists only above the map team list.
+  // The main renderer still creates its legacy header button. Remove it whenever
+  // the map DOM is rendered so the only team controls are the ones below.
   document.querySelectorAll<HTMLElement>('.header-right [data-action="open-equipment"]').forEach(el=>el.remove());
 
   const strip=document.querySelector<HTMLElement>(".team-strip");
   if(!strip)return;
-  const oldControls=strip.parentElement?.querySelector<HTMLElement>(".team-controls");
-  if(oldControls)oldControls.remove();
+  const parent=strip.parentElement;
+  if(!parent)return;
+  const oldControls=parent.querySelector<HTMLElement>(".team-controls");
+  if(oldControls)return;
+
   const controls=document.createElement("div");
   controls.className="team-controls";
   controls.innerHTML=`<div class="team-controls-title">GESTIONE TEAM</div><div class="team-controls-buttons"><button type="button" class="equipment-button" data-action="open-equipment">ZAINO · ${g.inventory.length}</button><button type="button" class="equipment-button deck-open-button" data-open-deck="true">MAZZO · ${g.cardCollection?.length??g.deck.length}</button></div>`;
-  strip.parentElement?.insertBefore(controls,strip);
+  parent.insertBefore(controls,strip);
 }
 
 export function setupDeckFix(g:Game){
@@ -67,7 +70,10 @@ export function setupDeckFix(g:Game){
   const originalReward=g.chooseReward.bind(g);
   g.chooseReward=(index:number)=>{const before=dg.deck.length;originalReward(index);ensureCollection(dg);if(dg.deck.length>before){const added=dg.deck[dg.deck.length-1];if(added)dg.cardCollection!.push({...added});}};
   document.addEventListener("click",event=>{const target=(event.target as HTMLElement).closest<HTMLElement>("[data-open-deck]");if(!target)return;event.preventDefault();event.stopPropagation();renderModal();});
+
+  // The map can be re-rendered without changing g.screen. Keep the controls
+  // attached to the freshly-rendered map without creating duplicates.
+  const observer=new MutationObserver(()=>injectButton());
+  observer.observe(document.querySelector("#app") ?? document.body,{childList:true,subtree:true});
   injectButton();
-  let lastScreen=g.screen;
-  setInterval(()=>{if(g.screen!==lastScreen){lastScreen=g.screen;injectButton();}},100);
 }
