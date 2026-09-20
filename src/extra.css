@@ -110,3 +110,10 @@ header small,.header-stat{font-size:9px!important;line-height:1.6!important}
 @media(max-width:1000px){.battle{grid-template-columns:150px minmax(0,1fr) minmax(0,1fr)!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.codex-entry{width:100%!important;height:auto!important;min-height:0!important}}
 @media(max-width:760px){.battle{display:grid!important;grid-template-columns:1fr!important;grid-template-areas:"heading" "active" "actions" "enemy" "bench" "energy" "hand" "end"!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}.battle .enemy-team-card{min-height:0!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:42vh!important}}
 @media(max-width:500px){.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.battle .active-dev>.combat-actions{grid-template-columns:1fr!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}}
+
+/* Combat hand: use the shared poker-card template without button chrome. */
+.battle .active-dev>.hand{align-items:stretch!important}
+.battle .hand .combat-card{min-width:0!important;min-height:0!important;height:auto!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;color:inherit!important;display:block!important;cursor:pointer!important;text-align:left!important}
+.battle .hand .combat-card:disabled{opacity:.48!important;cursor:not-allowed!important}
+.battle .hand .combat-card:not(:disabled):hover .devlike-poker-card{transform:translateY(-4px)!important;box-shadow:0 0 0 2px #67e8f9,4px 7px 0 rgba(0,0,0,.3),inset 0 0 0 2px #8f8a80!important}
+.battle .hand .devlike-poker-card{height:100%!important;transition:transform .12s ease,box-shadow .12s ease!important}
