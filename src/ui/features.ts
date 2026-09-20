@@ -63,7 +63,7 @@ function codexMarkup() {
 }
 
 function tutorialMarkup() {
-  return `<div class="feature-overlay" data-feature-overlay="tutorial"><div class="feature-window tutorial-window"><div class="feature-titlebar"><div><span class="codex-kicker">MANUALE OPERATIVO</span><h2>TUTORIAL COMPLETO</h2><small>Dalla scelta del Developer alla DEADLINE.</small></div><button type="button" class="feature-close" data-feature-close>CHIUDI ×</button></div><div class="tutorial-content">
+  return `<div class="feature-overlay" data-feature-overlay="tutorial"><div class="feature-window tutorial-window"><div class="feature-titlebar"><div><span class="codex-kicker">MANUALE OPERATIVO</span><h2>TUTORIAL COMPLETO</h2><small>Dalla scelta del Developer alla DEADLINE.</small></div><button type="button" class="feature-close" data-feature-close>CHIUDI ×</button></div><div class="tutorial-progress"><span data-tutorial-progress>1 / 20</span><div><i data-tutorial-bar></i></div></div><aside class="tutorial-nav" data-tutorial-nav></aside><div class="tutorial-content">
     <section class="tutorial-section"><span class="tutorial-number">01</span><div><h3>OBIETTIVO DELLA RUN</h3><p>Parti con un Developer, attraversa la mappa e arriva alla DEADLINE. Sconfiggere la DEADLINE completa il progetto, ripristina il team e genera il progetto successivo con difficoltà aumentata.</p></div></section>
     <section class="tutorial-section"><span class="tutorial-number">02</span><div><h3>SCELTA DEL DEVELOPER</h3><p>All'inizio vengono proposti 3 Developer casuali. Scegline uno in base a HP, CODICE, DEBUG, abilità, vantaggi e debolezze. Ogni Developer appartiene a una classe con una passiva specifica.</p></div></section>
     <section class="tutorial-section"><span class="tutorial-number">03</span><div><h3>IL TEAM</h3><p>Il team può contenere fino a 3 Developer. Durante un combattimento ne hai 1 attivo e gli altri restano in panchina. I Developer possono essere cambiati quando usi CAMBIO. Un Developer ESAUSTO non può essere utilizzato finché non viene recuperato.</p></div></section>
@@ -84,7 +84,42 @@ function tutorialMarkup() {
     <section class="tutorial-section"><span class="tutorial-number">18</span><div><h3>NUZLOCKE</h3><p>La modalità Nuzlocke aggiunge regole speciali selezionabili prima della run. Tra queste ci sono PERMADEATH, NIENTE GUARIGIONE, TEAM BLOCCATO, UN SOLO RECLUTAMENTO e altre restrizioni. Le regole attive vengono applicate alla singola run e rendono la gestione del team più importante.</p></div></section>
     <section class="tutorial-section"><span class="tutorial-number">19</span><div><h3>ESEMPIO DI TURNO</h3><p>Hai 3 Energia e 3 Tool in mano. Puoi spendere 1 Energia per CODICE e usare l'Energia rimanente per un altro Tool, oppure conservare risorse e usare DIFESA. Se il Developer è troppo stressato, valuta CAMBIO o una carta che riduce Stress. Prima di chiudere il turno controlla sempre HP, Stress e intenzione del nemico.</p></div></section>
     <section class="tutorial-section"><span class="tutorial-number">20</span><div><h3>PRIMA DI INIZIARE</h3><p>Leggi le statistiche dei 3 candidati. Controlla il Codex per conoscere matchup, carte e oggetti. Durante la run non pensare solo al danno: conserva HP, controlla lo Stress, costruisci un mazzo coerente e usa il cambio del Developer per sfruttare i matchup favorevoli.</p></div></section>
-  </div></div></div>`;
+  </div><div class="tutorial-actions"><button type="button" class="secondary" data-tutorial-prev>← INDIETRO</button><button type="button" class="primary" data-tutorial-next>AVANTI →</button></div></div></div>`;
+}
+
+function tutorialRefresh(index: number) {
+  const overlay = document.querySelector<HTMLElement>('[data-feature-overlay="tutorial"]');
+  if (!overlay) return;
+  const sections = Array.from(overlay.querySelectorAll<HTMLElement>(".tutorial-section"));
+  const current = Math.max(0, Math.min(index, sections.length - 1));
+  overlay.dataset.tutorialIndex = String(current);
+  sections.forEach((section, i) => section.classList.toggle("active", i === current));
+  const content = overlay.querySelector<HTMLElement>(".tutorial-content");
+  const progress = overlay.querySelector<HTMLElement>("[data-tutorial-progress]");
+  const bar = overlay.querySelector<HTMLElement>("[data-tutorial-bar]");
+  const prev = overlay.querySelector<HTMLButtonElement>("[data-tutorial-prev]");
+  const next = overlay.querySelector<HTMLButtonElement>("[data-tutorial-next]");
+  if (progress) progress.textContent = (current + 1) + " / " + sections.length;
+  if (bar) bar.style.width = (((current + 1) / sections.length) * 100) + "%";
+  if (prev) prev.disabled = current === 0;
+  if (next) next.textContent = current === sections.length - 1 ? "FINE ✓" : "AVANTI →";
+  sections.forEach((section, i) => {
+    const number = section.querySelector<HTMLElement>(".tutorial-number");
+    if (number) number.textContent = String(i + 1).padStart(2, "0");
+  });
+  if (content) content.scrollTop = 0;
+}
+
+function tutorialInit() {
+  const overlay = document.querySelector<HTMLElement>('[data-feature-overlay="tutorial"]');
+  if (!overlay) return;
+  const sections = Array.from(overlay.querySelectorAll<HTMLElement>(".tutorial-section"));
+  const nav = overlay.querySelector<HTMLElement>("[data-tutorial-nav]");
+  if (nav) nav.innerHTML = sections.map((section, i) => {
+    const title = section.querySelector("h3")?.textContent ?? "";
+    return '<button type="button" class="tutorial-step" data-tutorial-step="' + i + '"><span>' + String(i + 1).padStart(2, "0") + '</span><b>' + esc(title) + '</b></button>';
+  }).join("");
+  tutorialRefresh(0);
 }
 
 function codexRefresh(category: string, selectedId?: string) {
@@ -125,10 +160,14 @@ export function setupFeatures(game: FeatureGame) {
       event.stopPropagation();
       const kind = open.dataset.featureOpen;
       if (kind === "codex") { document.querySelector<HTMLElement>(".game-shell")?.insertAdjacentHTML("beforeend", codexMarkup()); codexRefresh("developers"); }
-      if (kind === "tutorial") document.querySelector<HTMLElement>(".game-shell")?.insertAdjacentHTML("beforeend", tutorialMarkup());
+      if (kind === "tutorial") { document.querySelector<HTMLElement>(".game-shell")?.insertAdjacentHTML("beforeend", tutorialMarkup()); tutorialInit(); }
       return;
     }
     if (close) { event.preventDefault(); event.stopPropagation(); overlay?.remove(); return; }
+    const tutorialStep = target.closest<HTMLButtonElement>("[data-tutorial-step]");
+    if (tutorialStep) { event.preventDefault(); event.stopPropagation(); tutorialRefresh(Number(tutorialStep.dataset.tutorialStep ?? 0)); return; }
+    if (target.closest("[data-tutorial-prev]")) { event.preventDefault(); event.stopPropagation(); tutorialRefresh(Number(overlay?.dataset.tutorialIndex ?? 0) - 1); return; }
+    if (target.closest("[data-tutorial-next]")) { event.preventDefault(); event.stopPropagation(); const current = Number(overlay?.dataset.tutorialIndex ?? 0); if (current >= document.querySelectorAll("[data-feature-overlay=\"tutorial\"] .tutorial-section").length - 1) overlay?.remove(); else tutorialRefresh(current + 1); return; }
     const category = target.closest<HTMLButtonElement>("[data-codex-category]");
     if (category) { event.preventDefault(); event.stopPropagation(); codexRefresh(category.dataset.codexCategory ?? "developers"); return; }
     const entry = target.closest<HTMLButtonElement>("[data-codex-entry]");
