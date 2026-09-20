@@ -4,6 +4,7 @@ import { rewardCards, startingDeck } from "../data/cards";
 import { rewardItems } from "../data/items";
 import type { Card, Developer, Enemy, Item } from "../entities/types";
 import { Game } from "../game/Game";
+import { renderPokerCard } from "../card-view";
 
 export type FeatureGame = Game & { nuzlockeActive: boolean; nuzlockeGraveyard: string[] };
 
@@ -40,7 +41,7 @@ function enemyDetails(e: Enemy) {
 }
 
 function cardDetails(c: Card) {
-  return `<div class="codex-detail-head"><div><span class="codex-kicker">TOOL</span><h2>${esc(c.name)}</h2></div><span class="codex-cost">${c.cost} ⚡</span></div><p class="codex-description">${esc(c.description)}</p><div class="codex-stats"><span>COSTO <b>${c.cost} ⚡</b></span><span>EFFETTO <b>${esc(cardEffect(c))}</b></span></div><section class="codex-block"><h3>EFFETTO TECNICO</h3><p>${esc(cardEffect(c))}</p></section>`;
+  return `<div class="codex-card-detail"><div class="codex-card-preview">${renderPokerCard(c)}</div><div class="codex-card-info"><span class="codex-kicker">DETTAGLIO TOOL</span><h2>${esc(c.name)}</h2><p class="codex-description">${esc(c.description)}</p><div class="codex-stats"><span>COSTO <b>${c.cost} ⚡</b></span><span>EFFETTO <b>${esc(cardEffect(c))}</b></span></div><section class="codex-block"><h3>EFFETTO TECNICO</h3><p>${esc(cardEffect(c))}</p></section></div></div>`;
 }
 
 function itemDetails(i: Item) {
