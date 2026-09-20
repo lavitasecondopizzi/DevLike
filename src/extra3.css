@@ -6,3 +6,30 @@
 @media(max-width:1000px){.codex-layout{grid-template-columns:360px minmax(0,1fr)!important}.codex-list{grid-template-columns:repeat(3,104px)!important;grid-auto-rows:104px!important}.codex-entry{width:104px!important;height:104px!important;min-height:104px!important}}
 @media(max-width:800px){.feature-window{height:auto;max-height:96vh}.codex-layout{display:block!important;height:auto!important;max-height:calc(92vh - 142px);overflow:auto!important}.codex-list{grid-template-columns:repeat(2,96px)!important;grid-auto-rows:96px!important;max-height:220px;height:auto!important;border-right:0!important;border-bottom:2px solid #343b4b!important}.codex-entry{width:96px!important;height:96px!important;min-height:96px!important}.codex-two{grid-template-columns:1fr}.codex-detail{min-height:360px}.codex-tabs button{font-size:8px!important;padding:10px 4px}.feature-overlay{padding:8px}.feature-window{max-height:96vh}.feature-titlebar h2{font-size:16px!important}}
 @media(max-width:500px){.codex-list{grid-template-columns:repeat(2,96px)!important}}
+
+
+/* Interactive compact tutorial. */
+.tutorial-window{max-width:980px!important;height:min(760px,88vh)!important;max-height:88vh!important}
+.tutorial-window .feature-titlebar{padding:12px 16px!important}
+.tutorial-layout{display:grid;grid-template-columns:190px minmax(0,1fr);min-height:0;flex:1;overflow:hidden}
+.tutorial-nav{padding:12px;border-right:2px solid #303746;background:#0b0f16;overflow:auto;display:flex;flex-direction:column;gap:5px}
+.tutorial-step{display:grid;grid-template-columns:26px 1fr;gap:7px;align-items:center;text-align:left;padding:8px!important;border:1px solid transparent!important;background:transparent!important;color:#94a3b8!important;font-size:7px!important;line-height:1.35!important}
+.tutorial-step span{opacity:.5}.tutorial-step b{font-size:7px!important;font-weight:700!important}
+.tutorial-step:hover:not(:disabled){transform:none!important;border-color:#343d4f!important;background:#151b27!important}
+.tutorial-step.active{border-color:#67e8f9!important;background:#142431!important;color:#f8fafc!important;box-shadow:inset 3px 0 0 #67e8f9}
+.tutorial-main{min-width:0;min-height:0;display:flex;flex-direction:column;padding:18px 22px}
+.tutorial-progress{display:flex;align-items:center;gap:12px;color:#67e8f9;font-size:8px!important;line-height:1.4;margin-bottom:14px}
+.tutorial-progress>div{height:5px;flex:1;background:#1e293b;border:1px solid #334155;overflow:hidden}.tutorial-progress i{display:block;height:100%;width:5%;background:#67e8f9;transition:width .15s}
+.tutorial-content{padding:0!important;overflow:auto!important;max-height:none!important;flex:1;min-height:0}
+.tutorial-section{display:none!important;border:1px solid #303746!important;background:#111722!important;padding:24px!important;grid-template-columns:44px minmax(0,1fr)!important;gap:16px!important;min-height:300px;align-content:start}
+.tutorial-section.active{display:grid!important}
+.tutorial-number{font-size:13px!important;color:#67e8f9!important;opacity:1!important}
+.tutorial-section h3{font-size:15px!important;color:#facc15!important;margin:0 0 12px!important;line-height:1.4!important}
+.tutorial-section p{font-size:13px!important;line-height:1.65!important;margin:0!important;color:#cbd5e1}
+.tutorial-section p b{color:#f8fafc}
+.tutorial-section>div{min-width:0}
+.tutorial-section:after{content:"";grid-column:2;display:block;height:1px;background:#303746}
+.tutorial-section .tutorial-tip{display:flex;gap:10px;align-items:flex-start;border:1px solid #303746;background:#0c111a;padding:10px;margin-top:8px;font-size:11px}
+.tutorial-actions{display:flex;justify-content:space-between;gap:10px;padding-top:14px}
+.tutorial-actions button{min-width:130px}
+@media(max-width:700px){.tutorial-window{height:94vh!important;max-height:94vh!important}.tutorial-layout{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.tutorial-nav{flex-direction:row;overflow-x:auto;overflow-y:hidden;border-right:0;border-bottom:2px solid #303746;padding:7px}.tutorial-step{min-width:82px;display:flex;flex-direction:column;gap:3px;text-align:center;padding:7px!important}.tutorial-step b{font-size:6px!important}.tutorial-main{padding:12px}.tutorial-section{grid-template-columns:34px minmax(0,1fr)!important;padding:16px!important;min-height:0}.tutorial-section h3{font-size:12px!important}.tutorial-section p{font-size:12px!important}.tutorial-actions button{min-width:110px}}
