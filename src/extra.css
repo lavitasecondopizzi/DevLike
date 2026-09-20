@@ -117,3 +117,14 @@ header small,.header-stat{font-size:9px!important;line-height:1.6!important}
 .battle .hand .combat-card:disabled{opacity:.48!important;cursor:not-allowed!important}
 .battle .hand .combat-card:not(:disabled):hover .devlike-poker-card{transform:translateY(-4px)!important;box-shadow:0 0 0 2px #67e8f9,4px 7px 0 rgba(0,0,0,.3),inset 0 0 0 2px #8f8a80!important}
 .battle .hand .devlike-poker-card{height:100%!important;transition:transform .12s ease,box-shadow .12s ease!important}
+
+/* Combat cards use the exact canonical poker-card template and compact sizing. */
+.battle .active-dev>.hand{display:flex!important;justify-content:center!important;align-items:stretch!important;gap:12px!important;flex-wrap:nowrap!important}
+.battle .hand .combat-card{flex:0 1 180px!important;width:180px!important;max-width:180px!important;min-width:150px!important}
+.battle .hand .combat-card .poker-card{width:100%!important;height:auto!important;aspect-ratio:2.5/3.5!important}
+.battle .hand .combat-card .poker-card-inner{padding:7px!important}
+.battle .hand .combat-card .poker-card-name{font-size:10px!important}
+.battle .hand .combat-card .poker-card-art{min-height:58px!important}
+.battle .hand .combat-card .poker-card-effect p{font-size:7px!important;line-height:1.35!important}
+@media(max-width:760px){.battle .active-dev>.hand{display:grid!important;grid-template-columns:repeat(2,minmax(145px,180px))!important;justify-content:center!important}.battle .hand .combat-card{width:100%!important;max-width:180px!important;min-width:0!important}}
+@media(max-width:500px){.battle .active-dev>.hand{grid-template-columns:minmax(145px,180px)!important}}
