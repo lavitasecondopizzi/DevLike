@@ -142,6 +142,7 @@ const memberInfo=(d:Developer,i:number)=>{
     <div class="battle-member-head"><strong>${esc(d.name)}</strong><span>${esc(d.role)}</span></div>
     <div class="battle-member-hp"><span>HP ${d.hp}/${d.maxHp}</span><i><em style="width:${pct(d.hp,d.maxHp)}%"></em></i></div>
     <div class="battle-member-stress"><span>STRESS ${d.stress}/100</span><i><em style="width:${d.stress}%"></em></i></div>
+    <div class="battle-member-switch-cost">CAMBIO: 1 ⚡</div>
     <div class="battle-member-stats">
       <span class="stat-tooltip" ${stats.hasCodeTip?`data-tooltip="${esc(stats.codeTip)}"`:""}><b>CODICE</b><strong>${stats.code}</strong></span>
       <span class="stat-tooltip" ${stats.hasDebugTip?`data-tooltip="${esc(stats.debugTip)}"`:""}><b>DEBUG</b><strong>${stats.debug}</strong></span>
