@@ -594,3 +594,10 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   height:auto!important;
   min-height:170px!important;
 }
+
+
+/* COMBAT DECK ZONES */
+.battle-redesign .deck-viewer-tabs{display:flex;gap:6px;min-width:0;flex-wrap:wrap}
+.battle-redesign .deck-viewer-tabs button{padding:5px 8px;border:1px solid #39495e;background:#151e2a;color:#9aa8bb;cursor:pointer;font-size:10px!important}
+.battle-redesign .deck-viewer-tabs button.active{border-color:#6b91bd;background:#223047;color:#e7f0fa}
+.battle-redesign .deck-viewer-empty{margin:auto;padding:20px;color:#7f8b9d;text-align:center}
