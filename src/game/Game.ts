@@ -56,13 +56,30 @@ export class Game {
   }
 
   private appendStageChoices(stage:number){
-    const current=this.currentMapNode;
-    if(!current)return;
+    const rows=this.mapNodes.filter(n=>n.row===stage);
+    if(rows.length)return;
     const scheme=MAP_SCHEMES[stage-1]??MAP_SCHEMES[MAP_SCHEMES.length-1];
     const types=[...scheme].sort(()=>Math.random()-.5);
-    const choices=types.map((type,col)=>this.mapNode(type,stage,col));
-    choices.forEach(node=>this.mapNodes.push(node));
-    current.next=choices.map(node=>node.id);
+    types.forEach((type,col)=>this.mapNodes.push(this.mapNode(type,stage,col)));
+    const from=this.mapNodes.filter(n=>n.row===stage-1);
+    const to=this.mapNodes.filter(n=>n.row===stage);
+    if(!from.length)return;
+    from.forEach(node=>{
+      const candidates=to
+        .slice()
+        .sort((x,y)=>Math.abs(x.col-node.col)-Math.abs(y.col-node.col)||Math.random()-.5);
+      const count=Math.random()<.55?1:2;
+      candidates.slice(0,count).forEach(target=>node.next.push(target.id));
+    });
+    // Every destination must remain reachable, while preserving crossing paths.
+    to.forEach(target=>{
+      if(!from.some(source=>source.next.includes(target.id))){
+        const source=from
+          .slice()
+          .sort((x,y)=>Math.abs(x.col-target.col)-Math.abs(y.col-target.col))[0];
+        if(source&&!source.next.includes(target.id))source.next.push(target.id);
+      }
+    });
   }
 
   private appendBossNode(row:number){
@@ -79,9 +96,8 @@ export class Game {
       return;
     }
     const rest:MapNode={id:"rest-final",row:7,col:1,type:"rest",title:"PAUSA FINALE",description:"Ultima pausa prima della Deadline. Recupera il team e preparati allo scontro.",next:[],visited:false,hiddenEncounter:false};
-    this.mapNodes.push(rest);
     const bossNode:MapNode={id:"boss-final",row:8,col:1,type:"boss",title:"DEADLINE",description:"DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.",next:[],visited:false,hiddenEncounter:false,enemyId:"deadline"};
-    this.mapNodes.push(bossNode);
+    this.mapNodes.push(rest,bossNode);
     rest.next=[bossNode.id];
     const current=this.currentMapNode;
     if(current)current.next=[rest.id];
@@ -92,7 +108,10 @@ export class Game {
     this.currentMapNodeId="start";
     this.currentNode=0;
     this.tempo=8;
-    this.appendStageChoices(1);
+    for(let stage=1;stage<=6;stage++)this.appendStageChoices(stage);
+    const start=this.mapNodes.find(n=>n.id==="start");
+    const first=this.mapNodes.filter(n=>n.row===1);
+    if(start)start.next=first.map(n=>n.id);
   }
 
   get currentMapNode(){return this.mapNodes.find(n=>n.id===this.currentMapNodeId)??null;}
@@ -106,7 +125,7 @@ export class Game {
     if(!node||node.visited||!this.availableMapNodes.some(n=>n.id===id))return;
     this.currentMapNodeId=id;
     node.visited=true;
-    this.currentNode=node.row;
+    this.currentNode=Math.min(node.row,6);
 
     if(node.type==="boss"){
       return this.prepareBattle(this.scaleEnemy({...boss,intent:{...boss.intent}}));
@@ -115,29 +134,16 @@ export class Game {
     const cost=MAP_NODE_COST[node.type]??1;
     this.tempo=Math.max(0,this.tempo-cost);
 
-    // Build the next destination set immediately, while keeping it hidden from the UI
-    // until the player returns to the map.
-    if(node.id!=="rest-final"){
-      if(this.tempo<=0){
-        this.appendBossNode(node.row+1);
-        this.message="TEMPO ESAURITO. La DEADLINE è arrivata prima della prossima tappa.";
-      }else if(node.row>=6){
-        this.appendFinalRestOrBoss();
-      }else{
-        this.appendStageChoices(node.row+1);
-      }
-    }
-
     if(node.type==="battle"||node.type==="elite"){
       const source=enemies.find(e=>e.id===node.enemyId)??this.enemyForNode(node.type);
       this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}}));
-      return;
-    }
-    if(node.type==="reward"){this.generateReward();return;}
-    if(node.type==="item"){this.generateItemReward();return;}
-    if(node.type==="recruit"){this.openRecruitment();return;}
-
-    if(node.type==="fullRest"){
+    }else if(node.type==="reward"){
+      this.generateReward();
+    }else if(node.type==="item"){
+      this.generateItemReward();
+    }else if(node.type==="recruit"){
+      this.openRecruitment();
+    }else if(node.type==="fullRest"){
       this.team.forEach(d=>{d.hp=d.maxHp;d.stress=0;});
       this.message="RECUPERO TOTALE: tutto il team è completamente guarito e senza Stress.";
     }else if(node.type==="rest"){
@@ -153,6 +159,11 @@ export class Game {
       }
     }
 
+    if(node.row>=6){
+      // The final rest is the only route to Deadline while time remains.
+      // If Tempo is gone, the Deadline replaces it immediately.
+      this.appendFinalRestOrBoss();
+    }
   }
 
   private prepareBattle(enemy:Enemy){this.pendingEnemy=enemy;this.selectedBattleStarterIndex=this.team.findIndex(d=>d.hp>0&&d.stress<100);if(this.selectedBattleStarterIndex<0)this.selectedBattleStarterIndex=0;this.screen="battleSetup";this.message="Scegli chi manda in campo per primo. Trascinalo nello slot di combattimento.";}
