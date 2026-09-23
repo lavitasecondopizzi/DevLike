@@ -142,7 +142,7 @@ const memberInfo=(d:Developer,i:number)=>{
     <div class="battle-member-head"><strong>${esc(d.name)}</strong><span>${esc(d.role)}</span></div>
     <div class="battle-member-hp"><span>HP ${d.hp}/${d.maxHp}</span><i><em style="width:${pct(d.hp,d.maxHp)}%"></em></i></div>
     <div class="battle-member-stress"><span>STRESS ${d.stress}/100</span><i><em style="width:${d.stress}%"></em></i></div>
-    <div class="battle-member-switch-cost">CAMBIO: 1 ⚡</div>
+    <div class="battle-member-switch-cost">${esc(c.switchPreview(i))}</div>
     <div class="battle-member-stats">
       <span class="stat-tooltip" ${stats.hasCodeTip?`data-tooltip="${esc(stats.codeTip)}"`:""}><b>CODICE</b><strong>${stats.code}</strong></span>
       <span class="stat-tooltip" ${stats.hasDebugTip?`data-tooltip="${esc(stats.debugTip)}"`:""}><b>DEBUG</b><strong>${stats.debug}</strong></span>
@@ -187,7 +187,7 @@ return `<section class="battle battle-redesign">
       <button type="button" data-action="defend" ${c.energy<1?"disabled":""}><b>DIFESA</b><small>COSTO: 1 ⚡ · +${c.defensePreview} BLOCCO · -3 STRESS</small></button>
     </div>
     <div class="battle-hand-label"><span>TOOL IN MANO</span><b>${c.hand.length} CARTE</b><button type="button" class="deck-counter" data-action="toggle-deck">MAZZO · ${c.drawPile.length} DISPONIBILI</button></div>
-    <div class="hand">${c.hand.map((card,i)=>`<button type="button" class="card combat-card" data-card="${i}" data-poker-rendered="true" ${!c.canPlayCardForUi(card)?"disabled":""}>${renderPokerCard(card)}</button>`).join("")}</div>
+    <div class="hand">${c.hand.map((card,i)=>{const playable=c.canPlayCardForUi(card);const reason=c.cardPlayReasonForUi(card);return `<button type="button" class="card combat-card ${playable?"":"card-unavailable"}" data-card="${i}" data-poker-rendered="true" ${playable?"":`disabled title="${esc(reason)}"`}>${renderPokerCard(card)}<span class="combat-card-preview">${esc(c.cardPreview(card))}</span>${!playable?`<span class="combat-card-reason">${esc(reason)}</span>`:""}</button>`;}).join("")}</div>
     ${c.showDeck?`<div class="deck-viewer">
       <div class="deck-viewer-head">
         <div class="deck-viewer-tabs">
@@ -199,7 +199,7 @@ return `<section class="battle battle-redesign">
       </div>
       <div class="deck-viewer-grid">${(c.deckView==="draw"?c.drawPile:c.deckView==="discard"?c.discardPile:c.consumedCards).map(card=>`<div class="deck-viewer-card">${renderPokerCard(card)}</div>`).join("")||`<p class="deck-viewer-empty">${c.deckView==="draw"?"Il mazzo è vuoto.":c.deckView==="discard"?"Nessuna carta negli scarti.":"Nessuna carta consumata."}</p>`}</div>
     </div>`:""}
-    <button type="button" class="end" data-action="end-turn">FINE TURNO → ATTACCO NEMICO (${c.incomingDamagePreview} DMG PREVISTI)</button>
+    <button type="button" class="end ${c.incomingLethalPreview?"danger":""}" data-action="end-turn">${c.incomingLethalPreview?"ATTENZIONE · ATTACCO POTENZIALMENTE LETALE":"FINE TURNO"} → ${c.incomingDamagePreview} DMG · +${c.incomingStressPreview} STRESS PREVISTI</button>
   </section>
   <aside class="battle-side battle-enemy panel">
     <div class="battle-side-title"><span>NEMICO</span><b>INTENT</b></div>
@@ -207,7 +207,7 @@ return `<section class="battle battle-redesign">
     <div class="battle-enemy-type">${esc(enemy.type)}</div>
     <div class="battle-hp-row"><span>HP</span><b>${enemy.hp}/${enemy.maxHp}</b></div>
     <div class="battle-healthbar battle-enemy-health"><i style="width:${pct(enemy.hp,enemy.maxHp)}%"></i></div>
-    <div class="battle-intent"><strong>${esc(enemy.intent.label)}</strong><span>${enemy.intent.damage} DMG · +${enemy.intent.stress} STRESS</span></div>
+    <div class="battle-intent ${c.incomingLethalPreview?"lethal":""}"><strong>${esc(enemy.intent.label)}</strong><span>${c.incomingDamagePreview} DMG SUBITI · +${c.incomingStressPreview} STRESS</span><small>${c.block>0?`${c.block} BLOCCO ATTIVO · ${c.incomingRawPreview} DMG LORDI`:"NESSUN BLOCCO"}</small></div>
     <div class="battle-ability"><strong>ABILITÀ</strong><span>${esc(enemy.passive)}</span></div>
     <div class="battle-matchups"><div><b>VANTAGGI</b>${enemy.advantages.map(x=>`<span>${esc(x)}</span>`).join("")}</div><div><b>DEBOLEZZE</b>${enemy.weaknesses.map(x=>`<span>${esc(x)}</span>`).join("")}</div></div>
   </aside>
