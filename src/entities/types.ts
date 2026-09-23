@@ -4,6 +4,7 @@ export type Item = {
   description: string;
   codeBonus: number;
   debugBonus: number;
+  tier: number;
 };
 
 export type Developer = {
