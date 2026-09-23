@@ -13,7 +13,7 @@ const NODE_TEMPLATES: Record<Exclude<MapNodeType, "boss">, Array<{ title: string
     { title: "PROD", description: "È venerdì pomeriggio. La produzione ha altri piani." }
   ],
   event: [
-    { title: "EVENTO", description: "Una decisione discutibile potrebbe salvare il progetto." },
+    { title: "EVENTO", description: "Una decisione discutibile potrebbe salvare la commessa." },
     { title: "IMPREVISTO", description: "Il cliente ha detto 'non tocco niente'." }
   ],
   rest: [
@@ -30,7 +30,7 @@ const NODE_TEMPLATES: Record<Exclude<MapNodeType, "boss">, Array<{ title: string
     { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }
   ],
   recruit: [
-    { title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente un progetto." },
+    { title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente una commessa." },
     { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }
   ]
 };
@@ -87,7 +87,7 @@ GamePrototype.generateMap = function(this: Game) {
     col: 1,
     type: "rest",
     title: "START",
-    description: "Il progetto parte. Per ora non è ancora esploso.",
+    description: "La commessa parte. Per ora non è ancora esploso.",
     next: [],
     visited: true,
     hiddenEncounter: false
