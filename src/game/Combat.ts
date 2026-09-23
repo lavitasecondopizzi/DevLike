@@ -39,6 +39,7 @@ export class Combat {
       case "removeStress": return "-"+Math.min(card.effect.amount,this.active.stress)+" STRESS";
       case "block": return "+"+card.effect.amount+" BLOCCO";
       case "codeBoost": return "+"+card.effect.amount+"% COD · +10 STRESS";
+      default: return "EFFETTO TOOL";
     }
   }
   switchPreview(index:number):string{
@@ -60,7 +61,7 @@ export class Combat {
     return this.previewDamage(Math.round(debug*1.5*(1+this.codeBoost/100)),"debug");
   }
   get defensePreview():number{return this.active.classId==="devops"?15:10;}
-  get incomingRawPreview():number{return Math.max(0,Math.round(this.enemy.intent.damage*this.incomingMultiplier(this.active)));}
+  get incomingRawPreview():number{let raw=this.enemy.intent.damage;if(this.enemy.typeId==="deadline")raw+=this.turn*2;return Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));}
   get incomingDamagePreview():number{return Math.max(0,this.incomingRawPreview-this.block);}
   get incomingStressPreview():number{
     let stress=this.enemy.intent.stress;
