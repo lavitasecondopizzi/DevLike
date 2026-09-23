@@ -17,6 +17,35 @@ export class Combat {
   playCard(index:number):boolean{const card=this.hand[index];if(!card||this.result!=="ongoing")return false;if(!this.canPlayCard(card))return false;const costReduction=this.active.classId==="designer"&&!this.firstCardPlayed?1:0;const effectiveCost=Math.max(0,card.cost-costReduction);if(effectiveCost>this.energy)return false;this.energy-=effectiveCost;this.hand.splice(index,1);if(this.nuzlockeRules.includes("battleCardLock"))this.usedCards.add(card);if(this.nuzlockeRules.includes("consumableCards")){this.consumedCards.push(card);}else{this.discardPile.push(card);}this.firstCardPlayed=true;this.toolPlayedThisTurn=true;switch(card.effect.type){case "damage":{const damage=this.dealDamage(Math.round(card.effect.amount*(1+this.codeBoost/100)),"card");this.log.push(`${card.name}: ${damage} danni.`);break;}case "heal":this.active.hp=Math.min(this.active.maxHp,this.active.hp+card.effect.amount);this.log.push(`${card.name}: +${card.effect.amount} HP.`);break;case "removeStress":this.active.stress=Math.max(0,this.active.stress-card.effect.amount);this.log.push(`${card.name}: -${card.effect.amount} Stress.`);break;case "block":this.block+=card.effect.amount;this.log.push(`${card.name}: +${card.effect.amount} Difesa.`);break;case "codeBoost":this.codeBoost+=card.effect.amount;this.active.stress=Math.min(100,this.active.stress+10);this.log.push(`${card.name}: +${card.effect.amount}% Codice, +10 Stress.`);break;}this.temporaryCodeBonus=this.active.classId==="fullstack"?1:0;this.checkBurnout();this.checkVictory();if(this.result==="ongoing")this.autoSkipIfNoAction();return true;}
   basicAction(action:"code"|"debug"|"defend"):boolean{if(this.result!=="ongoing")return false;if(action!=="defend"&&this.energy<=0)return false;if(action==="code"){if(this.nuzlockeRules.includes("noCode"))return false;this.energy-=1;let damage=this.active.code+this.itemCodeBonus+this.temporaryCodeBonus;if(this.active.classId==="senior")damage+=2;damage=Math.round(damage*(1+this.codeBoost/100));const dealt=this.dealDamage(damage,"code");this.active.stress=Math.min(100,this.active.stress+3);this.log.push(`CODICE: ${dealt} danni, +3 Stress.`);}if(action==="debug"){if(this.nuzlockeRules.includes("noDebug")||this.energy<2)return false;this.energy-=2;let debug=this.active.debug+this.itemDebugBonus;if(this.active.hp<this.active.maxHp*.5&&this.active.classId==="junior")debug+=2;if(this.active.classId==="hacker"&&this.enemy.typeId==="client")debug+=3;const damage=Math.round(debug*1.5*(1+this.codeBoost/100));const dealt=this.dealDamage(damage,"debug");this.active.stress=Math.min(100,this.active.stress+5);this.log.push(`DEBUG: ${dealt} danni, +5 Stress.`);}if(action==="defend"){if(this.nuzlockeRules.includes("noDefense"))return false;const freeDefense=this.active.classId==="architect"&&!this.firstDefenseUsed;if(!freeDefense)this.energy-=1;this.firstDefenseUsed=true;this.block+=this.active.classId==="devops"?15:10;this.active.stress=Math.max(0,this.active.stress-3);this.log.push(`DIFESA: ${this.block} danni bloccati, -3 Stress${freeDefense?" (GRATIS)":""}.`);}this.checkBurnout();this.checkVictory();return true;}
   canPlayCardForUi(card:Card):boolean{return this.canPlayCard(card);}
+  cardPlayReasonForUi(card:Card):string{
+    if(this.result!=="ongoing")return "COMBATTIMENTO TERMINATO";
+    if(this.nuzlockeRules.includes("oneTool")&&this.toolPlayedThisTurn)return "1 TOOL PER TURNO";
+    if(this.nuzlockeRules.includes("battleCardLock")&&this.usedCards.has(card))return "TOOL GIÀ USATO";
+    const upper=card.name.toUpperCase();
+    if(this.nuzlockeRules.includes("noCoffee")&&upper.includes("CAFFÈ"))return "CAFFÈ VIETATO";
+    if(this.nuzlockeRules.includes("noAI")&&(upper.includes("AI")||upper.includes("CHATGPT")))return "AI VIETATA";
+    if(this.nuzlockeRules.includes("noGit")&&upper.includes("GIT"))return "GIT VIETATO";
+    if(this.nuzlockeRules.includes("noHealing")&&card.effect.type==="heal")return "CURE VIETATE";
+    if(this.nuzlockeRules.includes("noStressRecovery")&&card.effect.type==="removeStress")return "RECUPERO STRESS VIETATO";
+    const costReduction=this.active.classId==="designer"&&!this.firstCardPlayed?1:0;
+    const cost=Math.max(0,card.cost-costReduction);
+    if(cost>this.energy)return "SERVONO "+cost+" ⚡";
+    return "";
+  }
+  cardPreview(card:Card):string{
+    switch(card.effect.type){
+      case "damage": return "~"+this.previewDamage(Math.round(card.effect.amount*(1+this.codeBoost/100)),"card")+" DMG";
+      case "heal": return "+"+Math.min(card.effect.amount,this.active.maxHp-this.active.hp)+" HP";
+      case "removeStress": return "-"+Math.min(card.effect.amount,this.active.stress)+" STRESS";
+      case "block": return "+"+card.effect.amount+" BLOCCO";
+      case "codeBoost": return "+"+card.effect.amount+"% COD · +10 STRESS";
+    }
+  }
+  switchPreview(index:number):string{
+    const dev=this.team[index];
+    if(!dev)return "Developer non disponibile";
+    return "CAMBIO · 1 ⚡ · HP "+dev.hp+"/"+dev.maxHp+" · STRESS "+dev.stress+"/100";
+  }
   get latestFeedback():string{return this.log[this.log.length-1]??"";}
   get codePreview():number{
     let damage=this.active.code+this.itemCodeBonus+this.temporaryCodeBonus;
@@ -31,10 +60,17 @@ export class Combat {
     return this.previewDamage(Math.round(debug*1.5*(1+this.codeBoost/100)),"debug");
   }
   get defensePreview():number{return this.active.classId==="devops"?15:10;}
-  get incomingDamagePreview():number{
-    const raw=Math.max(0,Math.round(this.enemy.intent.damage*this.incomingMultiplier(this.active)));
-    return Math.max(0,raw-this.block);
+  get incomingRawPreview():number{return Math.max(0,Math.round(this.enemy.intent.damage*this.incomingMultiplier(this.active)));}
+  get incomingDamagePreview():number{return Math.max(0,this.incomingRawPreview-this.block);}
+  get incomingStressPreview():number{
+    let stress=this.enemy.intent.stress;
+    if(this.enemy.typeId==="bug")stress+=this.enemyScaling+1;
+    if(this.enemy.typeId==="meeting"&&this.active.stress>=50)stress+=3;
+    if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;
+    if(this.enemy.typeId==="deadline")stress+=this.turn*2;
+    return Math.max(0,stress);
   }
+  get incomingLethalPreview():boolean{return this.incomingDamagePreview>=this.active.hp||this.active.stress+this.incomingStressPreview>=100;}
   private previewDamage(amount:number,action:"code"|"debug"|"card"):number{
     let adjusted=amount;
     if(this.enemy.typeId==="legacy"&&action==="debug")adjusted=Math.max(0,adjusted-2);
@@ -65,11 +101,11 @@ export class Combat {
   private autoSkipIfNoAction(){
     if(this.result!=="ongoing"||this.hasUsableAction())return;
     this.log.push("Nessuna azione disponibile: turno saltato automaticamente.");
-    this.endTurn();
+    this.endTurn(true);
   }
 
-  switchDeveloper(index:number):boolean{if(this.nuzlockeRules.includes("noSwitch")||this.nuzlockeRules.includes("noBattleSwitch"))return false;if(this.energy<1||index===this.activeIndex||!this.team[index]||this.team[index].hp<=0||this.team[index].stress>=100)return false;this.energy-=1;this.activeIndex=index;this.log.push(`Cambio: entra ${this.active.name}.`);this.autoSkipIfNoAction();return true;}
-  endTurn(){if(this.result!=="ongoing")return;this.discardPile.push(...this.hand.splice(0));this.enemyAttack();this.checkBurnout();if(this.result==="ongoing"){this.turn+=1;this.startTurn();}}
+  switchDeveloper(index:number):boolean{if(this.nuzlockeRules.includes("noSwitch")||this.nuzlockeRules.includes("noBattleSwitch"))return false;if(this.energy<1||index===this.activeIndex||!this.team[index]||this.team[index].hp<=0||this.team[index].stress>=100)return false;this.energy-=1;this.activeIndex=index;this.log.push(`Cambio: entra ${this.active.name} · HP ${this.active.hp}/${this.active.maxHp} · Stress ${this.active.stress}/100.`);this.autoSkipIfNoAction();return true;}
+  endTurn(auto=false){if(this.result!=="ongoing")return;this.discardPile.push(...this.hand.splice(0));this.log.push(auto?"Fine turno automatica: nessuna azione disponibile.":"Fine turno: attacco nemico in arrivo.");this.enemyAttack();this.checkBurnout();if(this.result==="ongoing"){this.turn+=1;this.startTurn();}}
   private enemyAttack(){let raw=this.enemy.intent.damage;let stress=this.enemy.intent.stress;if(this.enemy.typeId==="bug"){this.enemyScaling+=1;stress+=this.enemyScaling;}if(this.enemy.typeId==="meeting"&&this.active.stress>=50)stress+=3;if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;if(this.enemy.typeId==="deadline"){raw+=this.turn*2;stress+=this.turn*2;}raw=Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));const damage=Math.max(0,raw-this.block);this.block=Math.max(0,this.block-raw);this.active.hp=Math.max(0,this.active.hp-damage);const stressBefore=this.active.stress;this.active.stress=Math.min(100,this.active.stress+stress);if(this.active.classId==="intern"&&stressBefore<75&&this.active.stress>=75)this.active.stress=Math.max(0,this.active.stress-10);this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${stress} Stress.`);}
   private checkVictory(){if(this.enemy.hp<=0){this.result="victory";this.log.push(`${this.enemy.name} è stato sconfitto.`);}}
   private checkBurnout(){if(this.active.stress>=100||this.active.hp<=0){this.log.push(`${this.active.name} è andato in BURNOUT/ESAUSTO.`);const available=this.team.findIndex((d,i)=>i!==this.activeIndex&&d.hp>0&&d.stress<100);if(available>=0){this.active.stress=100;this.activeIndex=available;this.log.push(`Entra ${this.active.name}.`);}else{this.result="defeat";this.log.push("Tutti i developer sono fuori combattimento.");}}}
