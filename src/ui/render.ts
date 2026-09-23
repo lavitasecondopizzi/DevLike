@@ -156,6 +156,11 @@ return `<section class="battle battle-redesign">
     <div class="battle-log"><div class="battle-log-title">ULTIME AZIONI</div>${c.log.slice(-5).reverse().map(x=>`<div>${esc(x)}</div>`).join("")}</div>
   </aside>
   <section class="battle-main">
+    <div class="battle-turnbar">
+      <div><span>COMBATTIMENTO</span><strong>TURNO ${c.turn}</strong></div>
+      <div class="battle-turn-status">${c.energy>0?"IL TUO TURNO":"NESSUNA ENERGIA"}</div>
+      <div><span>NEMICO PRONTO</span><b>${esc(enemy.intent.label)}</b></div>
+    </div>
     <div class="battle-active-card">
       <div class="battle-active-top">
         <div><span>DEVELOPER ATTIVO</span><h2>${esc(active.name)}</h2><small>${esc(active.role)}</small></div>
@@ -175,10 +180,11 @@ return `<section class="battle battle-redesign">
       </div>
     </div>
     <div class="battle-energy"><span>ENERGIA</span><strong>${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</strong><small>3 MAX</small></div>
+    <div class="battle-feedback"><span>ULTIMA AZIONE</span><b>${esc(c.latestFeedback)}</b></div>
     <div class="battle-actions">
-      <button type="button" data-action="code" ${c.energy<1?"disabled":""}><b>CODICE</b><small>COSTO: 1 ⚡ · +3 STRESS</small></button>
-      <button type="button" data-action="debug" ${c.energy<2?"disabled":""}><b>DEBUG</b><small>COSTO: 2 ⚡ · +5 STRESS</small></button>
-      <button type="button" data-action="defend" ${c.energy<1?"disabled":""}><b>DIFESA</b><small>COSTO: 1 ⚡ · -3 STRESS</small></button>
+      <button type="button" data-action="code" ${c.energy<1?"disabled":""}><b>CODICE</b><small>COSTO: 1 ⚡ · ~${c.codePreview} DMG · +3 STRESS</small></button>
+      <button type="button" data-action="debug" ${c.energy<2?"disabled":""}><b>DEBUG</b><small>COSTO: 2 ⚡ · ~${c.debugPreview} DMG · +5 STRESS</small></button>
+      <button type="button" data-action="defend" ${c.energy<1?"disabled":""}><b>DIFESA</b><small>COSTO: 1 ⚡ · +${c.defensePreview} BLOCCO · -3 STRESS</small></button>
     </div>
     <div class="battle-hand-label"><span>TOOL IN MANO</span><b>${c.hand.length} CARTE</b><button type="button" class="deck-counter" data-action="toggle-deck">MAZZO · ${c.drawPile.length} DISPONIBILI</button></div>
     <div class="hand">${c.hand.map((card,i)=>`<button type="button" class="card combat-card" data-card="${i}" data-poker-rendered="true" ${!c.canPlayCardForUi(card)?"disabled":""}>${renderPokerCard(card)}</button>`).join("")}</div>
@@ -193,7 +199,7 @@ return `<section class="battle battle-redesign">
       </div>
       <div class="deck-viewer-grid">${(c.deckView==="draw"?c.drawPile:c.deckView==="discard"?c.discardPile:c.consumedCards).map(card=>`<div class="deck-viewer-card">${renderPokerCard(card)}</div>`).join("")||`<p class="deck-viewer-empty">${c.deckView==="draw"?"Il mazzo è vuoto.":c.deckView==="discard"?"Nessuna carta negli scarti.":"Nessuna carta consumata."}</p>`}</div>
     </div>`:""}
-    <button type="button" class="end" data-action="end-turn">FINE TURNO</button>
+    <button type="button" class="end" data-action="end-turn">FINE TURNO → ATTACCO NEMICO (${c.incomingDamagePreview} DMG PREVISTI)</button>
   </section>
   <aside class="battle-side battle-enemy panel">
     <div class="battle-side-title"><span>NEMICO</span><b>INTENT</b></div>
