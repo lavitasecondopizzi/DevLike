@@ -13,20 +13,22 @@ const NODE_TEMPLATES: Record<Exclude<MapNodeType, "boss">, Array<{ title: string
     { title: "PROD", description: "È venerdì pomeriggio. La produzione ha altri piani." }
   ],
   event: [
-    { title: "EVENTO", description: "Una decisione discutibile potrebbe salvare la commessa." },
-    { title: "IMPREVISTO", description: "Il cliente ha detto 'non tocco niente'." }
+    { title: "IMPREVISTO", description: "Il cliente ha detto 'non tocco niente'." },
+    { title: "DECISIONE", description: "Una scelta rischiosa potrebbe salvare la commessa." }
   ],
   rest: [
     { title: "PAUSA", description: "Cinque minuti di pausa. Nessuno deve saperlo." },
     { title: "CAFFÈ", description: "Il compilatore non si lamenta del caffè." }
   ],
-  fullRest: [{ title: "RECUPERO TOTALE", description: "Ricarica completamente HP e Stress di tutto il team." }],
+  fullRest: [
+    { title: "RECUPERO TOTALE", description: "Ricarica completamente HP e Stress di tutto il team." }
+  ],
   reward: [
-    { title: "TOOLBOX", description: "Un nuovo Tool entra nel tuo arsenale." },
+    { title: "TOOL", description: "Hai trovato un nuovo Tool per il tuo mazzo." },
     { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }
   ],
   item: [
-    { title: "EQUIPMENT", description: "Hai trovato un oggetto utile. Puoi equipaggiarlo o conservarlo nello zaino." },
+    { title: "EQUIPAGGIAMENTO", description: "Hai trovato un oggetto utile. Puoi equipaggiarlo o conservarlo nello zaino." },
     { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }
   ],
   recruit: [
@@ -34,6 +36,15 @@ const NODE_TEMPLATES: Record<Exclude<MapNodeType, "boss">, Array<{ title: string
     { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }
   ]
 };
+
+const MAP_STAGES: Exclude<MapNodeType, "boss">[][] = [
+  ["battle", "event", "item"],
+  ["battle", "reward", "recruit"],
+  ["battle", "elite", "event"],
+  ["rest", "reward", "item"],
+  ["battle", "elite", "recruit"],
+  ["battle", "elite", "reward"]
+];
 
 function randomTemplate(type: Exclude<MapNodeType, "boss">) {
   const list = NODE_TEMPLATES[type];
@@ -71,49 +82,79 @@ function createNode(game: Game, row: number, col: number, type: Exclude<MapNodeT
   };
 }
 
+function connectAdjacentRows(nodes: MapNode[], fromRow: number, toRow: number) {
+  const from = nodes.filter(node => node.row === fromRow);
+  const to = nodes.filter(node => node.row === toRow);
+
+  from.forEach(node => {
+    const candidates = to
+      .filter(target => Math.abs(target.col - node.col) <= 1)
+      .sort(() => Math.random() - 0.5);
+
+    // Each choice should normally lead to one or two meaningful alternatives.
+    const count = candidates.length > 1 && Math.random() < 0.55 ? 2 : 1;
+    node.next = candidates.slice(0, count).map(target => target.id);
+  });
+
+  // Guarantee that every node in the next stage can actually be reached.
+  to.forEach(target => {
+    if (from.some(source => source.next.includes(target.id))) return;
+
+    const source = from
+      .filter(node => Math.abs(node.col - target.col) <= 1)
+      .sort((a, b) => Math.abs(a.col - target.col) - Math.abs(b.col - target.col))[0];
+
+    if (source && !source.next.includes(target.id)) source.next.push(target.id);
+  });
+}
+
 /**
- * Replaces the map generator at runtime without intersecting Game's private
- * generateMap declaration at compile time.
+ * Runtime map generator. The map has a fixed six-stage structure so every
+ * stage has a clear gameplay purpose instead of three arbitrary node types.
  */
 const GamePrototype = Game.prototype as unknown as {
   generateMap: () => void;
 };
 
 GamePrototype.generateMap = function(this: Game) {
-  const finalRow = 7;
   const nodes: MapNode[] = [{
     id: "start",
     row: 0,
     col: 1,
     type: "rest",
     title: "START",
-    description: "La commessa parte. Per ora non è ancora esploso.",
+    description: "La commessa parte. Per ora non è ancora esplosa.",
     next: [],
     visited: true,
     hiddenEncounter: false
   }];
 
-  const rowNodes = (row: number) => nodes.filter(node => node.row === row);
+  MAP_STAGES.forEach((stageTypes, index) => {
+    const row = index + 1;
+    const types = [...stageTypes].sort(() => Math.random() - 0.5);
 
-  const firstRowTypes: Exclude<MapNodeType, "boss">[] = ["battle", "recruit", "item"];
-  firstRowTypes.forEach((type, col) => nodes.push(createNode(this, 1, col, type)));
-
-  // Every stage always contains the complete three-column graph.
-  // The player can only travel along edges that become available from the
-  // currently visited node, but no node is omitted from the map.
-  for (let row = 2; row < finalRow; row++) {
-    const typePool: Exclude<MapNodeType, "boss">[] = ["battle", "event", "rest", "reward", "item", "recruit"];
-    if (row === 4) typePool.push("elite");
-
-    [0, 1, 2].forEach(col => {
-      const type = typePool[Math.floor(Math.random() * typePool.length)];
+    types.forEach((type, col) => {
       nodes.push(createNode(this, row, col, type));
     });
-  }
 
-  nodes.push({
-    id: "boss",
-    row: finalRow,
+    connectAdjacentRows(nodes, row - 1, row);
+  });
+
+  const finalRest: MapNode = {
+    id: "rest-final",
+    row: 7,
+    col: 1,
+    type: "rest",
+    title: "PAUSA FINALE",
+    description: "Ultima pausa prima della Deadline. Recupera il team e preparati allo scontro.",
+    next: ["boss-final"],
+    visited: false,
+    hiddenEncounter: false
+  };
+
+  const finalBoss: MapNode = {
+    id: "boss-final",
+    row: 8,
     col: 1,
     type: "boss",
     title: "DEADLINE",
@@ -122,18 +163,13 @@ GamePrototype.generateMap = function(this: Game) {
     visited: false,
     hiddenEncounter: false,
     enemyId: boss.id
+  };
+
+  nodes.push(finalRest, finalBoss);
+
+  nodes.filter(node => node.row === 6).forEach(node => {
+    node.next = [finalRest.id];
   });
-
-  for (let row = 0; row < finalRow; row++) {
-    const from = rowNodes(row);
-    const to = rowNodes(row + 1);
-
-    from.forEach(node => {
-      node.next = to
-        .filter(target => Math.abs(target.col - node.col) <= 1)
-        .map(target => target.id);
-    });
-  }
 
   this.mapNodes = nodes;
   this.currentMapNodeId = "start";
