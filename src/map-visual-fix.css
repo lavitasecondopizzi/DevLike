@@ -1,5 +1,6 @@
 /* MAP PATH HISTORY */
-.map-lines .map-line:not(.active){display:none!important}
+/* Keep the complete generated graph visible. The active path is highlighted separately. */
+.map-lines .map-line{display:block!important}
 
 /* Visited nodes remain active-looking, but clearly darker and non-interactive. */
 .map-node.visited:not(.current){
