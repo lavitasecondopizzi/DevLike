@@ -173,14 +173,15 @@ return `<section class="battle battle-redesign">
         <div class="battle-effective-stat stat-tooltip" ${activeStats.hasDebugTip?`data-tooltip="${esc(activeStats.debugTip)}"`:""}><b>DEBUG</b><strong>${activeStats.debug}</strong></div>
       </div>
     </div>
-    <div class="battle-energy"><span>ENERGIA</span><strong>${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</strong></div>
+    <div class="battle-energy"><span>ENERGIA</span><strong>${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</strong><small>3 MAX</small></div>
     <div class="battle-actions">
-      <button type="button" data-action="code" ${c.energy<1?"disabled":""}><b>CODICE</b><small>1 ⚡ · attacco base</small></button>
-      <button type="button" data-action="debug" ${c.energy<2?"disabled":""}><b>DEBUG</b><small>2 ⚡ · attacco potente</small></button>
-      <button type="button" data-action="defend" ${c.energy<1?"disabled":""}><b>DIFESA</b><small>1 ⚡ · riduce danni</small></button>
+      <button type="button" data-action="code" ${c.energy<1?"disabled":""}><b>CODICE</b><small>COSTO: 1 ⚡ · +3 STRESS</small></button>
+      <button type="button" data-action="debug" ${c.energy<2?"disabled":""}><b>DEBUG</b><small>COSTO: 2 ⚡ · +5 STRESS</small></button>
+      <button type="button" data-action="defend" ${c.energy<1?"disabled":""}><b>DIFESA</b><small>COSTO: 1 ⚡ · -3 STRESS</small></button>
     </div>
-    <div class="battle-hand-label"><span>TOOL IN MANO</span><b>${c.hand.length} CARTE</b></div>
+    <div class="battle-hand-label"><span>TOOL IN MANO</span><b>${c.hand.length} CARTE</b><button type="button" class="deck-counter" data-action="toggle-deck">MAZZO · ${c.drawPile.length} DISPONIBILI</button></div>
     <div class="hand">${c.hand.map((card,i)=>`<button type="button" class="card combat-card" data-card="${i}" data-poker-rendered="true" ${card.cost>c.energy?"disabled":""}>${renderPokerCard(card)}</button>`).join("")}</div>
+    ${c.showDeck?`<div class="deck-viewer"><div class="deck-viewer-head"><b>MAZZO — ${c.drawPile.length} CARTE DISPONIBILI</b><button type="button" data-action="toggle-deck">CHIUDI</button></div><div class="deck-viewer-grid">${c.drawPile.map(card=>`<div class="deck-viewer-card">${renderPokerCard(card)}</div>`).join("")||"<p>Non ci sono carte disponibili nel mazzo.</p>"}</div></div>`:""}
     <button type="button" class="end" data-action="end-turn">FINE TURNO</button>
   </section>
   <aside class="battle-side battle-enemy panel">
@@ -232,7 +233,7 @@ return `<section class="battle battle-redesign">
 }
 
 function bind(game:Game){
-  root.querySelectorAll<HTMLElement>("[data-action]").forEach(el=>el.onclick=()=>{const a=el.dataset.action;if(a==="start")game.start();if(a==="confirm-start")game.confirmStartingDeveloper();if(a==="confirm-battle")game.confirmBattleStarter();if(a==="code")game.combat?.basicAction("code");if(a==="debug")game.combat?.basicAction("debug");if(a==="defend")game.combat?.basicAction("defend");if(a==="end-turn")game.combat?.endTurn();if(a==="reward")game.chooseReward(0);if(a==="confirm-recruit")game.confirmRecruitment();if(a==="confirm-item")game.confirmItemReward();if(a==="store-item")game.storeItemReward();if(a==="open-equipment")game.openEquipment();if(a==="close-equipment")game.closeEquipment();if(a==="restart")game.restart();render(game);if(game.screen==="combat"&&game.combat?.result!=="ongoing"){game.onCombatFinished();render(game);}});
+  root.querySelectorAll<HTMLElement>("[data-action]").forEach(el=>el.onclick=()=>{const a=el.dataset.action;if(a==="start")game.start();if(a==="confirm-start")game.confirmStartingDeveloper();if(a==="confirm-battle")game.confirmBattleStarter();if(a==="code")game.combat?.basicAction("code");if(a==="debug")game.combat?.basicAction("debug");if(a==="defend")game.combat?.basicAction("defend");if(a==="toggle-deck")game.combat?.toggleDeck();if(a==="end-turn")game.combat?.endTurn();if(a==="reward")game.chooseReward(0);if(a==="confirm-recruit")game.confirmRecruitment();if(a==="confirm-item")game.confirmItemReward();if(a==="store-item")game.storeItemReward();if(a==="open-equipment")game.openEquipment();if(a==="close-equipment")game.closeEquipment();if(a==="restart")game.restart();render(game);if(game.screen==="combat"&&game.combat?.result!=="ongoing"){game.onCombatFinished();render(game);}});
   root.querySelectorAll<HTMLElement>("[data-event-choice]").forEach(el=>el.onclick=()=>{game.chooseEvent(Number(el.dataset.eventChoice));render(game);});
   root.querySelectorAll<HTMLElement>("[data-boss-reward]").forEach(el=>el.onclick=()=>{game.chooseBossReward(Number(el.dataset.bossReward));render(game);});
   root.querySelectorAll<HTMLElement>("[data-dev]").forEach(el=>el.onclick=e=>{e.preventDefault();if(game.screen==="team"){const index=game.startingCandidates.findIndex(d=>d.id===el.dataset.dev);if(index>=0)game.selectStartingDeveloper(index);}render(game);});
