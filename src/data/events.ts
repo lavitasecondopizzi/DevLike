@@ -109,9 +109,13 @@ export function randomEvent(): GameEvent {
   return gameEvents[Math.floor(Math.random() * gameEvents.length)];
 }
 
-export function randomEventReward(kind: "tool"): Card;
-export function randomEventReward(kind: "item"): Item;
-export function randomEventReward(kind: "tool" | "item"): Card | Item {
-  if (kind === "tool") return rewardCards[Math.floor(Math.random() * rewardCards.length)];
-  return rewardItems[Math.floor(Math.random() * rewardItems.length)];
+export function randomEventReward(kind: "tool", maxTier?: number): Card;
+export function randomEventReward(kind: "item", maxScore?: number): Item;
+export function randomEventReward(kind: "tool" | "item", limit?: number): Card | Item {
+  if (kind === "tool") {
+    const pool=rewardCards.filter(card=>(card.tier??1)<=Math.max(1,limit??1));
+    return pool[Math.floor(Math.random()*pool.length)]??rewardCards[0];
+  }
+  const pool=rewardItems.filter(item=>item.codeBonus+item.debugBonus<=Math.max(1,limit??3));
+  return pool[Math.floor(Math.random()*pool.length)]??rewardItems[0];
 }
