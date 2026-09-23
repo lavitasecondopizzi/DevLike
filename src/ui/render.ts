@@ -181,8 +181,18 @@ return `<section class="battle battle-redesign">
       <button type="button" data-action="defend" ${c.energy<1?"disabled":""}><b>DIFESA</b><small>COSTO: 1 ⚡ · -3 STRESS</small></button>
     </div>
     <div class="battle-hand-label"><span>TOOL IN MANO</span><b>${c.hand.length} CARTE</b><button type="button" class="deck-counter" data-action="toggle-deck">MAZZO · ${c.drawPile.length} DISPONIBILI</button></div>
-    <div class="hand">${c.hand.map((card,i)=>`<button type="button" class="card combat-card" data-card="${i}" data-poker-rendered="true" ${card.cost>c.energy?"disabled":""}>${renderPokerCard(card)}</button>`).join("")}</div>
-    ${c.showDeck?`<div class="deck-viewer"><div class="deck-viewer-head"><b>MAZZO — ${c.drawPile.length} CARTE DISPONIBILI</b><button type="button" data-action="toggle-deck">CHIUDI</button></div><div class="deck-viewer-grid">${c.drawPile.map(card=>`<div class="deck-viewer-card">${renderPokerCard(card)}</div>`).join("")||"<p>Non ci sono carte disponibili nel mazzo.</p>"}</div></div>`:""}
+    <div class="hand">${c.hand.map((card,i)=>`<button type="button" class="card combat-card" data-card="${i}" data-poker-rendered="true" ${!c.canPlayCardForUi(card)?"disabled":""}>${renderPokerCard(card)}</button>`).join("")}</div>
+    ${c.showDeck?`<div class="deck-viewer">
+      <div class="deck-viewer-head">
+        <div class="deck-viewer-tabs">
+          <button type="button" class="${c.deckView==="draw"?"active":""}" data-deck-view="draw">MAZZO · ${c.drawPile.length}</button>
+          <button type="button" class="${c.deckView==="discard"?"active":""}" data-deck-view="discard">SCARTI · ${c.discardPile.length}</button>
+          ${c.consumedCards.length?`<button type="button" class="${c.deckView==="consumed"?"active":""}" data-deck-view="consumed">CONSUMATE · ${c.consumedCards.length}</button>`:""}
+        </div>
+        <button type="button" data-action="toggle-deck">CHIUDI</button>
+      </div>
+      <div class="deck-viewer-grid">${(c.deckView==="draw"?c.drawPile:c.deckView==="discard"?c.discardPile:c.consumedCards).map(card=>`<div class="deck-viewer-card">${renderPokerCard(card)}</div>`).join("")||`<p class="deck-viewer-empty">${c.deckView==="draw"?"Il mazzo è vuoto.":c.deckView==="discard"?"Nessuna carta negli scarti.":"Nessuna carta consumata."}</p>`}</div>
+    </div>`:""}
     <button type="button" class="end" data-action="end-turn">FINE TURNO</button>
   </section>
   <aside class="battle-side battle-enemy panel">
@@ -235,7 +245,8 @@ return `<section class="battle battle-redesign">
 
 function bind(game:Game){
   root.querySelectorAll<HTMLElement>("[data-action]").forEach(el=>el.onclick=()=>{const a=el.dataset.action;if(a==="start")game.start();if(a==="confirm-start")game.confirmStartingDeveloper();if(a==="confirm-battle")game.confirmBattleStarter();if(a==="code")game.combat?.basicAction("code");if(a==="debug")game.combat?.basicAction("debug");if(a==="defend")game.combat?.basicAction("defend");if(a==="toggle-deck")game.combat?.toggleDeck();if(a==="end-turn")game.combat?.endTurn();if(a==="reward")game.chooseReward(0);if(a==="confirm-recruit")game.confirmRecruitment();if(a==="confirm-item")game.confirmItemReward();if(a==="store-item")game.storeItemReward();if(a==="open-equipment")game.openEquipment();if(a==="close-equipment")game.closeEquipment();if(a==="restart")game.restart();render(game);if(game.screen==="combat"&&game.combat?.result!=="ongoing"){game.onCombatFinished();render(game);}});
-  root.querySelectorAll<HTMLElement>("[data-event-choice]").forEach(el=>el.onclick=()=>{game.chooseEvent(Number(el.dataset.eventChoice));render(game);});
+  root.querySelectorAll<HTMLElement>("[data-deck-view]").forEach(el=>el.onclick=()=>{game.combat?.setDeckView((el.dataset.deckView||"draw") as "draw"|"discard"|"consumed");render(game);});
+   root.querySelectorAll<HTMLElement>("[data-event-choice]").forEach(el=>el.onclick=()=>{game.chooseEvent(Number(el.dataset.eventChoice));render(game);});
   root.querySelectorAll<HTMLElement>("[data-boss-reward]").forEach(el=>el.onclick=()=>{game.chooseBossReward(Number(el.dataset.bossReward));render(game);});
   root.querySelectorAll<HTMLElement>("[data-dev]").forEach(el=>el.onclick=e=>{e.preventDefault();if(game.screen==="team"){const index=game.startingCandidates.findIndex(d=>d.id===el.dataset.dev);if(index>=0)game.selectStartingDeveloper(index);}render(game);});
   root.querySelectorAll<HTMLElement>("[data-card]").forEach(el=>el.onclick=()=>{game.combat?.playCard(Number(el.dataset.card));render(game);if(game.combat?.result!=="ongoing"){game.onCombatFinished();render(game);}});
