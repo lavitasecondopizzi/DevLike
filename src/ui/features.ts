@@ -32,9 +32,9 @@ function developerDetails(d: Developer) {
 }
 
 function enemyDetails(e: Enemy) {
-  return `<div class="codex-detail-head"><div><span class="codex-kicker">NEMICO · ${esc(e.type)} · VALORI BASE</span><h2>${esc(e.name)}</h2></div></div>
+  return `<div class="codex-detail-head"><div><span class="codex-kicker">NEMICO · TIER ${e.tier} · ${esc(e.type)} · VALORI BASE</span><h2>${esc(e.name)}</h2></div></div>
     <p class="codex-description">${esc(e.description)}</p>
-    <div class="codex-stats"><span>HP <b>${e.maxHp}</b></span><span>CODICE <b>${e.code}</b></span><span>DEBUG <b>${e.debug}</b></span><span>DMG <b>${e.intent.damage}</b></span><span>STRESS <b>+${e.intent.stress}</b></span></div>
+    <div class="codex-stats"><span>TIER <b>${e.tier}</b></span><span>HP <b>${e.maxHp}</b></span><span>CODICE <b>${e.code}</b></span><span>DEBUG <b>${e.debug}</b></span><span>DMG <b>${e.intent.damage}</b></span><span>STRESS <b>+${e.intent.stress}</b></span></div>
     <section class="codex-block"><h3>ABILITÀ</h3><p>${esc(e.passive)}</p></section>
     <section class="codex-block"><h3>INTENZIONE</h3><p>${esc(e.intent.label)} · ${e.intent.damage} danni · +${e.intent.stress} Stress</p></section>
     <div class="codex-two"><section class="codex-block"><h3>VANTAGGI</h3>${e.advantages.map(x => `<p>${esc(x)}</p>`).join("")}</section><section class="codex-block"><h3>DEBOLEZZE</h3>${e.weaknesses.map(x => `<p>${esc(x)}</p>`).join("")}</section></div>`;
