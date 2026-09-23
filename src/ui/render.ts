@@ -62,11 +62,11 @@ const effectiveStats=(d:Developer,isActive=false)=>{
   let code=d.code+codeItems+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
   let debug=d.debug+debugItems+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
 
-  const multipliers:(keyof Developer)[]=[] as any;
+  const conditionMatches=(condition:string)=>condition==="lowHp"?d.hp<d.maxHp*.5:condition==="highStress"?d.stress>=50:condition==="fullHp"?d.hp>=d.maxHp:condition==="highEnergy"?c.energy>=2:condition==="defending"?c.block>0:condition==="afterTool"?c.toolPlayedThisTurn:condition==="everyTwoTurns"?c.turn%2===0:false;
   let multiplier=1;
   if(d.advantageEnemyIds.includes(enemy.typeId)){multiplier*=1.15;codeParts.push("Vantaggio vs nemico: +15%");debugParts.push("Vantaggio vs nemico: +15%");}
   if(d.weaknessEnemyIds.includes(enemy.typeId)){multiplier*=.85;codeParts.push("Debolezza vs nemico: -15%");debugParts.push("Debolezza vs nemico: -15%");}
-  if(d.advantageConditions.some(x=>c["conditionMatches"](x,d))){multiplier*=1.1;codeParts.push("Condizione favorevole: +10%");debugParts.push("Condizione favorevole: +10%");}
+  if(d.advantageConditions.some(x=>conditionMatches(x))){multiplier*=1.1;codeParts.push("Condizione favorevole: +10%");debugParts.push("Condizione favorevole: +10%");}
   if(d.weaknessConditions.some(x=>c["conditionMatches"](x,d))){multiplier*=.9;codeParts.push("Condizione sfavorevole: -10%");debugParts.push("Condizione sfavorevole: -10%");}
   if(enemy.weaknessDeveloperIds.includes(d.classId)){multiplier*=1.15;codeParts.push("Nemico debole contro questa classe: +15%");debugParts.push("Nemico debole contro questa classe: +15%");}
   if(enemy.advantageDeveloperIds.includes(d.classId)){multiplier*=.9;codeParts.push("Nemico avvantaggiato: -10%");debugParts.push("Nemico avvantaggiato: -10%");}
