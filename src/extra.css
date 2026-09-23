@@ -696,3 +696,80 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   border-color:#d35b67!important;
   background:#472027!important;
 }
+
+
+/* COMBAT HUD LAYOUT FIX */
+.battle-redesign .battle-main{
+  grid-template-rows:auto auto auto auto auto auto minmax(0,1fr) auto!important;
+  gap:8px!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.battle-redesign .battle-hand-label{
+  min-height:22px!important;
+}
+.battle-redesign .hand{
+  min-height:0!important;
+  height:100%!important;
+  align-items:stretch!important;
+  overflow:hidden!important;
+}
+.battle-redesign .hand .combat-card{
+  all:unset!important;
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:stretch!important;
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  height:100%!important;
+  box-sizing:border-box!important;
+  cursor:pointer!important;
+}
+.battle-redesign .hand .combat-card .poker-card{
+  flex:1 1 auto!important;
+  width:100%!important;
+  height:auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  aspect-ratio:auto!important;
+  box-sizing:border-box!important;
+}
+.battle-redesign .hand .combat-card-preview{
+  flex:0 0 22px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:22px!important;
+  margin:0!important;
+  padding:3px 6px!important;
+  border-top:1px solid #35465b!important;
+  background:#101923!important;
+  color:#c5d8ec!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  letter-spacing:.03em!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.battle-redesign .hand .combat-card-reason{
+  flex:0 0 22px!important;
+  min-height:22px!important;
+  padding:3px 6px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+}
+.battle-redesign .hand .combat-card:disabled{
+  cursor:not-allowed!important;
+}
+.battle-redesign .hand .combat-card:disabled .poker-card{
+  opacity:.45!important;
+}
