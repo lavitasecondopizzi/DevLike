@@ -5,9 +5,9 @@ import { rewardItems } from "../data/items";
 import type { Card, Developer, Enemy, Item, MapNode, MapNodeType } from "../entities/types";
 import { Combat } from "./Combat";
 
-export type GameScreen = "menu" | "team" | "map" | "battleSetup" | "combat" | "reward" | "itemReward" | "recruit" | "equipment" | "result";
+export type GameScreen = "menu" | "team" | "map" | "battleSetup" | "combat" | "reward" | "itemReward" | "bossReward" | "recruit" | "equipment" | "result";
 type NormalNodeType = Exclude<MapNodeType, "boss">;
-type EquipmentSource = { zone: "dev" | "bag"; devIndex: number; itemIndex: number };
+type EquipmentSource = { zone: "dev" | "bag"; devIndex: number; itemIndex: number };\ntype BossRewardOption = { kind: "item" | "tool"; item?: Item; card?: Card };
 
 const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description: string }>> = {
   battle: [{ title: "BUG", description: "Qualcosa funziona. Quindi sicuramente c'è un bug." }, { title: "MEETING", description: "Poteva essere una mail." }, { title: "LEGACY", description: "Non sai chi l'ha scritto. Non sai perché esiste." }],
@@ -32,8 +32,8 @@ const MAP_NODE_COST: Partial<Record<NormalNodeType, number>> = {
 };
 
 export class Game {
-  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; inventory:Item[]=[]; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
-  start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
+  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; inventory:Item[]=[]; bossRewardOptions:BossRewardOption[]=[]; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
+  start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.bossRewardOptions=[];this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
   private cloneItem(item:Item):Item{return {...item};}
   private cloneDeveloper(dev:Developer):Developer{return {...dev,items:dev.items.map(x=>this.cloneItem(x))};}
   private randomDevelopers(count:number,excluded:string[]=[]){const pool=developers.filter(d=>!excluded.includes(d.id));return [...pool].sort(()=>Math.random()-.5).slice(0,count).map(d=>this.cloneDeveloper(d));}
@@ -182,6 +182,27 @@ export class Game {
   enterRandomBattle(){this.prepareBattle(this.randomEnemy());}
   enterBoss(){this.prepareBattle(this.scaleEnemy({...boss,intent:{...boss.intent}}));}
   chooseReward(_cardIndex:number){if(!this.reward)return;this.deck.push({...this.reward});this.reward=null;this.screen="map";this.message="Tool acquisito. Scegli il prossimo nodo.";}
+  private shuffle<T>(items:T[]):T[]{return [...items].sort(()=>Math.random()-.5);}
+  private generateBossRewards(){
+    const items=this.shuffle(rewardItems).slice(0,3).map(item=>({kind:"item" as const,item:this.cloneItem(item)}));
+    const tools=this.shuffle(rewardCards).slice(0,3).map(card=>({kind:"tool" as const,card:{...card}}));
+    this.bossRewardOptions=[...items,...tools];
+    this.screen="bossReward";
+    this.message="La DEADLINE è stata chiusa. Scegli UNA sola ricompensa: 3 oggetti da mettere nello ZAINO oppure 3 Tool.";
+  }
+  chooseBossReward(index:number){
+    const option=this.bossRewardOptions[index];
+    if(!option)return;
+    if(option.kind==="item"&&option.item){
+      this.inventory.push(this.cloneItem(option.item));
+      this.message=`${option.item.name} ottenuto e messo nello ZAINO.`;
+    }else if(option.kind==="tool"&&option.card){
+      this.deck.push({...option.card});
+      this.message=`${option.card.name} aggiunto al MAZZO.`;
+    }else return;
+    this.bossRewardOptions=[];
+    this.screen="map";
+  }
   generateReward(){const reward=rewardCards[Math.floor(Math.random()*rewardCards.length)];if(reward)this.reward={...reward};this.screen="reward";}
   generateItemReward(){const item=rewardItems[Math.floor(Math.random()*rewardItems.length)];if(!item)return;this.itemReward=this.cloneItem(item);this.selectedItemTargetIndex=null;this.screen="itemReward";this.message="Oggetto sbloccato. Puoi equipaggiarlo subito oppure metterlo nello zaino.";}
   selectItemTarget(index:number){if(!this.team[index]||this.team[index].items.length>=2||!this.itemReward)return;this.selectedItemTargetIndex=index;}
@@ -193,6 +214,13 @@ export class Game {
   selectEquipmentSource(zone:"dev"|"bag",itemIndex:number,devIndex=-1){const team=this.equipmentTeam;const item=zone==="bag"?this.inventory[itemIndex]:team[devIndex]?.items[itemIndex];if(!item)return;this.equipmentSource={zone,itemIndex,devIndex};}
   moveSelectedEquipment(targetZone:"dev"|"bag",targetDevIndex=-1,targetItemIndex=-1){const source=this.equipmentSource;if(!source)return;const team=this.equipmentTeam;const sourceItems=source.zone==="bag"?this.inventory:team[source.devIndex]?.items;if(!sourceItems||!sourceItems[source.itemIndex])return;if(targetZone==="dev"){const targetItems=team[targetDevIndex]?.items;if(!targetItems||targetItemIndex<0||targetItemIndex>1)return;if(source.zone==="dev"&&source.devIndex===targetDevIndex&&source.itemIndex===targetItemIndex)return;const sourceItem=sourceItems[source.itemIndex],targetItem=targetItems[targetItemIndex];if(source.zone==="dev"&&source.devIndex===targetDevIndex){[targetItems[targetItemIndex],targetItems[source.itemIndex]]=[targetItems[source.itemIndex],targetItems[targetItemIndex]];}else{if(targetItem)sourceItems[source.itemIndex]=targetItem;else sourceItems.splice(source.itemIndex,1);targetItems[targetItemIndex]=sourceItem;}}else if(source.zone==="bag"){if(targetItemIndex>=0&&targetItemIndex<this.inventory.length)[this.inventory[source.itemIndex],this.inventory[targetItemIndex]]=[this.inventory[targetItemIndex],this.inventory[source.itemIndex]];}else{this.inventory.push(sourceItems[source.itemIndex]);sourceItems.splice(source.itemIndex,1);}this.equipmentSource=null;}
   updateTeamFromCombat(){if(this.combat)this.team=this.combat.team;}
-  onCombatFinished(){this.updateTeamFromCombat();if(this.combat?.result==="victory"){if(this.combat.enemy.id==="deadline"){this.team.forEach(dev=>{dev.hp=dev.maxHp;dev.stress=0;});this.projectNumber+=1;this.difficulty+=.5;this.generateMap();this.screen="map";this.message=`COMMESSA COMPLETATA. Team completamente ripristinato: HP e STRESS azzerati. Commessa #${this.projectNumber} · difficoltà x${this.difficulty.toFixed(1)}.`;}else{const winner=this.team.find(dev=>dev.id==="freelancer");if(winner)winner.hp=Math.min(winner.maxHp,winner.hp+5);this.generateReward();}}else if(this.combat?.result==="defeat"){this.screen="result";this.message="COMMESSA FALLITA.";}}
+  onCombatFinished(){this.updateTeamFromCombat();if(this.combat?.result==="victory"){if(this.combat.enemy.id==="deadline"){
+      this.team.forEach(dev=>{dev.hp=dev.maxHp;dev.stress=0;});
+      this.projectNumber+=1;
+      this.difficulty+=.5;
+      this.generateMap();
+      this.tempo=8;
+      this.generateBossRewards();
+    }else{const winner=this.team.find(dev=>dev.id==="freelancer");if(winner)winner.hp=Math.min(winner.maxHp,winner.hp+5);this.generateReward();}}else if(this.combat?.result==="defeat"){this.screen="result";this.message="COMMESSA FALLITA.";}}
   restart(){this.start();}
 }
