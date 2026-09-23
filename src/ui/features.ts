@@ -55,7 +55,7 @@ function dataForCategory(category: string): Array<{ id: string; name: string; su
       .map(d => ({ id: d.id, name: d.name, tier: d.tier, subtitle: `T${d.tier} · ${d.role} · ${d.code} COD / ${d.debug} DEBUG`, details: developerDetails(d) }));
   }
   if (category === "enemies") {
-    return [...enemies, boss]
+    return [...enemies]
       .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "it"))
       .map(e => ({ id: e.id, name: e.name, tier: e.tier, subtitle: `T${e.tier} · ${e.type}`, details: enemyDetails(e) }));
   }
