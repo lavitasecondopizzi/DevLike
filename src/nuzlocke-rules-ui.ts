@@ -10,7 +10,7 @@ const labels: Record<NuzlockeRule, string> = {
   noSwitch:"NO CAMBIO", noBackpack:"NO ZAINO", oneEquipment:"UN SOLO EQUIPMENT", noCardRemoval:"NO RIMOZIONE CARTE", deckLock:"DECK LOCK",
   noRest:"NO PAUSA", randomPath:"PERCORSO CASUALE", eliteMandatory:"ELITE OBBLIGATORIA", noCode:"NO CODICE", noDebug:"NO DEBUG", noDefense:"NO DIFESA",
   noBattleSwitch:"CAMBIO VIETATO IN COMBATTIMENTO", twoEnergy:"2 ENERGIA", smallHand:"MANO DA 2", oneTool:"UN SOLO TOOL", noDuplicates:"NO DOPPIONI",
-  noCoffee:"NO CAFFÈ", noAI:"NO AI", noGit:"NO GIT", battleCardLock:"MONOUSO IN BATTAGLIA", consumableCards:"CARTE CONSUMABILI"
+  noCoffee:"NO CAFFÈ", noAI:"NO AI", noGit:"NO GIT", battleCardLock:"MONOUSO IN BATTAGLIA"
 };
 
 const groups: [string, NuzlockeRule[]][] = [
