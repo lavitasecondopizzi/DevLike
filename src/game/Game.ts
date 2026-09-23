@@ -66,6 +66,7 @@ export class Game {
     if(!from.length)return;
     from.forEach(node=>{
       const candidates=to
+        .filter(target=>Math.abs(target.col-node.col)<=1)
         .slice()
         .sort((x,y)=>Math.abs(x.col-node.col)-Math.abs(y.col-node.col)||Math.random()-.5);
       const count=Math.random()<.55?1:2;
@@ -75,6 +76,7 @@ export class Game {
     to.forEach(target=>{
       if(!from.some(source=>source.next.includes(target.id))){
         const source=from
+          .filter(source=>Math.abs(source.col-target.col)<=1)
           .slice()
           .sort((x,y)=>Math.abs(x.col-target.col)-Math.abs(y.col-target.col))[0];
         if(source&&!source.next.includes(target.id))source.next.push(target.id);
