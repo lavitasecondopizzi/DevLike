@@ -835,3 +835,51 @@ body::before{
 .game-shell h3{font-size:max(11px, 1.25rem)!important}
 .game-shell h4{font-size:max(11px, 1.1rem)!important}
 
+
+
+/* ===== DEVLIKE MAP REDESIGN ===== */
+.map-panel{display:flex;flex-direction:column;gap:14px}
+.map-status{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.tempo-badge,.map-progress{display:inline-flex;align-items:center;gap:7px;border:1px solid #334155;border-radius:999px;padding:7px 11px;background:#101a27;color:#a9b7c9;font-size:11px;line-height:1.2}
+.tempo-badge b,.map-progress b{color:#f8fafc;font-size:12px}
+.tempo-badge.ok{border-color:#315a76}.tempo-badge.ok b{color:#7dd3fc}
+.tempo-badge.basso{border-color:#7c5a27}.tempo-badge.basso b{color:#fbbf24}
+.tempo-badge.critico{border-color:#7f2935}.tempo-badge.critico b{color:#fb7185}
+.map-objective{display:flex;align-items:center;gap:10px;border:1px solid #263243;border-radius:8px;background:#0d141d;padding:10px 12px;color:#9aa7b8;font-size:12px;line-height:1.5}
+.map-objective strong{color:#93c5fd;font-size:11px;white-space:nowrap}
+.map-board{border:1px solid #263243;border-radius:10px;background:linear-gradient(180deg,#0d151f,#0a1119);padding:16px;min-height:280px}
+.map-history{display:flex;align-items:center;gap:8px;overflow-x:auto;padding-bottom:14px;border-bottom:1px solid #243142;scrollbar-width:thin}
+.map-history-step{display:flex;align-items:center;gap:7px;flex:0 0 auto;min-width:105px;padding:8px 10px;border:1px solid #2b394b;border-radius:8px;background:#111a25}
+.map-history-step>span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#1d2b3d;color:#93c5fd;font-size:11px;font-weight:700}
+.map-history-step b{display:block;color:#cbd5e1;font-size:11px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
+.map-history-step small{display:block;color:#718096;font-size:11px;line-height:1.3;margin-top:2px}
+.map-current-label{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:18px 4px 12px}
+.map-current-label span{font-size:11px;color:#718096;letter-spacing:.08em}
+.map-current-label b{font-size:15px;color:#e8edf5}
+.map-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.map-choice-wrap{min-width:0}
+.map-choice-wrap .map-node{position:relative!important;transform:none!important;left:auto!important;top:auto!important;width:100%!important;min-height:126px;padding:14px!important;display:flex;cursor:pointer}
+.map-choice-wrap .map-node:not(.available){cursor:default}
+.map-node{border-radius:10px!important;background:#111a25!important;border:1px solid #2f4054!important;box-shadow:0 5px 14px rgba(0,0,0,.2)!important;transition:transform .15s,border-color .15s,background .15s,box-shadow .15s}
+.map-node.available{border-color:#4f79a3!important;background:#142131!important;box-shadow:0 0 0 1px rgba(96,165,250,.12),0 8px 18px rgba(0,0,0,.22)!important}
+.map-node.available:hover:not(:disabled){transform:translateY(-2px)!important;border-color:#60a5fa!important;background:#17283b!important;box-shadow:0 0 0 2px rgba(96,165,250,.15),0 10px 22px rgba(0,0,0,.25)!important}
+.map-node .node-icon{font-size:24px!important;line-height:1;margin-bottom:4px}
+.map-node b{font-size:13px!important;line-height:1.35!important}
+.map-node small{font-size:11px!important;color:#8291a5!important;line-height:1.4}
+.map-node.type-battle.available{border-color:#3b82f6!important}
+.map-node.type-elite.available{border-color:#ef4444!important}
+.map-node.type-recruit.available{border-color:#a855f7!important}
+.map-node.type-reward.available{border-color:#eab308!important}
+.map-node.type-rest.available{border-color:#22c55e!important}
+.map-node.type-item.available{border-color:#06b6d4!important}
+.map-node.type-event.available{border-color:#f97316!important}
+.map-node.type-boss{border-color:#ef4444!important;background:#3a1218!important}
+.choice-panel{margin-top:0!important}
+.team-strip{margin-top:0!important}
+@media(max-width:800px){
+  .map-choice-grid{grid-template-columns:1fr}
+  .map-board{padding:12px}
+  .map-current-label{align-items:flex-start;flex-direction:column;gap:4px}
+  .map-status{justify-content:flex-start}
+  .map-objective{align-items:flex-start;flex-direction:column}
+}
