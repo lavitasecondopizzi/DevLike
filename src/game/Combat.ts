@@ -17,6 +17,29 @@ export class Combat {
   playCard(index:number):boolean{const card=this.hand[index];if(!card||this.result!=="ongoing")return false;if(!this.canPlayCard(card))return false;const costReduction=this.active.classId==="designer"&&!this.firstCardPlayed?1:0;const effectiveCost=Math.max(0,card.cost-costReduction);if(effectiveCost>this.energy)return false;this.energy-=effectiveCost;this.hand.splice(index,1);if(this.nuzlockeRules.includes("battleCardLock"))this.usedCards.add(card);if(this.nuzlockeRules.includes("consumableCards")){this.consumedCards.push(card);}else{this.discardPile.push(card);}this.firstCardPlayed=true;this.toolPlayedThisTurn=true;switch(card.effect.type){case "damage":{const damage=this.dealDamage(Math.round(card.effect.amount*(1+this.codeBoost/100)),"card");this.log.push(`${card.name}: ${damage} danni.`);break;}case "heal":this.active.hp=Math.min(this.active.maxHp,this.active.hp+card.effect.amount);this.log.push(`${card.name}: +${card.effect.amount} HP.`);break;case "removeStress":this.active.stress=Math.max(0,this.active.stress-card.effect.amount);this.log.push(`${card.name}: -${card.effect.amount} Stress.`);break;case "block":this.block+=card.effect.amount;this.log.push(`${card.name}: +${card.effect.amount} Difesa.`);break;case "codeBoost":this.codeBoost+=card.effect.amount;this.active.stress=Math.min(100,this.active.stress+10);this.log.push(`${card.name}: +${card.effect.amount}% Codice, +10 Stress.`);break;}this.temporaryCodeBonus=this.active.classId==="fullstack"?1:0;this.checkBurnout();this.checkVictory();if(this.result==="ongoing")this.autoSkipIfNoAction();return true;}
   basicAction(action:"code"|"debug"|"defend"):boolean{if(this.result!=="ongoing")return false;if(action!=="defend"&&this.energy<=0)return false;if(action==="code"){if(this.nuzlockeRules.includes("noCode"))return false;this.energy-=1;let damage=this.active.code+this.itemCodeBonus+this.temporaryCodeBonus;if(this.active.classId==="senior")damage+=2;damage=Math.round(damage*(1+this.codeBoost/100));const dealt=this.dealDamage(damage,"code");this.active.stress=Math.min(100,this.active.stress+3);this.log.push(`CODICE: ${dealt} danni, +3 Stress.`);}if(action==="debug"){if(this.nuzlockeRules.includes("noDebug")||this.energy<2)return false;this.energy-=2;let debug=this.active.debug+this.itemDebugBonus;if(this.active.hp<this.active.maxHp*.5&&this.active.classId==="junior")debug+=2;if(this.active.classId==="hacker"&&this.enemy.typeId==="client")debug+=3;const damage=Math.round(debug*1.5*(1+this.codeBoost/100));const dealt=this.dealDamage(damage,"debug");this.active.stress=Math.min(100,this.active.stress+5);this.log.push(`DEBUG: ${dealt} danni, +5 Stress.`);}if(action==="defend"){if(this.nuzlockeRules.includes("noDefense"))return false;const freeDefense=this.active.classId==="architect"&&!this.firstDefenseUsed;if(!freeDefense)this.energy-=1;this.firstDefenseUsed=true;this.block+=this.active.classId==="devops"?15:10;this.active.stress=Math.max(0,this.active.stress-3);this.log.push(`DIFESA: ${this.block} danni bloccati, -3 Stress${freeDefense?" (GRATIS)":""}.`);}this.checkBurnout();this.checkVictory();return true;}
   canPlayCardForUi(card:Card):boolean{return this.canPlayCard(card);}
+  get latestFeedback():string{return this.log[this.log.length-1]??"";}
+  get codePreview():number{
+    let damage=this.active.code+this.itemCodeBonus+this.temporaryCodeBonus;
+    if(this.active.classId==="senior")damage+=2;
+    damage=Math.round(damage*(1+this.codeBoost/100));
+    return this.previewDamage(damage,"code");
+  }
+  get debugPreview():number{
+    let debug=this.active.debug+this.itemDebugBonus;
+    if(this.active.hp<this.active.maxHp*.5&&this.active.classId==="junior")debug+=2;
+    if(this.active.classId==="hacker"&&this.enemy.typeId==="client")debug+=3;
+    return this.previewDamage(Math.round(debug*1.5*(1+this.codeBoost/100)),"debug");
+  }
+  get defensePreview():number{return this.active.classId==="devops"?15:10;}
+  get incomingDamagePreview():number{
+    const raw=Math.max(0,Math.round(this.enemy.intent.damage*this.incomingMultiplier(this.active)));
+    return Math.max(0,raw-this.block);
+  }
+  private previewDamage(amount:number,action:"code"|"debug"|"card"):number{
+    let adjusted=amount;
+    if(this.enemy.typeId==="legacy"&&action==="debug")adjusted=Math.max(0,adjusted-2);
+    return Math.max(0,Math.round(adjusted*this.damageMultiplier(this.active,action)));
+  }
   private canPlayCard(card:Card):boolean{
     if(this.nuzlockeRules.includes("oneTool")&&this.toolPlayedThisTurn)return false;
     if(this.nuzlockeRules.includes("battleCardLock")&&this.usedCards.has(card))return false;
