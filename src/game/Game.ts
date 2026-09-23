@@ -42,11 +42,17 @@ export class Game {
   selectStartingDeveloper(index:number){const c=this.startingCandidates[index];if(c)this.selectedStartingId=c.id;}
   confirmStartingDeveloper(){if(!this.selectedStartingId)return;const c=this.startingCandidates.find(d=>d.id===this.selectedStartingId);if(!c)return;this.team=[{...this.cloneDeveloper(c),hp:c.maxHp,stress:0,items:[]}];this.generateMap();this.screen="map";this.message=`${c.name} è il developer principale. Il primo bivio offre combattimento, evento e oggetto.`;}
   private randomTemplate(type:NormalNodeType){const list=NODE_TEMPLATES[type];return list[Math.floor(Math.random()*list.length)];}
-  private enemyForNode(type:"battle"|"elite"){const pool=type==="elite"?enemies.filter(e=>e.id==="client"||e.id==="legacy"):enemies;return pool[Math.floor(Math.random()*pool.length)]??enemies[0];}
+  private enemyForNode(type:"battle"|"elite",row=1){
+    const targetTier=Math.min(4,Math.max(1,Math.ceil(row/2)+(type==="elite"?1:0)));
+    const eligible=enemies.filter(e=>e.tier<=targetTier);
+    const tierPool=eligible.filter(e=>e.tier===targetTier);
+    const pool=tierPool.length?tierPool:eligible;
+    return pool[Math.floor(Math.random()*pool.length)]??enemies[0];
+  }
   private mapNode(type:NormalNodeType,row:number,col:number):MapNode{
     const t=this.randomTemplate(type);
     const battle=type==="battle"||type==="elite";
-    const source=battle?this.enemyForNode(type):undefined;
+    const source=battle?this.enemyForNode(type,row):undefined;
     const hidden=battle?Math.random()<.38:false;
     return {
       id:`r${row}c${col}-${Math.random().toString(36).slice(2,7)}`,
@@ -137,7 +143,7 @@ export class Game {
     this.tempo=Math.max(0,this.tempo-cost);
 
     if(node.type==="battle"||node.type==="elite"){
-      const source=enemies.find(e=>e.id===node.enemyId)??this.enemyForNode(node.type);
+      const source=enemies.find(e=>e.id===node.enemyId)??this.enemyForNode(node.type,node.row);
       this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}},node.row,node.type==="elite"));
     }else if(node.type==="reward"){
       this.generateReward();
@@ -181,7 +187,7 @@ export class Game {
   selectRecruitCandidate(index:number){if(!this.recruitCandidates[index])return;this.selectedRecruitIndex=index;if(this.team.length<3)this.confirmRecruitment();}
   selectRecruitTarget(index:number){if(this.team.length<3||!this.team[index])return;this.recruitTargetIndex=index;}
   confirmRecruitment(){if(this.selectedRecruitIndex===null)return;const c=this.recruitCandidates[this.selectedRecruitIndex];if(!c)return;const fresh={...c,hp:c.maxHp,stress:0,items:[]};if(this.team.length<3)this.team.push(fresh);else{if(this.recruitTargetIndex===null)return;this.team[this.recruitTargetIndex]=fresh;}this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.recruitCandidates=[];this.screen="map";this.message=`${c.name} entra nel team. Scegli il prossimo nodo.`;}
-  private randomEnemy(elite=false):Enemy{const pool=elite?enemies.filter(e=>e.id==="client"||e.id==="legacy"):enemies;const source=pool[Math.floor(Math.random()*pool.length)]??enemies[0];return this.scaleEnemy({...source,intent:{...source.intent}});}
+  private randomEnemy(elite=false):Enemy{const source=this.enemyForNode(elite?"elite":"battle",6);return this.scaleEnemy({...source,intent:{...source.intent}},6,elite);}
   private scaleEnemy(enemy:Enemy,row=6,elite=false):Enemy{const stageMultiplier=Math.min(1.3,0.85+(Math.max(1,Math.min(6,row))-1)*0.09);const m=this.difficulty*stageMultiplier;const hpMultiplier=m*(elite?1.2:1);const pressureMultiplier=m*(elite?1.1:1);return {...enemy,hp:Math.max(1,Math.round(enemy.maxHp*hpMultiplier)),maxHp:Math.max(1,Math.round(enemy.maxHp*hpMultiplier)),intent:{...enemy.intent,damage:Math.max(1,Math.round(enemy.intent.damage*pressureMultiplier)),stress:Math.max(1,Math.round(enemy.intent.stress*(1+(pressureMultiplier-1)*.5)))}};}
   startBattle(enemy:Enemy){this.combat=new Combat(this.team,enemy,this.deck);this.screen="combat";this.pendingEnemy=null;}
   enterRandomBattle(){this.prepareBattle(this.randomEnemy());}
