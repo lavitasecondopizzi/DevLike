@@ -19,7 +19,28 @@ const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description:
   item: [{ title: "EQUIPMENT", description: "Hai trovato un oggetto utile. Puoi equipaggiarlo o conservarlo nello zaino." }, { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }],
   recruit: [{ title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente un progetto." }, { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }]
 };
+const MAP_SCHEMES: NormalNodeType[][] = [
+  ["battle","event","item"],
+  ["battle","reward","recruit"],
+  ["battle","elite","event"],
+  ["rest","reward","item"],
+  ["battle","elite","recruit"],
+  ["battle","elite","reward"]
+];
+const MAP_NODE_COST: Partial<Record<NormalNodeType, number>> = {
+  battle:1, elite:2, event:1, rest:0, fullRest:0, reward:1, item:1, recruit:2
+};
+
 export class Game {
+  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; inventory:Item[]=[]; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
+  start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
+  private cloneItem(item:Item):Item{return {...item};}
+  private cloneDeveloper(dev:Developer):Developer{return {...dev,items:dev.items.map(x=>this.cloneItem(x))};}
+  private randomDevelopers(count:number,excluded:string[]=[]){const pool=developers.filter(d=>!excluded.includes(d.id));return [...pool].sort(()=>Math.random()-.5).slice(0,count).map(d=>this.cloneDeveloper(d));}
+  selectStartingDeveloper(index:number){const c=this.startingCandidates[index];if(c)this.selectedStartingId=c.id;}
+  confirmStartingDeveloper(){if(!this.selectedStartingId)return;const c=this.startingCandidates.find(d=>d.id===this.selectedStartingId);if(!c)return;this.team=[{...this.cloneDeveloper(c),hp:c.maxHp,stress:0,items:[]}];this.generateMap();this.screen="map";this.message=`${c.name} è il developer principale. Il primo bivio offre sempre combattimento, reclutamento e oggetto.`;}
+  private randomTemplate(type:NormalNodeType){const list=NODE_TEMPLATES[type];return list[Math.floor(Math.random()*list.length)];}
+  private enemyForNode(type:"battle"|"elite"){const pool=type==="elite"?enemies.filter(e=>e.id==="client"||e.id==="legacy"):enemies;return pool[Math.floor(Math.random()*pool.length)]??enemies[0];}
   private mapNode(type:NormalNodeType,row:number,col:number):MapNode{
     const t=this.randomTemplate(type);
     const battle=type==="battle"||type==="elite";
@@ -45,7 +66,7 @@ export class Game {
   }
 
   private appendBossNode(row:number){
-    const bossNode:MapNode={id:"boss",row,col:1,type:"boss",title:"DEADLINE",description:"DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.",next:[],visited:false,hiddenEncounter:false,enemyId:"deadline"};
+    const bossNode:MapNode={id:`boss-${row}-${Math.random().toString(36).slice(2,6)}`,row,col:1,type:"boss",title:"DEADLINE",description:"DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.",next:[],visited:false,hiddenEncounter:false,enemyId:"deadline"};
     this.mapNodes.push(bossNode);
     const current=this.currentMapNode;
     if(current)current.next=[bossNode.id];
@@ -59,18 +80,15 @@ export class Game {
     }
     const rest:MapNode={id:"rest-final",row:7,col:1,type:"rest",title:"PAUSA FINALE",description:"Ultima pausa prima della Deadline. Recupera il team e preparati allo scontro.",next:[],visited:false,hiddenEncounter:false};
     this.mapNodes.push(rest);
-    this.mapNodes.push({id:"boss",row:8,col:1,type:"boss",title:"DEADLINE",description:"DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.",next:[],visited:false,hiddenEncounter:false,enemyId:"deadline"});
-    rest.next=["boss"];
+    const bossNode:MapNode={id:"boss-final",row:8,col:1,type:"boss",title:"DEADLINE",description:"DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.",next:[],visited:false,hiddenEncounter:false,enemyId:"deadline"};
+    this.mapNodes.push(bossNode);
+    rest.next=[bossNode.id];
     const current=this.currentMapNode;
     if(current)current.next=[rest.id];
   }
 
   private generateMap(){
-    this.mapNodes=[{
-      id:"start",row:0,col:1,type:"rest",title:"START",
-      description:"Il progetto parte. Per ora non è ancora esploso.",
-      next:[],visited:true,hiddenEncounter:false
-    }];
+    this.mapNodes=[{id:"start",row:0,col:1,type:"rest",title:"START",description:"Il progetto parte. Per ora non è ancora esploso.",next:[],visited:true,hiddenEncounter:false}];
     this.currentMapNodeId="start";
     this.currentNode=0;
     this.tempo=8;
@@ -78,17 +96,14 @@ export class Game {
   }
 
   get currentMapNode(){return this.mapNodes.find(n=>n.id===this.currentMapNodeId)??null;}
-
   get availableMapNodes(){
     const c=this.currentMapNode;
     if(!c)return [];
     return c.next.map(id=>this.mapNodes.find(n=>n.id===id)).filter((n):n is MapNode=>n!==undefined&&!n.visited);
   }
-
   selectMapNode(id:string){
     const node=this.mapNodes.find(n=>n.id===id);
     if(!node||node.visited||!this.availableMapNodes.some(n=>n.id===id))return;
-
     this.currentMapNodeId=id;
     node.visited=true;
     this.currentNode=node.row;
@@ -105,30 +120,16 @@ export class Game {
       this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}}));
       return;
     }
-
-    if(node.type==="reward"){
-      this.generateReward();
-      return;
-    }
-
-    if(node.type==="item"){
-      this.generateItemReward();
-      return;
-    }
-
-    if(node.type==="recruit"){
-      this.openRecruitment();
-      return;
-    }
+    if(node.type==="reward"){this.generateReward();return;}
+    if(node.type==="item"){this.generateItemReward();return;}
+    if(node.type==="recruit"){this.openRecruitment();return;}
 
     if(node.type==="fullRest"){
       this.team.forEach(d=>{d.hp=d.maxHp;d.stress=0;});
       this.message="RECUPERO TOTALE: tutto il team è completamente guarito e senza Stress.";
     }else if(node.type==="rest"){
       this.team.forEach(d=>{d.hp=Math.min(d.maxHp,d.hp+14);d.stress=Math.max(0,d.stress-10);});
-      this.message=node.id==="rest-final"
-        ?"PAUSA FINALE: +14 HP e -10 STRESS al team. La Deadline aspetta."
-        :"PAUSA: +14 HP e -10 STRESS al team.";
+      this.message=node.id==="rest-final"?"PAUSA FINALE: +14 HP e -10 STRESS al team. La Deadline aspetta.":"PAUSA: +14 HP e -10 STRESS al team.";
     }else{
       if(Math.random()<.5){
         this.team.forEach(d=>d.stress=Math.max(0,d.stress-8));
@@ -144,12 +145,10 @@ export class Game {
       this.message="TEMPO ESAURITO. La DEADLINE è arrivata prima della prossima tappa.";
       return;
     }
-
     if(node.row>=6){
       this.appendFinalRestOrBoss();
       return;
     }
-
     this.appendStageChoices(node.row+1);
   }
 
