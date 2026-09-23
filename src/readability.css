@@ -414,3 +414,308 @@ button:focus-visible{
   .dev-description,.ability,.matchup-grid span{font-size:11px!important}
   .battle-redesign .battle-active-top h2{font-size:22px!important}
 }
+
+
+/* ===== DEVLIKE PALETTE v3 =====
+   Global palette supplied for the application:
+   #386D63 green / success
+   #1AAED5 cyan / information
+   #D78346 orange / logo and warning
+   #5C5598 purple / primary interface color
+   #BAB6C4 lavender-gray / readable neutral text
+*/
+:root{
+  --dl-green:#386D63;
+  --dl-cyan:#1AAED5;
+  --dl-orange:#D78346;
+  --dl-purple:#5C5598;
+  --dl-gray:#BAB6C4;
+
+  --dl-bg:#0d0d16;
+  --dl-surface:#171622;
+  --dl-surface-2:#211f30;
+  --dl-border:#3b394c;
+  --dl-border-soft:#302e40;
+  --dl-text:#f0edf3;
+  --dl-muted:#BAB6C4;
+}
+
+body{
+  color:var(--dl-text)!important;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(92,85,152,.20),transparent 42%),
+    radial-gradient(circle at 100% 45%,rgba(26,174,213,.07),transparent 34%),
+    var(--dl-bg)!important;
+}
+
+header,.panel{
+  border-color:var(--dl-border)!important;
+  background:var(--dl-surface)!important;
+}
+
+header{
+  box-shadow:0 8px 28px rgba(0,0,0,.24),0 0 0 1px rgba(92,85,152,.08);
+}
+
+button{
+  border-color:var(--dl-border)!important;
+  background:var(--dl-surface-2)!important;
+  color:var(--dl-text)!important;
+}
+button:hover:not(:disabled){
+  border-color:var(--dl-purple)!important;
+  background:#29263b!important;
+}
+button:focus-visible{
+  outline:2px solid var(--dl-cyan)!important;
+  outline-offset:2px;
+}
+
+/* Primary interaction color: purple. */
+.primary{
+  background:var(--dl-purple)!important;
+  border-color:#7169ad!important;
+  color:#fff!important;
+  box-shadow:0 4px 12px rgba(92,85,152,.28)!important;
+}
+.primary:hover:not(:disabled){
+  background:#6861a5!important;
+  border-color:#8179bd!important;
+}
+.secondary{
+  background:#252334!important;
+  border-color:#514d68!important;
+}
+.danger{
+  background:#352126!important;
+  border-color:#8e4f57!important;
+}
+
+/* Logo: orange. */
+.logo span{
+  color:var(--dl-orange)!important;
+}
+.center h1,
+.pixel-icon{
+  color:var(--dl-orange)!important;
+}
+
+/* Main readable text and muted UI text. */
+.game-shell p,
+.game-shell span,
+.game-shell b,
+.game-shell strong,
+.game-shell small,
+.game-shell label,
+.game-shell li{
+  color:inherit;
+}
+header small,
+.header-stat,
+.selection-heading p,
+.dev-head span,
+.dev-description,
+.selection-hint,
+.recruit-note,
+.map-top small,
+.roguelike-help,
+.choice-panel small,
+.battle-redesign .battle-log,
+.battle-redesign .battle-active-top small{
+  color:var(--dl-gray)!important;
+}
+
+/* Developer cards and selected states. */
+.dev-card{
+  border-color:#454257!important;
+  background:#1c1a28!important;
+}
+.dev-card:hover{
+  border-color:#5f5a79!important;
+  background:#211f30!important;
+}
+.dev-card.selected{
+  border-color:var(--dl-purple)!important;
+  background:#27243a!important;
+  box-shadow:0 0 0 1px var(--dl-purple),0 8px 24px rgba(0,0,0,.22)!important;
+}
+.dev-head b{color:#f0edf3!important}
+.dev-head span{color:var(--dl-gray)!important}
+.dev-description{color:#d0ccd5!important}
+
+/* Semantic accents from the palette. */
+.bar i{
+  background:var(--dl-green)!important;
+}
+.stress i{
+  background:var(--dl-orange)!important;
+}
+.ability strong{
+  color:var(--dl-cyan)!important;
+}
+.matchup-grid>div:first-child{
+  border-left:2px solid var(--dl-green)!important;
+}
+.matchup-grid>div:last-child{
+  border-left:2px solid var(--dl-orange)!important;
+}
+.matchup-grid>div:first-child strong{color:#63a99b!important}
+.matchup-grid>div:last-child strong{color:#e3a06f!important}
+
+/* Equipment / backpack. */
+.equipment-slots>strong{
+  color:var(--dl-cyan)!important;
+}
+.equip-slot.filled{
+  border-color:#287d91!important;
+  background:#132a31!important;
+}
+.equip-slot.filled b,
+.backpack-item span{
+  color:#65c8e2!important;
+}
+.backpack-item:hover,
+.backpack-item.selected{
+  border-color:var(--dl-purple)!important;
+  background:#27243a!important;
+}
+
+/* Map: purple is the common interaction state; node types use the palette. */
+.map-viewport{
+  border-color:#39364b!important;
+  background:radial-gradient(circle at center,#211f32 0,#0d0d16 72%)!important;
+}
+.map-line{stroke:#48445a!important}
+.map-line.active{stroke:#706b86!important}
+.map-node{
+  background:#1a1925!important;
+  border-color:#454257!important;
+}
+.map-node.available:not(.visited){
+  border-color:#7169ad!important;
+  box-shadow:0 0 0 2px rgba(92,85,152,.14),0 5px 14px rgba(0,0,0,.25)!important;
+}
+.map-node.current{
+  border-color:var(--dl-purple)!important;
+  box-shadow:0 0 0 2px rgba(92,85,152,.18) inset,0 5px 14px rgba(0,0,0,.25)!important;
+}
+.map-node.type-battle.available{border-color:var(--dl-cyan)!important}
+.map-node.type-elite.available{border-color:var(--dl-orange)!important}
+.map-node.type-recruit.available{border-color:#7a72b0!important}
+.map-node.type-reward.available{border-color:var(--dl-orange)!important}
+.map-node.type-rest.available{border-color:var(--dl-green)!important}
+.map-node.type-fullRest.available{border-color:var(--dl-green)!important}
+.map-node.type-item.available{border-color:var(--dl-cyan)!important}
+.map-node.type-event.available{border-color:var(--dl-orange)!important}
+.map-node.type-boss{
+  border-color:var(--dl-orange)!important;
+  background:#33231d!important;
+}
+.map-node.type-battle .node-icon,
+.map-node.type-item .node-icon{color:var(--dl-cyan)!important}
+.map-node.type-elite .node-icon,
+.map-node.type-reward .node-icon,
+.map-node.type-event .node-icon,
+.map-node.type-boss .node-icon{color:var(--dl-orange)!important}
+.map-node.type-recruit .node-icon{color:#8b84bb!important}
+.map-node.type-rest .node-icon,
+.map-node.type-fullRest .node-icon{color:#63a99b!important}
+
+/* Setup / choice surfaces. */
+.random-badge{
+  border-color:#635d8e!important;
+  background:#28243b!important;
+  color:#c4bfe0!important;
+}
+.roguelike-help{
+  border-color:#39364b!important;
+  background:#14131d!important;
+}
+.choice-panel{
+  border-color:#49445e!important;
+  background:#211f30!important;
+}
+.choice-panel b{color:#e7e3eb!important}
+.battle-drop-zone{
+  border-color:#514d68!important;
+  background:#14131d!important;
+}
+.battle-drop-zone.drag-over{
+  border-color:var(--dl-purple)!important;
+  background:#24213a!important;
+}
+
+/* Enemy/danger surfaces: orange marks urgency without introducing a new palette color. */
+.enemy-team-card{
+  border-color:#8e4f57!important;
+  background:#2b1d22!important;
+}
+.enemy-name,.battle-redesign .battle-enemy-name{color:#e3a06f!important}
+.enemy-type,.enemy-badge{color:#d9a37d!important}
+.enemy-badge{border-color:#8e4f57!important}
+.enemy-ability{border-top-color:#654047!important}
+
+/* Rewards and special moments. */
+.reward-card{
+  border-color:#8e734f!important;
+  background:#2a231d!important;
+}
+.reward-card b{color:#e3a06f!important}
+.item-reward-card{
+  border-color:#287d91!important;
+  background:#152a31!important;
+}
+.item-reward-card h2{color:#65c8e2!important}
+.item-bonus{color:#e3a06f!important}
+
+/* Combat hierarchy: purple primary, cyan information, green defense, orange debug/warning. */
+.battle-redesign .battle-actions button{
+  border-color:#454257!important;
+  background:#1c1a28!important;
+}
+.battle-redesign .battle-actions button:hover:not(:disabled){
+  border-color:#625d7e!important;
+  background:#252238!important;
+}
+.battle-redesign .battle-actions button:nth-child(1){
+  border-left:3px solid var(--dl-purple)!important;
+}
+.battle-redesign .battle-actions button:nth-child(2){
+  border-left:3px solid var(--dl-orange)!important;
+}
+.battle-redesign .battle-actions button:nth-child(3){
+  border-left:3px solid var(--dl-green)!important;
+}
+.battle-redesign .battle-energy strong,
+.battle-redesign .battle-energy{
+  color:var(--dl-orange)!important;
+}
+.battle-redesign .battle-active-health>div:first-child{
+  color:#63a99b!important;
+}
+.battle-redesign .battle-active-stress>div:first-child{
+  color:var(--dl-orange)!important;
+}
+
+/* Poker cards: palette accents by tier. */
+.poker-card-cost{
+  background:var(--dl-purple)!important;
+}
+.poker-card-tier-1{--card-accent:var(--dl-purple)}
+.poker-card-tier-2{--card-accent:var(--dl-green)}
+.poker-card-tier-3{--card-accent:var(--dl-cyan)}
+.poker-card-tier-4{--card-accent:var(--dl-orange)}
+.poker-card-tier-5{--card-accent:#77709f}
+.poker-card-tier{
+  border-color:var(--card-accent)!important;
+  color:var(--card-accent)!important;
+}
+
+/* Keep the supplied palette visible in the Codex and other secondary surfaces. */
+.codex-entry:hover{
+  border-color:var(--dl-purple)!important;
+}
+.codex-detail{
+  border-color:#454257!important;
+  background:#14131d!important;
+}
