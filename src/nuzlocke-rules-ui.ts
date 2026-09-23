@@ -16,7 +16,7 @@ const labels: Record<NuzlockeRule, string> = {
 const groups: [string, NuzlockeRule[]][] = [
   ["SOPRAVVIVENZA", ["permadeath","noHealing","noBurnoutRecovery","noStressRecovery","noRest"]],
   ["TEAM", ["noRecruit","limitedRecruit","noReplacement","firstPick","noSwitch","noBattleSwitch"]],
-  ["RISORSE", ["noBackpack","oneEquipment","noCardRemoval","deckLock","noDuplicates","consumableCards"]],
+  ["RISORSE", ["noBackpack","oneEquipment","noCardRemoval","deckLock","noDuplicates"]],
   ["MAPPA", ["randomPath","eliteMandatory"]],
   ["COMBATTIMENTO", ["noCode","noDebug","noDefense","twoEnergy","smallHand","oneTool","battleCardLock"]],
   ["CAOS DEVLIKE", ["noCoffee","noAI","noGit"]]
