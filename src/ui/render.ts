@@ -53,14 +53,31 @@ const effectiveStats=(d:Developer,isActive=false)=>{
   if(codeItems)codeParts.push(`Oggetti: +${codeItems}`);
   if(d.classId==="senior")codeParts.push("Senior: +2");
   if(isActive&&c.temporaryCodeBonus)codeParts.push(`Bonus temporaneo: +${c.temporaryCodeBonus}`);
-  if(d.classId==="junior"&&d.hp<d.maxHp*.5)codeParts.push("Junior sotto 50% HP: +2 DEBUG");
   const debugParts=[`Base: ${d.debug}`];
   const debugItems=d.items.reduce((n,x)=>n+x.debugBonus,0);
   if(debugItems)debugParts.push(`Oggetti: +${debugItems}`);
   if(d.classId==="junior"&&d.hp<d.maxHp*.5)debugParts.push("Junior sotto 50% HP: +2");
   if(d.classId==="hacker"&&enemy.typeId==="client")debugParts.push("Hacker contro Client: +3");
-  const code=d.code+codeItems+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
-  const debug=d.debug+debugItems+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
+
+  let code=d.code+codeItems+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
+  let debug=d.debug+debugItems+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
+
+  const multipliers:(keyof Developer)[]=[] as any;
+  let multiplier=1;
+  if(d.advantageEnemyIds.includes(enemy.typeId)){multiplier*=1.15;codeParts.push("Vantaggio vs nemico: +15%");debugParts.push("Vantaggio vs nemico: +15%");}
+  if(d.weaknessEnemyIds.includes(enemy.typeId)){multiplier*=.85;codeParts.push("Debolezza vs nemico: -15%");debugParts.push("Debolezza vs nemico: -15%");}
+  if(d.advantageConditions.some(x=>c["conditionMatches"](x,d))){multiplier*=1.1;codeParts.push("Condizione favorevole: +10%");debugParts.push("Condizione favorevole: +10%");}
+  if(d.weaknessConditions.some(x=>c["conditionMatches"](x,d))){multiplier*=.9;codeParts.push("Condizione sfavorevole: -10%");debugParts.push("Condizione sfavorevole: -10%");}
+  if(enemy.weaknessDeveloperIds.includes(d.classId)){multiplier*=1.15;codeParts.push("Nemico debole contro questa classe: +15%");debugParts.push("Nemico debole contro questa classe: +15%");}
+  if(enemy.advantageDeveloperIds.includes(d.classId)){multiplier*=.9;codeParts.push("Nemico avvantaggiato: -10%");debugParts.push("Nemico avvantaggiato: -10%");}
+  if(enemy.typeId==="legacy"){debug=Math.max(0,debug-2);debugParts.push("Legacy: -2 DEBUG");}
+
+  code=Math.max(0,Math.round(code*multiplier));
+  debug=Math.max(0,Math.round(debug*multiplier));
+  if(multiplier!==1){
+    codeParts.push(`Moltiplicatore nemico: ${Math.round(multiplier*100)}%`);
+    debugParts.push(`Moltiplicatore nemico: ${Math.round(multiplier*100)}%`);
+  }
   return {code,debug,codeTip:codeParts.join(" · "),debugTip:debugParts.join(" · ")};
 };
 const activeStats=effectiveStats(active,true);
