@@ -2,10 +2,11 @@ import { developers } from "../data/developers";
 import { enemies, boss } from "../data/enemies";
 import { rewardCards, startingDeck } from "../data/cards";
 import { rewardItems } from "../data/items";
+import { randomEvent, randomEventReward, type GameEvent } from "../data/events";
 import type { Card, Developer, Enemy, Item, MapNode, MapNodeType } from "../entities/types";
 import { Combat } from "./Combat";
 
-export type GameScreen = "menu" | "team" | "map" | "battleSetup" | "combat" | "reward" | "itemReward" | "bossReward" | "recruit" | "equipment" | "result";
+export type GameScreen = "menu" | "team" | "map" | "battleSetup" | "combat" | "reward" | "itemReward" | "bossReward" | "event" | "recruit" | "equipment" | "result";
 type NormalNodeType = Exclude<MapNodeType, "boss">;
 type EquipmentSource = { zone: "dev" | "bag"; devIndex: number; itemIndex: number };
 type BossRewardOption = { kind: "item" | "tool"; item?: Item; card?: Card };
@@ -33,8 +34,8 @@ const MAP_NODE_COST: Partial<Record<NormalNodeType, number>> = {
 };
 
 export class Game {
-  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; inventory:Item[]=[]; bossRewardOptions:BossRewardOption[]=[]; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
-  start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.bossRewardOptions=[];this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
+  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; inventory:Item[]=[]; bossRewardOptions:BossRewardOption[]=[]; currentEvent:GameEvent|null=null; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
+  start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.bossRewardOptions=[];this.currentEvent=null;this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
   private cloneItem(item:Item):Item{return {...item};}
   private cloneDeveloper(dev:Developer):Developer{return {...dev,items:dev.items.map(x=>this.cloneItem(x))};}
   private randomDevelopers(count:number,excluded:string[]=[]){const pool=developers.filter(d=>!excluded.includes(d.id));return [...pool].sort(()=>Math.random()-.5).slice(0,count).map(d=>this.cloneDeveloper(d));}
@@ -144,6 +145,9 @@ export class Game {
       this.generateItemReward();
     }else if(node.type==="recruit"){
       this.openRecruitment();
+    }else if(node.type==="event"){
+      this.openEvent();
+      return;
     }else if(node.type==="fullRest"){
       this.team.forEach(d=>{d.hp=d.maxHp;d.stress=0;});
       this.message="RECUPERO TOTALE: tutto il team è completamente guarito e senza Stress.";
@@ -203,6 +207,39 @@ export class Game {
     }else return;
     this.bossRewardOptions=[];
     this.screen="map";
+  }
+  private openEvent(){
+    this.currentEvent=randomEvent();
+    this.screen="event";
+    this.message="Scegli come gestire l'imprevisto. La scelta avrà una conseguenza immediata.";
+  }
+  chooseEvent(index:number){
+    const event=this.currentEvent;
+    const choice=event?.choices[index];
+    if(!event||!choice)return;
+    const effect=choice.effect;
+    if(effect.hp){
+      this.team.forEach(dev=>dev.hp=Math.max(1,Math.min(dev.maxHp,dev.hp+effect.hp!)));
+    }
+    if(effect.stress){
+      this.team.forEach(dev=>dev.stress=Math.max(0,Math.min(100,dev.stress+effect.stress!)));
+    }
+    if(effect.tempo)this.tempo=Math.max(0,this.tempo+effect.tempo);
+    let rewardText="";
+    if(effect.reward){
+      const reward=randomEventReward(effect.reward);
+      if(effect.reward==="tool"&&reward){
+        this.deck.push({...reward});
+        rewardText=` Tool ${reward.name} aggiunto al MAZZO.`;
+      }else if(effect.reward==="item"&&reward){
+        this.inventory.push(this.cloneItem(reward));
+        rewardText=` ${reward.name} messo nello ZAINO.`;
+      }
+    }
+    this.currentEvent=null;
+    this.screen="map";
+    this.message=`EVENTO: ${choice.label}. ${choice.description}${rewardText}`;
+    if(this.tempo<=0)this.skipFinalRestForTimeout();
   }
   generateReward(){const reward=rewardCards[Math.floor(Math.random()*rewardCards.length)];if(reward)this.reward={...reward};this.screen="reward";}
   generateItemReward(){const item=rewardItems[Math.floor(Math.random()*rewardItems.length)];if(!item)return;this.itemReward=this.cloneItem(item);this.selectedItemTargetIndex=null;this.screen="itemReward";this.message="Oggetto sbloccato. Puoi equipaggiarlo subito oppure metterlo nello zaino.";}
