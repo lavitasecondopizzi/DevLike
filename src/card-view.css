@@ -5,21 +5,21 @@
 .poker-card-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
 .poker-card-cost{min-width:25px;height:25px;padding:0 5px;border-radius:50%;display:flex;align-items:center;justify-content:center;gap:2px;background:#13263b;color:#f5f2e9!important;border:2px solid #607895;font-size:12px;font-weight:900;line-height:1;box-sizing:border-box;white-space:nowrap;box-shadow:1px 2px 0 rgba(0,0,0,.3)}
 .poker-card-energy{font-size:11px;line-height:1;color:#ffb347!important}
-.poker-card-tier{font-size:7px;font-weight:900;letter-spacing:.08em;border:1px solid #626b78;padding:3px 4px;background:#d9d4c8;color:#303641!important}
-.poker-card-name{margin:7px 0 5px;text-align:center;font-size:10px;line-height:1.15;font-weight:900;letter-spacing:.03em;min-height:23px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;color:#111722!important}
+.poker-card-tier{font-size:11px;font-weight:900;letter-spacing:.08em;border:1px solid #626b78;padding:3px 4px;background:#d9d4c8;color:#303641!important}
+.poker-card-name{margin:7px 0 5px;text-align:center;font-size:11px;line-height:1.15;font-weight:900;letter-spacing:.03em;min-height:23px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;color:#111722!important}
 .poker-card-art{aspect-ratio:1.25/1;min-height:58px;border:2px solid #26374b;background:#0d1725;display:grid;place-items:center;margin-bottom:6px;position:relative;z-index:1;box-shadow:inset 0 0 0 2px #1d2a3b}
 .poker-card-art span{font-size:34px;font-weight:900;color:#65c8d8!important;text-shadow:2px 2px 0 #08111c}
-.poker-card-type{text-align:center;font-size:7px;font-weight:900;letter-spacing:.12em;padding:3px 4px;border-top:1px solid #77736b;border-bottom:1px solid #77736b;position:relative;z-index:1;color:#111722!important}
+.poker-card-type{text-align:center;font-size:11px;font-weight:900;letter-spacing:.12em;padding:3px 4px;border-top:1px solid #77736b;border-bottom:1px solid #77736b;position:relative;z-index:1;color:#111722!important}
 .poker-card-effect{margin-top:6px;position:relative;z-index:1;flex:1;display:flex;flex-direction:column}
-.poker-card-effect b{font-size:8px;line-height:1.2;text-transform:uppercase;color:#111722!important}
-.poker-card-effect p{font-size:7px;line-height:1.35;margin:5px 0 0;color:#303641!important}
-.poker-card-flavor{font-size:6.5px;line-height:1.25;font-style:italic;text-align:center;color:#5e5a53!important;border-top:1px solid #aaa49a;padding-top:5px;margin-top:5px;position:relative;z-index:1}
+.poker-card-effect b{font-size:11px;line-height:1.2;text-transform:uppercase;color:#111722!important}
+.poker-card-effect p{font-size:11px;line-height:1.35;margin:5px 0 0;color:#303641!important}
+.poker-card-flavor{font-size:11px;line-height:1.25;font-style:italic;text-align:center;color:#5e5a53!important;border-top:1px solid #aaa49a;padding-top:5px;margin-top:5px;position:relative;z-index:1}
 .poker-card-bottom{display:none!important}
 .poker-card-tier-2{border-color:#b8a36c}.poker-card-tier-3{border-color:#8c9cb2}.poker-card-tier-4{border-color:#a88bb8}
 .poker-card-host.selected .poker-card{box-shadow:0 0 0 2px #5d88d9,4px 5px 0 rgba(0,0,0,.3),inset 0 0 0 2px #8f8a80}
 .poker-card-host:disabled{opacity:.55}
 .poker-card-management-host{display:flex!important;flex-direction:column!important;gap:8px;box-sizing:border-box}.poker-card-management-host>.poker-card{width:100%}
-.poker-card-management{display:flex;align-items:center;justify-content:space-between;gap:8px}.poker-card-management span{font-size:8px;color:#7f8b9d;line-height:1.2}.poker-card-management button{padding:7px 8px!important;border:1px solid #46536a!important;background:#202a3a!important;color:#e8edf5!important;font-weight:700!important;font-size:9px!important;cursor:pointer}.poker-card-management button:disabled{opacity:.5;cursor:not-allowed}
+.poker-card-management{display:flex;align-items:center;justify-content:space-between;gap:8px}.poker-card-management span{font-size:11px;color:#7f8b9d;line-height:1.2}.poker-card-management button{padding:7px 8px!important;border:1px solid #46536a!important;background:#202a3a!important;color:#e8edf5!important;font-weight:700!important;font-size:11px!important;cursor:pointer}.poker-card-management button:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:800px){.poker-card-name{font-size:11px}.poker-card-art span{font-size:34px}}
 
 /* Removed duplicated description area from all poker cards. */
