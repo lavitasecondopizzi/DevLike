@@ -14,3 +14,17 @@
 .backpack-modal-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .backpack-modal-slot{min-height:82px;text-align:left;padding:10px;background:#171f2c;border:1px solid #303b4d;color:#e8edf5;cursor:pointer;display:flex;flex-direction:column;gap:4px}.backpack-modal-slot:hover,.backpack-modal-slot.selected{border-color:#67e8f9;background:#1a2938}.backpack-modal-slot.empty{opacity:.7}.backpack-modal-slot span{font-size:11px;color:#7f9ac0}.backpack-modal-slot b{font-size:11px}.backpack-modal-slot small{font-size:11px;color:#9aa7b8}
 @media(max-width:800px){.backpack-modal-body{grid-template-columns:1fr;padding:14px}.backpack-modal-slots{grid-template-columns:1fr 1fr}}
+
+/* DECK MANAGEMENT — POKER COLLECTION */
+.deck-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.devlike-poker-management-host{min-height:0!important;padding:8px!important;background:#0f151f!important;border:1px solid #303b4d!important;border-radius:8px!important;display:flex!important;flex-direction:column!important;gap:8px!important;box-sizing:border-box!important}
+.devlike-poker-management-host:hover{border-color:#5d88d9!important}
+.devlike-poker-management-host .poker-card{width:100%!important;max-width:220px!important;margin:0 auto!important}
+.devlike-poker-management{display:flex;flex-direction:column;gap:7px}
+.devlike-poker-management span{font-size:10px;color:#8fa1b8;text-align:center;letter-spacing:.05em;min-height:14px}
+.devlike-poker-management button{width:100%;padding:8px;border:1px solid #46536a;background:#202a3a;color:#e8edf5;font-weight:800;font-size:10px;letter-spacing:.04em;cursor:pointer}
+.devlike-poker-management button:hover:not(:disabled){background:#2a3850;border-color:#67c8d8}
+.devlike-poker-management button:disabled{opacity:.45;cursor:not-allowed}
+.collection-card.devlike-poker-management-host{background:#111a26!important}
+.deck-columns>.deck-section{min-width:0}
+@media(max-width:800px){.deck-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px}.devlike-poker-management-host .poker-card{max-width:190px!important}}
