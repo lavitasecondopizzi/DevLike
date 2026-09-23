@@ -194,6 +194,28 @@ return `<section class="battle battle-redesign">
     <div class="battle-matchups"><div><b>VANTAGGI</b>${enemy.advantages.map(x=>`<span>${esc(x)}</span>`).join("")}</div><div><b>DEBOLEZZE</b>${enemy.weaknesses.map(x=>`<span>${esc(x)}</span>`).join("")}</div></div>
   </aside>
 </section>`;}  if(game.screen==="reward"){const card=game.reward!;return `<section class="panel center"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi un Tool al deck.</p><button type="button" class="reward-card" data-action="reward"><b>${esc(card.name)}</b><span>${card.cost} ⚡</span><small>${esc(card.description)}</small></button></section>`;}
+  if(game.screen==="event"&&game.currentEvent){
+    const event=game.currentEvent;
+    const choices=event.choices.map((choice,i)=>{
+      const effects:string[]=[];
+      if(choice.effect.hp)effects.push(`${choice.effect.hp>0?"+":""}${choice.effect.hp} HP`);
+      if(choice.effect.stress)effects.push(`${choice.effect.stress>0?"+":""}${choice.effect.stress} STRESS`);
+      if(choice.effect.tempo)effects.push(`${choice.effect.tempo>0?"+":""}${choice.effect.tempo} TEMPO`);
+      if(choice.effect.reward==="tool")effects.push("TOOL");
+      if(choice.effect.reward==="item")effects.push("OGGETTO");
+      return `<button type="button" class="event-choice-card" data-event-choice="${i}">
+        <span class="event-choice-number">SCELTA ${i+1}</span>
+        <b>${esc(choice.label)}</b>
+        <small>${esc(choice.description)}</small>
+        <strong>${effects.join(" · ")}</strong>
+      </button>`;
+    }).join("");
+    return `<section class="panel selection-panel event-panel">
+      <div class="selection-heading"><div><h2>${esc(event.title)}</h2><p>${esc(event.description)}</p></div><span class="random-badge">EVENTO · 1 SCELTA</span></div>
+      <div class="event-choice-grid">${choices}</div>
+      <div class="selection-footer"><span class="selection-hint">La scelta viene applicata immediatamente.</span></div>
+    </section>`;
+  }
   if(game.screen==="bossReward"){
     const options=game.bossRewardOptions.map((option,i)=>{
       if(option.kind==="item"&&option.item)return `<button type="button" class="boss-reward-card boss-item-reward" data-boss-reward="${i}"><span class="boss-reward-kind">OGGETTO · ZAINO</span><b>${esc(option.item.name)}</b><strong>+${option.item.codeBonus} COD · +${option.item.debugBonus} DEBUG</strong><small>${esc(option.item.description)}</small></button>`;
@@ -211,6 +233,7 @@ return `<section class="battle battle-redesign">
 
 function bind(game:Game){
   root.querySelectorAll<HTMLElement>("[data-action]").forEach(el=>el.onclick=()=>{const a=el.dataset.action;if(a==="start")game.start();if(a==="confirm-start")game.confirmStartingDeveloper();if(a==="confirm-battle")game.confirmBattleStarter();if(a==="code")game.combat?.basicAction("code");if(a==="debug")game.combat?.basicAction("debug");if(a==="defend")game.combat?.basicAction("defend");if(a==="end-turn")game.combat?.endTurn();if(a==="reward")game.chooseReward(0);if(a==="confirm-recruit")game.confirmRecruitment();if(a==="confirm-item")game.confirmItemReward();if(a==="store-item")game.storeItemReward();if(a==="open-equipment")game.openEquipment();if(a==="close-equipment")game.closeEquipment();if(a==="restart")game.restart();render(game);if(game.screen==="combat"&&game.combat?.result!=="ongoing"){game.onCombatFinished();render(game);}});
+  root.querySelectorAll<HTMLElement>("[data-event-choice]").forEach(el=>el.onclick=()=>{game.chooseEvent(Number(el.dataset.eventChoice));render(game);});
   root.querySelectorAll<HTMLElement>("[data-boss-reward]").forEach(el=>el.onclick=()=>{game.chooseBossReward(Number(el.dataset.bossReward));render(game);});
   root.querySelectorAll<HTMLElement>("[data-dev]").forEach(el=>el.onclick=e=>{e.preventDefault();if(game.screen==="team"){const index=game.startingCandidates.findIndex(d=>d.id===el.dataset.dev);if(index>=0)game.selectStartingDeveloper(index);}render(game);});
   root.querySelectorAll<HTMLElement>("[data-card]").forEach(el=>el.onclick=()=>{game.combat?.playCard(Number(el.dataset.card));render(game);if(game.combat?.result!=="ongoing"){game.onCombatFinished();render(game);}});
