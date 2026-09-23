@@ -72,9 +72,30 @@ export const rewardCards:Card[]=[
  // TIER 4
  {id:"chatgpt-protocol",name:"CHATGPT PROTOCOL",cost:2,description:"Infligge 22 danni.",effect:{type:"damage",amount:22}},
  {id:"emergency-hotfix",name:"HOTFIX D'EMERGENZA",cost:2,description:"Infligge 20 danni.",effect:{type:"damage",amount:20}}
+
+ // TIER 1 · nuovi Tool
+ {id:"grep-log",name:"GREP LOG",cost:1,description:"Infligge 6 danni.",effect:{type:"damage",amount:6}},
+ {id:"backup",name:"BACKUP",cost:1,description:"Recupera 7 HP.",effect:{type:"heal",amount:7}},
+ {id:"todo-list",name:"TODO LIST",cost:1,description:"Riduce lo Stress di 5.",effect:{type:"removeStress",amount:5}},
+ {id:"firewall",name:"FIREWALL",cost:1,description:"Blocca 7 danni.",effect:{type:"block",amount:7}},
+ // TIER 2 · nuovi Tool
+ {id:"code-review-plus",name:"CODE REVIEW PLUS",cost:1,description:"Infligge 11 danni.",effect:{type:"damage",amount:11}},
+ {id:"cache-clear",name:"CACHE CLEAR",cost:1,description:"Riduce lo Stress di 10.",effect:{type:"removeStress",amount:10}},
+ {id:"backup-db",name:"BACKUP DATABASE",cost:1,description:"Recupera 11 HP.",effect:{type:"heal",amount:11}},
+ {id:"load-balancer",name:"LOAD BALANCER",cost:1,description:"Blocca 10 danni.",effect:{type:"block",amount:10}},
+ // TIER 3 · nuovi Tool
+ {id:"power-patch",name:"POWER PATCH",cost:2,description:"Infligge 19 danni.",effect:{type:"damage",amount:19}},
+ {id:"rollback-production",name:"ROLLBACK PRODUZIONE",cost:1,description:"Riduce lo Stress di 14.",effect:{type:"removeStress",amount:14}},
+ {id:"medical-leave",name:"FERIE STRATEGICHE",cost:1,description:"Recupera 16 HP.",effect:{type:"heal",amount:16}},
+ {id:"waf",name:"WAF",cost:2,description:"Blocca 17 danni.",effect:{type:"block",amount:17}},
+ // TIER 4 · nuovi Tool
+ {id:"mega-patch",name:"MEGA PATCH",cost:2,description:"Infligge 25 danni.",effect:{type:"damage",amount:25}},
+ {id:"full-restore",name:"FULL RESTORE",cost:2,description:"Recupera 22 HP.",effect:{type:"heal",amount:22}},
+ {id:"incident-response",name:"INCIDENT RESPONSE",cost:1,description:"Riduce lo Stress di 18.",effect:{type:"removeStress",amount:18}},
+ {id:"mega-shield",name:"MEGA SHIELD",cost:2,description:"Blocca 22 danni.",effect:{type:"block",amount:22}},
 ];
 
-export const rewardCardTiers:Record<string,number>={chatgpt:1,jira:1,google:1,"rubber-duck":1,"stackoverflow-copy":1,"npm-install":1,"git-pull":1,"console-log":1,breakpoint:1,"rubber-duck-debug":1,"unit-test":1,sleep:1,documentation:1,"rubber-stamp":1,"git-push":2,"merge-conflict":2,regex:2,refactor:2,"legacy-patch":2,"stackoverflow-answer":2,"integration-test":2,hotfix:2,rollback:2,"meeting-cancel":2,"energy-drink-card":2,"ai-slop":2,"coffee-overdose":3,production:3,"code-review":3,"deadline-extension":3,"chatgpt-protocol":4,"emergency-hotfix":4};
+export const rewardCardTiers:Record<string,number>={grep-log:1,backup:1,"todo-list":1,firewall:1,"code-review-plus":2,"cache-clear":2,"backup-db":2,"load-balancer":2,"power-patch":3,"rollback-production":3,"medical-leave":3,waf:3,"mega-patch":4,"full-restore":4,"incident-response":4,"mega-shield":4,chatgpt:1,jira:1,google:1,"rubber-duck":1,"stackoverflow-copy":1,"npm-install":1,"git-pull":1,"console-log":1,breakpoint:1,"rubber-duck-debug":1,"unit-test":1,sleep:1,documentation:1,"rubber-stamp":1,"git-push":2,"merge-conflict":2,regex:2,refactor:2,"legacy-patch":2,"stackoverflow-answer":2,"integration-test":2,hotfix:2,rollback:2,"meeting-cancel":2,"energy-drink-card":2,"ai-slop":2,"coffee-overdose":3,production:3,"code-review":3,"deadline-extension":3,"chatgpt-protocol":4,"emergency-hotfix":4};
 
 rewardCards.forEach(card=>{card.tier=rewardCardTiers[card.id]??1;});
 
