@@ -9,6 +9,7 @@ import "./map-visual-fix.css";
 import "./deck-fix.css";
 import "./card-view.css";
 import "./team-tools-fix.css";
+import "./readability.css";
 import "./nuzlocke-rules-ui";
 import "./nuzlocke-ui-fix.css";
 import "./nuzlocke-ui-fix";
