@@ -317,3 +317,100 @@ button:focus-visible{
 /* Small semantic accents */
 .random-badge{border-color:#496b91!important;background:#172b43!important;color:#a8c9f1!important}
 .primary + .secondary{border-left-color:#49627d!important}
+
+
+/* ===== READABILITY V3 =====
+   Absolute minimum: 14px for readable UI text.
+   Headings may remain larger; no normal text is allowed below 14px.
+*/
+.game-shell p,
+.game-shell span,
+.game-shell b,
+.game-shell strong,
+.game-shell small,
+.game-shell label,
+.game-shell li,
+.game-shell button,
+.game-shell input,
+.game-shell select,
+.game-shell textarea{
+  font-size:14px!important;
+  line-height:1.45!important;
+}
+
+.logo{font-size:18px!important;line-height:1.2!important}
+.logo span{font-size:inherit!important}
+.center h1{font-size:clamp(22px,5vw,42px)!important}
+.center h2,
+.selection-heading h2{font-size:20px!important}
+.map-node b{font-size:14px!important}
+.map-node small{font-size:14px!important}
+.map-node .node-icon{font-size:20px!important}
+
+.dev-head b{font-size:16px!important}
+.dev-head span{font-size:14px!important}
+.dev-description{font-size:16px!important}
+.stat-line{font-size:14px!important}
+.stat-grid span{font-size:14px!important}
+.stat-grid b{font-size:16px!important}
+.ability{font-size:15px!important}
+.ability strong{font-size:14px!important}
+.matchup-grid strong{font-size:14px!important}
+.matchup-grid span{font-size:14px!important}
+.equipment-slots>strong{font-size:14px!important}
+.equip-slot span,.equip-slot b,.equip-slot small{font-size:14px!important}
+
+.battle-redesign .battle-side-title,
+.battle-redesign .battle-side-title b,
+.battle-redesign .battle-member-head strong,
+.battle-redesign .battle-member-head span,
+.battle-redesign .battle-member-hp>span,
+.battle-redesign .battle-member-stress>span,
+.battle-redesign .battle-member-stats b,
+.battle-redesign .battle-log-title,
+.battle-redesign .battle-log>div:not(.battle-log-title),
+.battle-redesign .battle-active-top small,
+.battle-redesign .battle-active-top>div:first-child>span,
+.battle-redesign .battle-active-ability,
+.battle-redesign .battle-active-ability b,
+.battle-redesign .battle-active-health>div:first-child,
+.battle-redesign .battle-active-stress>div:first-child,
+.battle-redesign .battle-effective-stat b,
+.battle-redesign .battle-energy span,
+.battle-redesign .battle-actions button b,
+.battle-redesign .battle-actions button small,
+.battle-redesign .battle-hand-label,
+.battle-redesign .end,
+.battle-redesign .battle-enemy-type,
+.battle-redesign .battle-hp-row,
+.battle-redesign .battle-intent strong,
+.battle-redesign .battle-intent span,
+.battle-redesign .battle-ability,
+.battle-redesign .battle-ability strong,
+.battle-redesign .battle-matchups b,
+.battle-redesign .battle-matchups span{
+  font-size:14px!important;
+  line-height:1.45!important;
+}
+.battle-redesign .battle-active-top h2{font-size:25px!important}
+.battle-redesign .battle-effective-stat strong{font-size:27px!important}
+.battle-redesign .battle-energy strong{font-size:18px!important}
+.battle-redesign .battle-enemy-name{font-size:23px!important}
+
+.poker-card-name,
+.poker-card-type,
+.poker-card-effect b,
+.poker-card-tier,
+.poker-card-cost,
+.poker-card-energy,
+.poker-card-management span,
+.poker-card-management button{
+  font-size:14px!important;
+  line-height:1.3!important;
+}
+.poker-card-effect{font-size:14px!important;line-height:1.4!important}
+
+@media(max-width:800px){
+  .dev-description,.ability,.matchup-grid span{font-size:14px!important}
+  .battle-redesign .battle-active-top h2{font-size:22px!important}
+}
