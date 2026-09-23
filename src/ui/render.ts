@@ -48,37 +48,46 @@ function screen(game:Game){
   if(game.screen==="equipment")return equipmentScreen(game);
   if(game.screen==="combat"&&game.combat){const c=game.combat;const active=c.active;const enemy=c.enemy;
 const effectiveStats=(d:Developer,isActive=false)=>{
-  const codeParts=[`Base: ${d.code}`];
+  const codeParts:string[]=[];
+  const debugParts:string[]=[];
   const codeItems=d.items.reduce((n,x)=>n+x.codeBonus,0);
+  const debugItems=d.items.reduce((n,x)=>n+x.debugBonus,0);
+  let code=d.code+codeItems+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
+  let debug=d.debug+debugItems+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
+
   if(codeItems)codeParts.push(`Oggetti: +${codeItems}`);
   if(d.classId==="senior")codeParts.push("Senior: +2");
   if(isActive&&c.temporaryCodeBonus)codeParts.push(`Bonus temporaneo: +${c.temporaryCodeBonus}`);
-  const debugParts=[`Base: ${d.debug}`];
-  const debugItems=d.items.reduce((n,x)=>n+x.debugBonus,0);
   if(debugItems)debugParts.push(`Oggetti: +${debugItems}`);
   if(d.classId==="junior"&&d.hp<d.maxHp*.5)debugParts.push("Junior sotto 50% HP: +2");
   if(d.classId==="hacker"&&enemy.typeId==="client")debugParts.push("Hacker contro Client: +3");
-
-  let code=d.code+codeItems+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
-  let debug=d.debug+debugItems+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
 
   const conditionMatches=(condition:string)=>condition==="lowHp"?d.hp<d.maxHp*.5:condition==="highStress"?d.stress>=50:condition==="fullHp"?d.hp>=d.maxHp:condition==="highEnergy"?c.energy>=2:condition==="defending"?c.block>0:condition==="afterTool"?c.toolPlayedThisTurn:condition==="everyTwoTurns"?c.turn%2===0:false;
   let multiplier=1;
   if(d.advantageEnemyIds.includes(enemy.typeId)){multiplier*=1.15;codeParts.push("Vantaggio vs nemico: +15%");debugParts.push("Vantaggio vs nemico: +15%");}
   if(d.weaknessEnemyIds.includes(enemy.typeId)){multiplier*=.85;codeParts.push("Debolezza vs nemico: -15%");debugParts.push("Debolezza vs nemico: -15%");}
   if(d.advantageConditions.some(x=>conditionMatches(x))){multiplier*=1.1;codeParts.push("Condizione favorevole: +10%");debugParts.push("Condizione favorevole: +10%");}
-  if(d.weaknessConditions.some(x=>c["conditionMatches"](x,d))){multiplier*=.9;codeParts.push("Condizione sfavorevole: -10%");debugParts.push("Condizione sfavorevole: -10%");}
+  if(d.weaknessConditions.some(x=>conditionMatches(x))){multiplier*=.9;codeParts.push("Condizione sfavorevole: -10%");debugParts.push("Condizione sfavorevole: -10%");}
   if(enemy.weaknessDeveloperIds.includes(d.classId)){multiplier*=1.15;codeParts.push("Nemico debole contro questa classe: +15%");debugParts.push("Nemico debole contro questa classe: +15%");}
   if(enemy.advantageDeveloperIds.includes(d.classId)){multiplier*=.9;codeParts.push("Nemico avvantaggiato: -10%");debugParts.push("Nemico avvantaggiato: -10%");}
-  if(enemy.typeId==="legacy"){debug=Math.max(0,debug-2);debugParts.push("Legacy: -2 DEBUG");}
 
+  if(enemy.typeId==="legacy"){
+    debug=Math.max(0,debug-2);
+    debugParts.push("Legacy: -2 DEBUG");
+  }
   code=Math.max(0,Math.round(code*multiplier));
   debug=Math.max(0,Math.round(debug*multiplier));
-  if(multiplier!==1){
-    codeParts.push(`Moltiplicatore nemico: ${Math.round(multiplier*100)}%`);
-    debugParts.push(`Moltiplicatore nemico: ${Math.round(multiplier*100)}%`);
+  if(enemy.typeId==="client"&&d.classId==="hacker"){
+    debug=Math.max(0,Math.round(debug*1.2));
+    debugParts.push("Hacker contro Client: +20% DEBUG");
   }
-  return {code,debug,codeTip:codeParts.join(" · "),debugTip:debugParts.join(" · ")};
+  if(multiplier!==1){
+    codeParts.push(`Moltiplicatore: ${Math.round(multiplier*100)}%`);
+    debugParts.push(`Moltiplicatore: ${Math.round(multiplier*100)}%`);
+  }
+  const codeTip=codeParts.join(" · ");
+  const debugTip=debugParts.join(" · ");
+  return {code,debug,codeTip,debugTip,hasCodeTip:Boolean(codeTip),hasDebugTip:Boolean(debugTip)};
 };
 const activeStats=effectiveStats(active,true);
 const memberInfo=(d:Developer,i:number)=>{
@@ -89,8 +98,8 @@ const memberInfo=(d:Developer,i:number)=>{
     <div class="battle-member-hp"><span>HP ${d.hp}/${d.maxHp}</span><i><em style="width:${pct(d.hp,d.maxHp)}%"></em></i></div>
     <div class="battle-member-stress"><span>STRESS ${d.stress}/100</span><i><em style="width:${d.stress}%"></em></i></div>
     <div class="battle-member-stats">
-      <span class="stat-tooltip" data-tooltip="${esc(stats.codeTip)}"><b>CODICE</b><strong>${stats.code}</strong></span>
-      <span class="stat-tooltip" data-tooltip="${esc(stats.debugTip)}"><b>DEBUG</b><strong>${stats.debug}</strong></span>
+      <span class="stat-tooltip" ${stats.hasCodeTip?`data-tooltip="${esc(stats.codeTip)}"`:""}><b>CODICE</b><strong>${stats.code}</strong></span>
+      <span class="stat-tooltip" ${stats.hasDebugTip?`data-tooltip="${esc(stats.debugTip)}"`:""}><b>DEBUG</b><strong>${stats.debug}</strong></span>
     </div>
   </button>`;
 };
@@ -115,8 +124,8 @@ return `<section class="battle battle-redesign">
         <div class="battle-stressbar"><i style="width:${active.stress}%"></i></div>
       </div>
       <div class="battle-active-details">
-        <div class="battle-effective-stat stat-tooltip" data-tooltip="${esc(activeStats.codeTip)}"><b>CODICE</b><strong>${activeStats.code}</strong></div>
-        <div class="battle-effective-stat stat-tooltip" data-tooltip="${esc(activeStats.debugTip)}"><b>DEBUG</b><strong>${activeStats.debug}</strong></div>
+        <div class="battle-effective-stat stat-tooltip" ${activeStats.hasCodeTip?`data-tooltip="${esc(activeStats.codeTip)}"`:""}><b>CODICE</b><strong>${activeStats.code}</strong></div>
+        <div class="battle-effective-stat stat-tooltip" ${activeStats.hasDebugTip?`data-tooltip="${esc(activeStats.debugTip)}"`:""}><b>DEBUG</b><strong>${activeStats.debug}</strong></div>
       </div>
     </div>
     <div class="battle-energy"><span>ENERGIA</span><strong>${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</strong></div>
