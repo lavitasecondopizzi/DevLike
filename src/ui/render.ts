@@ -48,46 +48,41 @@ function screen(game:Game){
   if(game.screen==="equipment")return equipmentScreen(game);
   if(game.screen==="combat"&&game.combat){const c=game.combat;const active=c.active;const enemy=c.enemy;
 const effectiveStats=(d:Developer,isActive=false)=>{
-  const codeParts:string[]=[];
-  const debugParts:string[]=[];
-  const codeItems=d.items.reduce((n,x)=>n+x.codeBonus,0);
-  const debugItems=d.items.reduce((n,x)=>n+x.debugBonus,0);
-  let code=d.code+codeItems+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
-  let debug=d.debug+debugItems+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
+  const codeChanges:string[]=[];
+  const debugChanges:string[]=[];
+  let code=d.code+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
+  let debug=d.debug+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
 
-  if(codeItems)codeParts.push(`Oggetti: +${codeItems}`);
-  if(d.classId==="senior")codeParts.push("Senior: +2");
-  if(isActive&&c.temporaryCodeBonus)codeParts.push(`Bonus temporaneo: +${c.temporaryCodeBonus}`);
-  if(debugItems)debugParts.push(`Oggetti: +${debugItems}`);
-  if(d.classId==="junior"&&d.hp<d.maxHp*.5)debugParts.push("Junior sotto 50% HP: +2");
-  if(d.classId==="hacker"&&enemy.typeId==="client")debugParts.push("Hacker contro Client: +3");
+  for(const item of d.items){
+    if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name+": bonus CODICE dell'oggetto");}
+  }
+  if(d.classId==="senior")codeChanges.push("+2 · Senior: bonus permanente a CODICE");
+  if(isActive&&c.temporaryCodeBonus)codeChanges.push("+"+c.temporaryCodeBonus+" · Bonus temporaneo: potenziamento attivo a CODICE");
+
+  for(const item of d.items){
+    if(item.debugBonus){debug+=item.debugBonus;debugChanges.push("+"+item.debugBonus+" · "+item.name+": bonus DEBUG dell'oggetto");}
+  }
+  if(d.classId==="junior"&&d.hp<d.maxHp*.5)debugChanges.push("+2 · Junior sotto il 50% HP: bonus a DEBUG");
+  if(d.classId==="hacker"&&enemy.typeId==="client")debugChanges.push("+3 · Hacker contro Client: bonus a DEBUG");
 
   const conditionMatches=(condition:string)=>condition==="lowHp"?d.hp<d.maxHp*.5:condition==="highStress"?d.stress>=50:condition==="fullHp"?d.hp>=d.maxHp:condition==="highEnergy"?c.energy>=2:condition==="defending"?c.block>0:condition==="afterTool"?c.toolPlayedThisTurn:condition==="everyTwoTurns"?c.turn%2===0:false;
   let multiplier=1;
-  if(d.advantageEnemyIds.includes(enemy.typeId)){multiplier*=1.15;codeParts.push("Vantaggio vs nemico: +15%");debugParts.push("Vantaggio vs nemico: +15%");}
-  if(d.weaknessEnemyIds.includes(enemy.typeId)){multiplier*=.85;codeParts.push("Debolezza vs nemico: -15%");debugParts.push("Debolezza vs nemico: -15%");}
-  if(d.advantageConditions.some(x=>conditionMatches(x))){multiplier*=1.1;codeParts.push("Condizione favorevole: +10%");debugParts.push("Condizione favorevole: +10%");}
-  if(d.weaknessConditions.some(x=>conditionMatches(x))){multiplier*=.9;codeParts.push("Condizione sfavorevole: -10%");debugParts.push("Condizione sfavorevole: -10%");}
-  if(enemy.weaknessDeveloperIds.includes(d.classId)){multiplier*=1.15;codeParts.push("Nemico debole contro questa classe: +15%");debugParts.push("Nemico debole contro questa classe: +15%");}
-  if(enemy.advantageDeveloperIds.includes(d.classId)){multiplier*=.9;codeParts.push("Nemico avvantaggiato: -10%");debugParts.push("Nemico avvantaggiato: -10%");}
+  if(d.advantageEnemyIds.includes(enemy.typeId)){multiplier*=1.15;codeChanges.push("+15% · Vantaggio contro questo tipo di nemico");debugChanges.push("+15% · Vantaggio contro questo tipo di nemico");}
+  if(d.weaknessEnemyIds.includes(enemy.typeId)){multiplier*=.85;codeChanges.push("-15% · Debolezza contro questo tipo di nemico");debugChanges.push("-15% · Debolezza contro questo tipo di nemico");}
+  if(d.advantageConditions.some(x=>conditionMatches(x))){multiplier*=1.1;codeChanges.push("+10% · Condizione favorevole attiva");debugChanges.push("+10% · Condizione favorevole attiva");}
+  if(d.weaknessConditions.some(x=>conditionMatches(x))){multiplier*=.9;codeChanges.push("-10% · Condizione sfavorevole attiva");debugChanges.push("-10% · Condizione sfavorevole attiva");}
+  if(enemy.weaknessDeveloperIds.includes(d.classId)){multiplier*=1.15;codeChanges.push("+15% · Il nemico è debole contro questa classe");debugChanges.push("+15% · Il nemico è debole contro questa classe");}
+  if(enemy.advantageDeveloperIds.includes(d.classId)){multiplier*=.9;codeChanges.push("-10% · Il nemico è avvantaggiato contro questa classe");debugChanges.push("-10% · Il nemico è avvantaggiato contro questa classe");}
 
-  if(enemy.typeId==="legacy"){
-    debug=Math.max(0,debug-2);
-    debugParts.push("Legacy: -2 DEBUG");
-  }
+  if(enemy.typeId==="legacy"){debug=Math.max(0,debug-2);debugChanges.push("-2 · Legacy: penalità a DEBUG");}
   code=Math.max(0,Math.round(code*multiplier));
   debug=Math.max(0,Math.round(debug*multiplier));
-  if(enemy.typeId==="client"&&d.classId==="hacker"){
-    debug=Math.max(0,Math.round(debug*1.2));
-    debugParts.push("Hacker contro Client: +20% DEBUG");
-  }
-  if(multiplier!==1){
-    codeParts.push(`Moltiplicatore: ${Math.round(multiplier*100)}%`);
-    debugParts.push(`Moltiplicatore: ${Math.round(multiplier*100)}%`);
-  }
-  const codeTip=codeParts.join(" · ");
-  const debugTip=debugParts.join(" · ");
-  return {code,debug,codeTip,debugTip,hasCodeTip:Boolean(codeTip),hasDebugTip:Boolean(debugTip)};
+  if(enemy.typeId==="client"&&d.classId==="hacker"){debug=Math.max(0,Math.round(debug*1.2));debugChanges.push("+20% · Hacker contro Client: potenziamento aggiuntivo a DEBUG");}
+
+  const tooltip=(base:number,changes:string[])=>["Base: "+base,...changes.map(x=>"• "+x)].join("\\n");
+  const codeTip=tooltip(d.code,codeChanges);
+  const debugTip=tooltip(d.debug,debugChanges);
+  return {code,debug,codeTip,debugTip,hasCodeTip:codeChanges.length>0,hasDebugTip:debugChanges.length>0};
 };
 const activeStats=effectiveStats(active,true);
 const memberInfo=(d:Developer,i:number)=>{
