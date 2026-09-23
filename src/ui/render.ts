@@ -47,23 +47,23 @@ function screen(game:Game){
   if(game.screen==="itemReward"&&game.itemReward){const targets=game.team.map((dev,i)=>{const full=dev.items.length>=2;return `<button type="button" class="assignment-card ${game.selectedItemTargetIndex===i?"selected":""}" data-item-target="${i}" ${full?"disabled":""}><div><b>${esc(dev.name)}</b><span>${esc(dev.role)}</span></div><div class="item-target-stats">HP ${dev.hp}/${dev.maxHp} · COD ${dev.code} · DEBUG ${dev.debug}</div><div class="matchup-mini"><strong>VANTAGGI</strong> ${dev.advantages.map(esc).join(" · ")}<br><strong>DEBOLEZZE</strong> ${dev.weaknesses.map(esc).join(" · ")}</div>${equipmentSlots(dev)}<em>${full?"INVENTARIO PIENO — USA LO ZAINO":"CLICCA PER SELEZIONARE"}</em></button>`;}).join("");return `<section class="panel selection-panel"><div class="selection-heading"><div><h2>OGGETTO SBLOCCATO</h2><p>${esc(game.message)}</p></div><span class="random-badge">EQUIPAGGIAMENTO</span></div><div class="item-reward-card"><h2>${esc(game.itemReward.name)}</h2><p>${esc(game.itemReward.description)}</p><div class="item-bonus">+${game.itemReward.codeBonus} CODICE · +${game.itemReward.debugBonus} DEBUG</div></div><h3 class="assign-title">A QUALE DEVELOPER CONSEGNARLO?</h3><div class="assignment-grid">${targets}</div><div class="selection-footer"><div class="selection-hint">${game.selectedItemTargetIndex===null?"Puoi anche metterlo direttamente nello zaino.":`Consegnerai ${esc(game.itemReward.name)} a ${esc(game.team[game.selectedItemTargetIndex]?.name??"")}.`}</div><div class="reward-actions"><button type="button" class="secondary" data-action="store-item">METTI NELLO ZAINO</button><button type="button" class="primary" data-action="confirm-item" ${game.selectedItemTargetIndex!==null?"":"disabled"}>EQUIPAGGIA OGGETTO</button></div></div></section>`;}
   if(game.screen==="equipment")return equipmentScreen(game);
   if(game.screen==="combat"&&game.combat){const c=game.combat;const active=c.active;const enemy=c.enemy;
-const effectiveStats=(d:Developer)=>{
+const effectiveStats=(d:Developer,isActive=false)=>{
   const codeParts=[`Base: ${d.code}`];
   const codeItems=d.items.reduce((n,x)=>n+x.codeBonus,0);
   if(codeItems)codeParts.push(`Oggetti: +${codeItems}`);
   if(d.classId==="senior")codeParts.push("Senior: +2");
-  if(d.classId==="fullstack")codeParts.push("Fullstack: +1 temporaneo");
+  if(isActive&&c.temporaryCodeBonus)codeParts.push(`Bonus temporaneo: +${c.temporaryCodeBonus}`);
   if(d.classId==="junior"&&d.hp<d.maxHp*.5)codeParts.push("Junior sotto 50% HP: +2 DEBUG");
   const debugParts=[`Base: ${d.debug}`];
   const debugItems=d.items.reduce((n,x)=>n+x.debugBonus,0);
   if(debugItems)debugParts.push(`Oggetti: +${debugItems}`);
   if(d.classId==="junior"&&d.hp<d.maxHp*.5)debugParts.push("Junior sotto 50% HP: +2");
   if(d.classId==="hacker"&&enemy.typeId==="client")debugParts.push("Hacker contro Client: +3");
-  const code=d.code+codeItems+(d.classId==="senior"?2:0)+(d.classId==="fullstack"?1:0);
+  const code=d.code+codeItems+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
   const debug=d.debug+debugItems+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
   return {code,debug,codeTip:codeParts.join(" · "),debugTip:debugParts.join(" · ")};
 };
-const activeStats=effectiveStats(active);
+const activeStats=effectiveStats(active,true);
 const memberInfo=(d:Developer,i:number)=>{
   const stats=effectiveStats(d);
   const disabled=d.hp<=0||d.stress>=100;
