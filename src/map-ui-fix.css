@@ -4,3 +4,91 @@
 .map-panel>.map-viewport{display:block!important;width:100%!important;margin-top:14px!important}
 .map-panel>.choice-panel{display:block!important;width:100%!important;margin-top:14px!important}
 .map-panel>.team-strip{display:grid!important;width:100%!important;margin-top:14px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;flex-direction:initial!important}
+
+
+/* Final strategic-map layout: controls + team on the left, map on the right. */
+.map-panel{
+  display:grid!important;
+  grid-template-columns:minmax(220px,280px) minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto minmax(0,1fr) auto!important;
+  column-gap:18px!important;
+  row-gap:12px!important;
+  align-items:start!important;
+}
+.map-panel>.map-top{grid-column:1 / -1!important;grid-row:1!important;}
+.map-panel>.map-objective{grid-column:1 / -1!important;grid-row:2!important;}
+.map-panel>.roguelike-help{grid-column:2!important;grid-row:3!important;}
+.map-panel>.map-viewport{
+  grid-column:2!important;grid-row:4!important;
+  width:100%!important;min-width:0!important;
+  margin:0!important;min-height:520px!important;
+}
+.map-panel>.choice-panel{
+  grid-column:2!important;grid-row:5!important;
+  width:100%!important;margin:0!important;
+}
+.map-panel>.team-controls{
+  grid-column:1!important;grid-row:3!important;
+  width:100%!important;margin:0!important;
+}
+.map-panel>.team-strip{
+  grid-column:1!important;grid-row:4 / span 2!important;
+  width:100%!important;margin:0!important;
+  display:flex!important;flex-direction:column!important;
+  gap:10px!important;
+  align-self:start!important;
+}
+.map-panel>.team-strip .team-summary{width:100%!important;}
+.team-controls{
+  display:block!important;
+  padding:12px!important;
+  border:1px solid #343b4b!important;
+  background:#111722!important;
+  box-sizing:border-box!important;
+}
+.team-controls-title{
+  font-size:10px!important;
+  letter-spacing:1.2px!important;
+  opacity:.65!important;
+  margin-bottom:9px!important;
+}
+.team-controls-buttons{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:8px!important;
+}
+.team-controls .equipment-button{
+  width:100%!important;
+  min-height:40px!important;
+  border:1px solid #596276!important;
+  background:#0c1018!important;
+  color:inherit!important;
+  cursor:pointer!important;
+  font:inherit!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.8px!important;
+  text-align:left!important;
+  padding:9px 10px!important;
+}
+.team-controls .equipment-button:hover{
+  filter:brightness(1.15)!important;
+}
+@media(max-width:800px){
+  .map-panel{
+    display:block!important;
+  }
+  .map-panel>.map-top,
+  .map-panel>.map-objective,
+  .map-panel>.roguelike-help,
+  .map-panel>.map-viewport,
+  .map-panel>.choice-panel,
+  .map-panel>.team-controls,
+  .map-panel>.team-strip{
+    width:100%!important;
+    margin-top:14px!important;
+  }
+  .map-panel>.team-controls{margin-top:14px!important;}
+  .map-panel>.team-strip{margin-top:10px!important;}
+  .map-panel>.map-viewport{min-height:420px!important;}
+}
