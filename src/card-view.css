@@ -14,7 +14,7 @@
 .poker-card-effect b{font-size:8px;line-height:1.2;text-transform:uppercase;color:#111722!important}
 .poker-card-effect p{font-size:7px;line-height:1.35;margin:5px 0 0;color:#303641!important}
 .poker-card-flavor{font-size:6.5px;line-height:1.25;font-style:italic;text-align:center;color:#5e5a53!important;border-top:1px solid #aaa49a;padding-top:5px;margin-top:5px;position:relative;z-index:1}
-.poker-card-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:5px;font-size:6px;font-weight:900;letter-spacing:.08em;position:relative;z-index:1;color:#2563eb!important}.poker-card-bottom span:last-child{font-size:7px!important;color:#2563eb!important;letter-spacing:.02em!important}
+.poker-card-bottom{display:none!important}
 .poker-card-tier-2{border-color:#b8a36c}.poker-card-tier-3{border-color:#8c9cb2}.poker-card-tier-4{border-color:#a88bb8}
 .poker-card-host.selected .poker-card{box-shadow:0 0 0 2px #5d88d9,4px 5px 0 rgba(0,0,0,.3),inset 0 0 0 2px #8f8a80}
 .poker-card-host:disabled{opacity:.55}
