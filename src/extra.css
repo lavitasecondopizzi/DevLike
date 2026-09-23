@@ -506,3 +506,91 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
 @media(max-width:450px){
   .battle-redesign .hand{grid-template-columns:1fr!important}
 }
+
+
+/* ===== COMBAT COSTS + DECK VIEWER ===== */
+.battle-redesign .battle-energy small{
+  font-size:10px!important;
+  color:#8f8350!important;
+  letter-spacing:.08em!important;
+}
+.battle-redesign .battle-actions button small{
+  font-weight:700!important;
+  letter-spacing:.02em!important;
+}
+.battle-redesign .battle-member-switch-cost{
+  margin-top:5px!important;
+  padding-top:4px!important;
+  border-top:1px solid #303b4a!important;
+  color:#8f9aae!important;
+  font-size:10px!important;
+  letter-spacing:.04em!important;
+}
+.battle-redesign .battle-hand-label{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+.battle-redesign .battle-hand-label>b{
+  margin-left:auto!important;
+}
+.battle-redesign .deck-counter{
+  padding:5px 8px!important;
+  border:1px solid #49617b!important;
+  background:#111a25!important;
+  color:#a9c7e7!important;
+  cursor:pointer!important;
+}
+.battle-redesign .deck-counter:hover{
+  border-color:#6b91bd!important;
+}
+.battle-redesign .deck-viewer{
+  position:absolute!important;
+  z-index:20!important;
+  left:8px!important;
+  right:8px!important;
+  top:8px!important;
+  bottom:8px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:0!important;
+  padding:12px!important;
+  border:2px solid #49617b!important;
+  background:#101722!important;
+  box-shadow:0 18px 45px rgba(0,0,0,.55)!important;
+}
+.battle-redesign .battle-main{
+  position:relative!important;
+}
+.battle-redesign .deck-viewer-head{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding-bottom:9px!important;
+  margin-bottom:9px!important;
+  border-bottom:1px solid #394555!important;
+}
+.battle-redesign .deck-viewer-head b{
+  font-size:12px!important;
+}
+.battle-redesign .deck-viewer-head button{
+  margin-left:auto!important;
+  padding:5px 9px!important;
+  cursor:pointer!important;
+}
+.battle-redesign .deck-viewer-grid{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fill,minmax(145px,1fr))!important;
+  gap:8px!important;
+  min-height:0!important;
+  overflow:auto!important;
+  padding:3px!important;
+}
+.battle-redesign .deck-viewer-card{
+  min-width:0!important;
+}
+.battle-redesign .deck-viewer-card .poker-card{
+  width:100%!important;
+  height:auto!important;
+  min-height:170px!important;
+}
