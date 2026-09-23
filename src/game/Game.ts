@@ -159,9 +159,9 @@ export class Game {
       }
     }
 
-    if(this.tempo<=0){
+    if(this.tempo<=0 && node.id!=="rest-final"){
       this.skipFinalRestForTimeout();
-    }else if(node.row>=6){
+    }else if(node.row>=6 && node.id!=="rest-final"){
       this.message="Ultima tappa completata. La PAUSA FINALE è davanti a te.";
       const finalRest=this.mapNodes.find(n=>n.id==="rest-final");
       if(finalRest)node.next=[finalRest.id];
