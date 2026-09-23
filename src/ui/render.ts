@@ -89,7 +89,6 @@ function screen(game:Game){
       <div class="map-objective"><strong>OBIETTIVO</strong><span>Segui il percorso, gestisci il Tempo e arriva alla PAUSA FINALE prima della DEADLINE.</span></div>
       <div class="roguelike-help"><span>⚔ BATTAGLIA</span><span>☠ ELITE</span><span>? EVENTO</span><span>◆ TOOL</span><span>🔧 OGGETTO</span><span>👤 RECLUTA</span><span>+ PAUSA</span><span>☠ DEADLINE</span></div>
       ${renderMap(game)}
-      <div class="choice-panel"><b>${choices.length?`SCEGLI LA PROSSIMA DESTINAZIONE · ${choices.length} STRADE`:"PERCORSO CONCLUSO"}</b><small>${choices.length?choiceText:"La Deadline è arrivata."}</small></div>
       <div class="team-strip">${game.team.map(teamSummary).join("")}</div>
     </section>`;
   }
