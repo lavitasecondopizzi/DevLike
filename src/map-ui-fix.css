@@ -110,3 +110,19 @@
 .map-panel>.map-viewport .map-lines{
   pointer-events:none!important;
 }
+
+/* Final map presentation: no internal scrolling; the whole graph fits naturally. */
+.map-panel>.map-viewport{
+  max-height:none!important;
+  min-height:0!important;
+  overflow:visible!important;
+  padding:8px 0!important;
+}
+.map-panel>.map-viewport .map-canvas{
+  min-height:0!important;
+  height:auto!important;
+}
+.map-panel>.map-viewport .map-node-wrap{
+  transform:translate(-50%,-50%) scale(.82)!important;
+  transform-origin:center center!important;
+}
