@@ -45,17 +45,29 @@ function cardDetails(c: Card) {
 }
 
 function itemDetails(i: Item) {
-  return `<div class="codex-detail-head"><div><span class="codex-kicker">OGGETTO · POTENZA ${i.codeBonus + i.debugBonus}</span><h2>${esc(i.name)}</h2></div></div><p class="codex-description">${esc(i.description)}</p><div class="codex-stats"><span>CODICE <b>+${i.codeBonus}</b></span><span>DEBUG <b>+${i.debugBonus}</b></span><span>POTENZA <b>${i.codeBonus + i.debugBonus}</b></span><span>SLOT <b>1</b></span></div><section class="codex-block"><h3>EFFETTO</h3><p>${i.codeBonus ? `+${i.codeBonus} CODICE` : "Nessun bonus CODICE"} · ${i.debugBonus ? `+${i.debugBonus} DEBUG` : "Nessun bonus DEBUG"}</p></section>`;
+  return `<div class="codex-detail-head"><div><span class="codex-kicker">OGGETTO · TIER ${i.tier}</span><h2>${esc(i.name)}</h2></div></div><p class="codex-description">${esc(i.description)}</p><div class="codex-stats"><span>TIER <b>${i.tier}</b></span><span>CODICE <b>+${i.codeBonus}</b></span><span>DEBUG <b>+${i.debugBonus}</b></span><span>POTENZA <b>${i.codeBonus + i.debugBonus}</b></span><span>SLOT <b>1</b></span></div><section class="codex-block"><h3>EFFETTO</h3><p>${i.codeBonus ? `+${i.codeBonus} CODICE` : "Nessun bonus CODICE"} · ${i.debugBonus ? `+${i.debugBonus} DEBUG` : "Nessun bonus DEBUG"}</p></section>`;
 }
 
-function dataForCategory(category: string): Array<{ id: string; name: string; subtitle: string; details: string }> {
-  if (category === "developers") return developers.map(d => ({ id: d.id, name: d.name, subtitle: `T${d.tier} · ${d.role} · ${d.code} COD / ${d.debug} DEBUG`, details: developerDetails(d) }));
-  if (category === "enemies") return [...enemies, boss].map(e => ({ id: e.id, name: e.name, subtitle: e.type, details: enemyDetails(e) }));
+function dataForCategory(category: string): Array<{ id: string; name: string; subtitle: string; details: string; tier?: number }> {
+  if (category === "developers") {
+    return [...developers]
+      .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "it"))
+      .map(d => ({ id: d.id, name: d.name, tier: d.tier, subtitle: `T${d.tier} · ${d.role} · ${d.code} COD / ${d.debug} DEBUG`, details: developerDetails(d) }));
+  }
+  if (category === "enemies") {
+    return [...enemies, boss]
+      .sort((a, b) => a.name.localeCompare(b.name, "it"))
+      .map(e => ({ id: e.id, name: e.name, subtitle: e.type, details: enemyDetails(e) }));
+  }
   if (category === "cards") {
     const all = [...startingDeck, ...rewardCards].filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i);
-    return all.map(c => ({ id: c.id, name: c.name, subtitle: `T${c.tier ?? 1} · ${c.cost} ⚡ · ${cardEffect(c)}`, details: cardDetails(c) }));
+    return all
+      .sort((a, b) => (a.tier ?? 1) - (b.tier ?? 1) || a.name.localeCompare(b.name, "it"))
+      .map(c => ({ id: c.id, name: c.name, tier: c.tier ?? 1, subtitle: `T${c.tier ?? 1} · ${c.cost} ⚡ · ${cardEffect(c)}`, details: cardDetails(c) }));
   }
-  return rewardItems.map(i => ({ id: i.id, name: i.name, subtitle: `+${i.codeBonus} COD · +${i.debugBonus} DEBUG`, details: itemDetails(i) }));
+  return [...rewardItems]
+    .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "it"))
+    .map(i => ({ id: i.id, name: i.name, tier: i.tier, subtitle: `T${i.tier} · +${i.codeBonus} COD · +${i.debugBonus} DEBUG`, details: itemDetails(i) }));
 }
 
 function codexMarkup() {
@@ -131,7 +143,18 @@ function codexRefresh(category: string, selectedId?: string) {
   const data = dataForCategory(category);
   const selected = data.find(x => x.id === selectedId) ?? data[0];
   tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.codexCategory === category));
-  if (list) list.innerHTML = data.map(x => `<button type="button" class="codex-entry ${x.id === selected?.id ? "selected" : ""}" data-codex-entry="${esc(x.id)}"><b>${esc(x.name)}</b><small>${esc(x.subtitle)}</small></button>`).join("");
+  if (list) {
+    let lastTier: number | undefined;
+    const markup: string[] = [];
+    data.forEach(x => {
+      if (x.tier !== undefined && x.tier !== lastTier) {
+        lastTier = x.tier;
+        markup.push(`<div class="codex-tier-divider"><span>TIER ${x.tier}</span></div>`);
+      }
+      markup.push(`<button type="button" class="codex-entry ${x.id === selected?.id ? "selected" : ""}" data-codex-entry="${esc(x.id)}"><b>${esc(x.name)}</b><small>${esc(x.subtitle)}</small></button>`);
+    });
+    list.innerHTML = markup.join("");
+  }
   if (detail) detail.innerHTML = selected?.details ?? `<div class="codex-empty">NESSUN RECORD</div>`;
 }
 
