@@ -138,7 +138,7 @@ export class Game {
 
     if(node.type==="battle"||node.type==="elite"){
       const source=enemies.find(e=>e.id===node.enemyId)??this.enemyForNode(node.type);
-      this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}}));
+      this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}},node.type==="elite"));
     }else if(node.type==="reward"){
       this.generateReward();
     }else if(node.type==="item"){
@@ -182,15 +182,17 @@ export class Game {
   selectRecruitTarget(index:number){if(this.team.length<3||!this.team[index])return;this.recruitTargetIndex=index;}
   confirmRecruitment(){if(this.selectedRecruitIndex===null)return;const c=this.recruitCandidates[this.selectedRecruitIndex];if(!c)return;const fresh={...c,hp:c.maxHp,stress:0,items:[]};if(this.team.length<3)this.team.push(fresh);else{if(this.recruitTargetIndex===null)return;this.team[this.recruitTargetIndex]=fresh;}this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.recruitCandidates=[];this.screen="map";this.message=`${c.name} entra nel team. Scegli il prossimo nodo.`;}
   private randomEnemy(elite=false):Enemy{const pool=elite?enemies.filter(e=>e.id==="client"||e.id==="legacy"):enemies;const source=pool[Math.floor(Math.random()*pool.length)]??enemies[0];return this.scaleEnemy({...source,intent:{...source.intent}});}
-  private scaleEnemy(enemy:Enemy):Enemy{const m=this.difficulty;return {...enemy,hp:Math.max(1,Math.round(enemy.maxHp*m)),maxHp:Math.max(1,Math.round(enemy.maxHp*m)),intent:{...enemy.intent,damage:Math.max(1,Math.round(enemy.intent.damage*m)),stress:Math.max(1,Math.round(enemy.intent.stress*(1+(m-1)*.5)))}};}
+  private scaleEnemy(enemy:Enemy,elite=false):Enemy{const m=this.difficulty*(elite?1.3:1);return {...enemy,hp:Math.max(1,Math.round(enemy.maxHp*m)),maxHp:Math.max(1,Math.round(enemy.maxHp*m)),intent:{...enemy.intent,damage:Math.max(1,Math.round(enemy.intent.damage*m)),stress:Math.max(1,Math.round(enemy.intent.stress*(1+(m-1)*.5)))}};}
   startBattle(enemy:Enemy){this.combat=new Combat(this.team,enemy,this.deck);this.screen="combat";this.pendingEnemy=null;}
   enterRandomBattle(){this.prepareBattle(this.randomEnemy());}
   enterBoss(){this.prepareBattle(this.scaleEnemy({...boss,intent:{...boss.intent}}));}
   chooseReward(_cardIndex:number){if(!this.reward)return;this.deck.push({...this.reward});this.reward=null;this.screen="map";this.message="Tool acquisito. Scegli il prossimo nodo.";}
   private shuffle<T>(items:T[]):T[]{return [...items].sort(()=>Math.random()-.5);}
   private generateBossRewards(){
-    const items=this.shuffle(rewardItems).slice(0,3).map(item=>({kind:"item" as const,item:this.cloneItem(item)}));
-    const tools=this.shuffle(rewardCards).slice(0,3).map(card=>({kind:"tool" as const,card:{...card}}));
+    const bossItems=this.shuffle(rewardItems.filter(item=>item.codeBonus+item.debugBonus>=4));
+    const bossCards=this.shuffle(rewardCards.filter(card=>(card.tier??1)>=2));
+    const items=bossItems.slice(0,3).map(item=>({kind:"item" as const,item:this.cloneItem(item)}));
+    const tools=bossCards.slice(0,3).map(card=>({kind:"tool" as const,card:{...card}}));
     this.bossRewardOptions=[...items,...tools];
     this.screen="bossReward";
     this.message="La DEADLINE è stata chiusa. Scegli UNA sola ricompensa: 3 oggetti da mettere nello ZAINO oppure 3 Tool.";
@@ -242,8 +244,25 @@ export class Game {
     this.message=`EVENTO: ${choice.label}. ${choice.description}${rewardText}`;
     if(this.tempo<=0)this.skipFinalRestForTimeout();
   }
-  generateReward(){const reward=rewardCards[Math.floor(Math.random()*rewardCards.length)];if(reward)this.reward={...reward};this.screen="reward";}
-  generateItemReward(){const item=rewardItems[Math.floor(Math.random()*rewardItems.length)];if(!item)return;this.itemReward=this.cloneItem(item);this.selectedItemTargetIndex=null;this.screen="itemReward";this.message="Oggetto sbloccato. Puoi equipaggiarlo subito oppure metterlo nello zaino.";}
+  private rewardTierForStage():number{const row=this.currentMapNode?.row??1;if(row<=2)return 1;if(row<=4)return 2;if(row===5)return 3;return 3;}
+  private randomRewardCard():Card{
+    const maxTier=this.rewardTierForStage();
+    const pool=rewardCards.filter(card=>(card.tier??1)<=maxTier);
+    const tierPool=pool.filter(card=>(card.tier??1)===maxTier);
+    const source=(tierPool.length&&Math.random()<.72?tierPool:pool);
+    return source[Math.floor(Math.random()*source.length)]??rewardCards[0];
+  }
+  private randomRewardItem():Item{
+    const row=this.currentMapNode?.row??1;
+    const maxScore=row<=2?3:row<=4?4:5;
+    const pool=rewardItems.filter(item=>item.codeBonus+item.debugBonus<=maxScore);
+    const latePool=pool.filter(item=>item.codeBonus+item.debugBonus>=Math.min(maxScore,4));
+    const source=(latePool.length&&row>=3&&Math.random()<.7?latePool:pool);
+    return source[Math.floor(Math.random()*source.length)]??rewardItems[0];
+  }
+  generateReward(){const reward=this.randomRewardCard();if(reward)this.reward={...reward};this.screen="reward";}
+
+  generateItemReward(){const item=this.randomRewardItem();if(!item)return;this.itemReward=this.cloneItem(item);this.selectedItemTargetIndex=null;this.screen="itemReward";this.message="Oggetto sbloccato. Puoi equipaggiarlo subito oppure metterlo nello zaino.";}
   selectItemTarget(index:number){if(!this.team[index]||this.team[index].items.length>=2||!this.itemReward)return;this.selectedItemTargetIndex=index;}
   confirmItemReward(){if(!this.itemReward||this.selectedItemTargetIndex===null)return;const target=this.team[this.selectedItemTargetIndex];if(!target||target.items.length>=2)return;target.items.push(this.cloneItem(this.itemReward));const name=target.name,item=this.itemReward.name;this.itemReward=null;this.selectedItemTargetIndex=null;this.screen="map";this.message=`${item} equipaggiato su ${name}. Puoi spostarlo in seguito da EQUIPMENT.`;}
   storeItemReward(){if(!this.itemReward)return;const itemName=this.itemReward.name;this.inventory.push(this.cloneItem(this.itemReward));this.itemReward=null;this.selectedItemTargetIndex=null;this.screen="map";this.message=`${itemName} messo nello ZAINO. Puoi equipaggiarlo quando vuoi.`;}
