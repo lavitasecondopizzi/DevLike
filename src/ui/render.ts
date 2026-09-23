@@ -40,16 +40,20 @@ function renderMapNode(node:MapNode,game:Game){
   return `<button type="button" class="${nodeClass(node,game)}" data-map-node="${node.id}" ${available?"":"disabled"} title="${esc(node.description)}"><span class="node-icon">${nodeIcon[node.type]}</span><b>${esc(label)}</b><small>${typeLabel}</small></button>`;
 }
 function renderMap(game:Game){
-  const current=game.currentMapNode;
-  const choices=game.availableMapNodes;
-  const history=game.mapNodes.filter(n=>n.visited&&n.type!=="boss").sort((a,b)=>a.row-b.row);
-  const historyHtml=history.map((node,i)=>`<div class="map-history-step"><span>${i+1}</span><div><b>${esc(node.title)}</b><small>${node.type.toUpperCase()}</small></div></div>`).join("");
-  const choicesHtml=choices.map(node=>`<div class="map-choice-wrap">${renderMapNode(node,game)}</div>`).join("");
-  return `<div class="map-board">
-    <div class="map-history">${historyHtml}</div>
-    <div class="map-current-label"><span>POSIZIONE ATTUALE</span><b>${current?esc(current.title):"START"}</b></div>
-    <div class="map-choice-grid">${choicesHtml}</div>
-  </div>`;
+  const width=960,rowHeight=105;
+  const x=(c:number)=>160+c*320;
+  const y=(row:number)=>48+row*rowHeight;
+  const maxRow=Math.max(8,...game.mapNodes.map(n=>n.row));
+  const height=maxRow*rowHeight+110;
+  const lines=game.mapNodes.flatMap(node=>node.next.map(nextId=>{
+    const target=game.mapNodes.find(n=>n.id===nextId);
+    if(!target)return "";
+    const active=node.visited&&target.visited;
+    const reachable=node.visited&&game.availableMapNodes.some(n=>n.id===target.id);
+    return `<line class="map-line ${active?"active":""} ${reachable?"reachable":""}" x1="${x(node.col)}" y1="${y(node.row)}" x2="${x(target.col)}" y2="${y(target.row)}"/>`;
+  })).join("");
+  const nodes=game.mapNodes.map(node=>`<div class="map-node-wrap" style="left:${x(node.col)/width*100}%;top:${y(node.row)}px">${renderMapNode(node,game)}</div>`).join("");
+  return `<div class="map-viewport"><div class="map-canvas" style="height:${height}px;width:${width}px;min-width:${width}px"><svg class="map-lines" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${lines}</svg>${nodes}</div></div>`;
 }
 function teamSummary(dev:Developer,i:number){return `<div class="team-summary ${i===0?"main-member":""}">${devCard(dev,i===0,true)}</div>`;}
 
@@ -64,24 +68,18 @@ function screen(game:Game){
   if(game.screen==="team")return `<section class="panel selection-panel"><div class="selection-heading"><div><h2>SCEGLI IL DEVELOPER PRINCIPALE</h2><p>Ogni progetto parte con un solo developer. Gli altri arriveranno lungo il percorso.</p></div><span class="random-badge">3 CANDIDATI CASUALI</span></div><div class="developer-choice-grid">${game.startingCandidates.map(dev=>`<button type="button" class="developer-choice ${game.selectedStartingId===dev.id?"selected":""}" data-dev="${dev.id}">${devCard(dev,game.selectedStartingId===dev.id)}</button>`).join("")}</div><div class="selection-footer"><div class="selection-hint">${game.selectedStartingId?"Developer selezionato. Controlla statistiche, abilità, vantaggi e debolezze, poi conferma.":"Clicca una scheda per selezionare il tuo protagonista."}</div><button type="button" class="primary" data-action="confirm-start" ${game.selectedStartingId?"":"disabled"}>INIZIA IL PROGETTO</button></div></section>`;
   if(game.screen==="map"){
     const choices=game.availableMapNodes;
-    const choiceText=choices.map(node=>`${nodeIcon[node.type]} ${node.hiddenEncounter?"?":node.title} — ${esc(node.description)}`).join("<br>");
     const progress=Math.min(6,Math.max(0,game.currentNode));
     const tempoState=game.tempo<=2?"CRITICO":game.tempo<=4?"BASSO":"OK";
+    const choiceText=choices.map(node=>`${nodeIcon[node.type]} ${node.hiddenEncounter?"?":node.title} — ${esc(node.description)}`).join("<br>");
     return `<section class="panel map-panel">
       <div class="map-top">
         <div><b>MISSIONE #${game.projectNumber}</b><br><small>${esc(game.message||"Scegli il prossimo nodo.")}</small></div>
-        <div class="map-status">
-          <span class="tempo-badge ${tempoState.toLowerCase()}">TEMPO <b>${game.tempo}</b></span>
-          <span class="map-progress">TAPPA <b>${progress}/6</b></span>
-        </div>
+        <div class="map-status"><span class="tempo-badge ${tempoState.toLowerCase()}">TEMPO <b>${game.tempo}</b></span><span class="map-progress">TAPPA <b>${progress}/6</b></span></div>
       </div>
-      <div class="map-objective"><strong>OBIETTIVO</strong><span>Supera 6 tappe, raggiungi la PAUSA FINALE e affronta la DEADLINE.</span></div>
+      <div class="map-objective"><strong>OBIETTIVO</strong><span>Segui il percorso, gestisci il Tempo e arriva alla PAUSA FINALE prima della DEADLINE.</span></div>
       <div class="roguelike-help"><span>⚔ BATTAGLIA</span><span>☠ ELITE</span><span>? EVENTO</span><span>◆ TOOL</span><span>🔧 OGGETTO</span><span>👤 RECLUTA</span><span>+ PAUSA</span><span>☠ DEADLINE</span></div>
       ${renderMap(game)}
-      <div class="choice-panel">
-        <b>${choices.length?`SCEGLI LA PROSSIMA DESTINAZIONE · ${choices.length} OPZIONI`:"NESSUNA DESTINAZIONE DISPONIBILE"}</b>
-        <small>${choices.length?choiceText:"La Deadline è arrivata."}</small>
-      </div>
+      <div class="choice-panel"><b>${choices.length?`SCEGLI LA PROSSIMA DESTINAZIONE · ${choices.length} STRADE`:"PERCORSO CONCLUSO"}</b><small>${choices.length?choiceText:"La Deadline è arrivata."}</small></div>
       <div class="team-strip">${game.team.map(teamSummary).join("")}</div>
     </section>`;
   }
