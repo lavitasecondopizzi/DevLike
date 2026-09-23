@@ -29,3 +29,219 @@ header{display:flex;justify-content:space-between;align-items:center;border:2px 
 @media(max-width:1000px){.developer-choice-grid,.replacement-team,.assignment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.battle-setup .lineup{grid-template-columns:minmax(0,1fr) minmax(170px,210px) minmax(0,1fr)}.equipment-layout{grid-template-columns:minmax(0,1fr) 260px}.equipment-developer{grid-template-columns:1fr}.enemy-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.team-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:800px){.game-shell{width:calc(100% - 16px)}.developer-choice-grid,.team-strip,.replacement-team,.assignment-grid{grid-template-columns:1fr}.selection-heading,.selection-footer,.setup-footer,.equipment-footer{flex-direction:column;align-items:stretch}.random-badge{align-self:flex-start}.battle-setup .lineup{grid-template-columns:1fr}.battle-drop-zone{min-height:180px}.combat-area{grid-template-columns:1fr}.hand{grid-template-columns:repeat(2,minmax(0,1fr))}.map-top{flex-direction:column}.map-progress{text-align:left}.equipment-layout{grid-template-columns:1fr}.backpack{align-self:stretch}.header-right{flex-direction:column;align-items:flex-end}.header-stat{font-size:6px}}
 @media(max-width:520px){.game-shell{width:calc(100% - 10px)}header{padding:10px;align-items:flex-start}.logo{font-size:16px}.header-stat{font-size:5px}.equipment-button{font-size:5px;padding:7px}.selection-panel,.battle-setup,.equipment-panel{padding:14px}.dev-card{padding:11px}.dev-head b{font-size:9px}.dev-head span{font-size:6px}.dev-description{font-size:13px}.ability{font-size:12px}.matchup-grid{grid-template-columns:1fr}.slot-row{grid-template-columns:1fr}.combat-actions{grid-template-columns:1fr}.hand{grid-template-columns:1fr}.map-canvas{margin-left:0}.enemy-stat-grid{grid-template-columns:1fr 1fr}}
+
+
+/* ===== DEVLIKE VISUAL SYSTEM v2 =====
+   Clean, standard UI with restrained retro accents.
+*/
+:root{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:#e8edf5;
+  background:#0a0e15;
+  line-height:1.45;
+  font-synthesis:none;
+}
+html,body,#app{min-height:100%}
+body{
+  min-width:320px;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(59,130,246,.12),transparent 42%),
+    #0a0e15;
+}
+button{font-family:inherit;image-rendering:auto;border:1px solid #334155;border-radius:8px;background:#151c28;padding:10px 13px;transition:background .15s,border-color .15s,transform .15s,box-shadow .15s}
+button:hover:not(:disabled){border-color:#64748b;background:#1b2533;transform:translateY(-1px)}
+button:focus-visible{outline:2px solid #60a5fa;outline-offset:2px}
+button:disabled{opacity:.45}
+.game-shell{width:min(1280px,calc(100% - 28px));margin:14px auto 32px}
+header{
+  border:1px solid #263243;
+  border-radius:12px;
+  background:rgba(15,22,32,.94);
+  padding:13px 18px;
+  margin-bottom:14px;
+  min-height:62px;
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+}
+.logo{font-family:"Press Start 2P",monospace;font-size:18px;letter-spacing:.02em}
+.logo span{color:#60a5fa}
+header small{font-family:inherit;font-size:10px;color:#7f8b9d;margin-top:4px}
+.header-right{gap:8px}
+.header-stat{font-size:11px;color:#9aa7b8;line-height:1.5}
+
+.panel{
+  border:1px solid #263243;
+  border-radius:12px;
+  background:#101720;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+.center{padding:64px 28px}
+.center h1{font-family:"Press Start 2P",monospace;color:#60a5fa;letter-spacing:.02em}
+.center p{font-size:15px;color:#9aa7b8}
+.pixel-icon{font-family:"Press Start 2P",monospace;color:#60a5fa}
+
+.primary{
+  border-color:#3b82f6;
+  background:#2563eb;
+  color:#fff;
+  box-shadow:0 4px 12px rgba(37,99,235,.2);
+}
+.primary:hover:not(:disabled){background:#3b82f6;border-color:#60a5fa}
+.secondary{background:#182230;border-color:#3b506b}
+.danger{background:#3a161b;border-color:#8b3a46}
+
+.selection-panel,.battle-setup,.equipment-panel{padding:24px}
+.selection-heading{margin-bottom:22px}
+.selection-heading h2{font-family:inherit;font-size:20px;font-weight:750;letter-spacing:-.02em;color:#f1f5f9;margin-bottom:6px}
+.selection-heading p{font-size:14px;color:#8f9bad;line-height:1.55}
+.random-badge{
+  border:1px solid #35506f;
+  border-radius:999px;
+  background:#172638;
+  color:#9bc7ff;
+  padding:7px 11px;
+  font-family:inherit;
+  font-size:10px;
+}
+
+.developer-choice-grid{gap:16px}
+.developer-choice>.dev-card{height:100%}
+.dev-card{
+  border:1px solid #2f3d50;
+  border-radius:10px;
+  background:#151e2a;
+  padding:16px;
+  box-shadow:0 5px 18px rgba(0,0,0,.14);
+}
+.dev-card:hover{border-color:#48627f}
+.dev-card.selected{border-color:#60a5fa;box-shadow:0 0 0 1px #60a5fa,0 8px 24px rgba(0,0,0,.2);background:#182538}
+.dev-head b{font-size:13px;font-family:inherit}
+.dev-head span{font-size:11px;color:#8f9bad}
+.dev-description{font-size:13px;line-height:1.55;color:#b7c0ce}
+.stat-line{font-size:10px}
+.bar,.stress{height:7px;border:0;border-radius:999px;background:#202a38;margin:5px 0 10px}
+.bar i,.stress i{border-radius:999px}
+.stat-grid{gap:8px;margin:12px 0}
+.stat-grid span{border:1px solid #2c394a;border-radius:7px;background:#101720;padding:9px;font-family:inherit;font-size:10px}
+.stat-grid b{font-size:15px}
+.ability{border-top:1px solid #2b3747;color:#b7c0ce;font-size:13px}
+.ability strong{font-family:inherit;font-size:10px;color:#93c5fd}
+.matchup-grid{gap:8px}
+.matchup-grid>div{border:1px solid #2b3747;border-radius:7px;background:#0e151e;padding:9px}
+.matchup-grid strong{font-family:inherit;font-size:9px}
+.matchup-grid span{font-size:11px}
+
+.equipment-slots{border-top-color:#2b3747}
+.equipment-slots>strong{font-family:inherit;font-size:9px;color:#93c5fd}
+.equip-slot{border:1px solid #334155;border-radius:7px;background:#101720}
+.equip-slot.filled{border-color:#315a76;background:#10283a}
+.equip-slot.filled b{color:#8bd5ff}
+.selection-footer,.setup-footer,.equipment-footer{margin-top:22px}
+.selection-hint{font-size:13px;color:#8794a6}
+
+.map-panel{gap:14px}
+.map-top{
+  padding:2px 2px 14px;
+  border-bottom:1px solid #263243;
+}
+.map-progress{color:#7f8b9d;font-size:10px;text-align:right}
+.map-progress b{color:#60a5fa;letter-spacing:1px}
+.roguelike-help{
+  border:1px solid #263243;
+  border-radius:8px;
+  background:#0d141d;
+  padding:9px 11px;
+  color:#8f9bad;
+  font-size:10px;
+}
+.choice-panel{
+  border:1px solid #2f4054;
+  border-radius:9px;
+  background:#131d29;
+  padding:12px 14px;
+}
+.choice-panel b{font-size:11px;color:#dce6f3}
+.choice-panel small{display:block;margin-top:5px;color:#8f9bad;font-size:12px;line-height:1.5}
+.team-strip{gap:10px}
+.team-summary .dev-card{border-radius:9px;padding:12px}
+.map-node{
+  border-radius:10px!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.2)!important;
+}
+.map-node.available:not(.visited){
+  border-color:#4f79a3!important;
+  box-shadow:0 0 0 2px rgba(96,165,250,.1),0 5px 14px rgba(0,0,0,.25)!important;
+}
+.map-node.current{border-color:#60a5fa!important}
+
+.starter-deck-preview{
+  border:1px solid #263243;
+  border-radius:10px;
+  background:#0d141d;
+  box-shadow:none;
+}
+.starter-deck-heading h3{font-family:inherit;font-size:13px;color:#93c5fd}
+.starter-deck-heading>span{border:1px solid #315a76;border-radius:999px;background:#10283a;color:#8bd5ff;font-family:inherit;font-size:10px}
+.starter-card{border:1px solid #2f3d50;border-radius:8px;background:#151e2a}
+.starter-card-top b{font-family:inherit;font-size:11px;color:#dce6f3}
+.starter-card-top strong{font-family:inherit;font-size:10px;color:#8bd5ff}
+.starter-card p{font-size:11px;color:#9aa7b8}
+
+.battle-setup .selection-heading{border-bottom:1px solid #263243;padding-bottom:18px}
+.lineup{gap:18px}
+.lineup-side>h3{font-family:inherit;font-size:11px;color:#93a4b8}
+.battle-drop-zone{
+  border:1px dashed #40556f!important;
+  border-radius:12px!important;
+  background:#0d141d!important;
+}
+.battle-drop-zone.drag-over{border-color:#60a5fa!important;background:#122136!important}
+
+.assignment-card,.replacement-team button{
+  border:1px solid #2f3d50;
+  border-radius:9px;
+  background:#151e2a;
+}
+.assignment-card.selected,.replacement-team button.selected{border-color:#60a5fa;background:#182538}
+
+.equipment-layout{gap:18px}
+.backpack{
+  border:1px solid #263243;
+  border-radius:10px;
+  background:#0d141d;
+}
+.backpack-item{
+  border:1px solid #2f3d50;
+  border-radius:8px;
+  background:#151e2a;
+}
+.backpack-item:hover,.backpack-item.selected{border-color:#60a5fa;background:#182538}
+
+.reward-card{
+  max-width:420px;
+  margin:20px auto;
+  border:1px solid #40556f;
+  border-radius:10px;
+  background:#151e2a;
+  padding:18px;
+  text-align:left;
+}
+.reward-card b{font-family:inherit;font-size:14px}
+.reward-card span{color:#8bd5ff}
+.reward-card small{font-family:inherit;font-size:12px;line-height:1.5;color:#9aa7b8}
+
+@media(max-width:800px){
+  .game-shell{width:min(100% - 18px,1280px);margin-top:9px}
+  header{padding:11px 13px}
+  .header-stat{font-size:9px}
+  .panel{padding:16px}
+  .selection-heading{flex-direction:column}
+  .selection-heading h2{font-size:18px}
+}
+@media(max-width:520px){
+  .logo{font-size:15px}
+  .header-right{display:none}
+  .panel{border-radius:9px}
+  .developer-choice-grid{grid-template-columns:1fr}
+  .selection-footer,.setup-footer,.equipment-footer{flex-direction:column;align-items:stretch}
+}
