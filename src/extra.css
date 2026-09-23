@@ -165,7 +165,7 @@ header small,.header-stat{font-size:9px!important;line-height:1.6!important}
   line-height:1.4!important;
   font-weight:400;
   text-align:left;
-  white-space:normal;
+  white-space:pre-line;
   box-shadow:0 6px 18px rgba(0,0,0,.35);
   opacity:0;
   pointer-events:none;
