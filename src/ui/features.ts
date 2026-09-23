@@ -24,9 +24,9 @@ function cardEffect(card: Card) {
 }
 
 function developerDetails(d: Developer) {
-  return `<div class="codex-detail-head"><div><span class="codex-kicker">DEVELOPER</span><h2>${esc(d.name)}</h2><b>${esc(d.role)}</b></div></div>
+  return `<div class="codex-detail-head"><div><span class="codex-kicker">DEVELOPER · TIER ${d.tier}</span><h2>${esc(d.name)}</h2><b>${esc(d.role)}</b></div></div>
     <p class="codex-description">${esc(d.description)}</p>
-    <div class="codex-stats"><span>HP <b>${d.maxHp}</b></span><span>CODICE <b>${d.code}</b></span><span>DEBUG <b>${d.debug}</b></span><span>STRESS MAX <b>100</b></span></div>
+    <div class="codex-stats"><span>TIER <b>${d.tier}</b></span><span>HP <b>${d.maxHp}</b></span><span>CODICE <b>${d.code}</b></span><span>DEBUG <b>${d.debug}</b></span><span>STRESS MAX <b>${d.maxStress}</b></span></div>
     <section class="codex-block"><h3>ABILITÀ</h3><p>${esc(d.passive)}</p></section>
     <div class="codex-two"><section class="codex-block"><h3>VANTAGGI</h3>${d.advantages.map(x => `<p>${esc(x)}</p>`).join("")}</section><section class="codex-block"><h3>DEBOLEZZE</h3>${d.weaknesses.map(x => `<p>${esc(x)}</p>`).join("")}</section></div>`;
 }
@@ -49,7 +49,7 @@ function itemDetails(i: Item) {
 }
 
 function dataForCategory(category: string): Array<{ id: string; name: string; subtitle: string; details: string }> {
-  if (category === "developers") return developers.map(d => ({ id: d.id, name: d.name, subtitle: d.role, details: developerDetails(d) }));
+  if (category === "developers") return developers.map(d => ({ id: d.id, name: d.name, subtitle: `T${d.tier} · ${d.role} · ${d.code} COD / ${d.debug} DEBUG`, details: developerDetails(d) }));
   if (category === "enemies") return [...enemies, boss].map(e => ({ id: e.id, name: e.name, subtitle: e.type, details: enemyDetails(e) }));
   if (category === "cards") {
     const all = [...startingDeck, ...rewardCards].filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i);
