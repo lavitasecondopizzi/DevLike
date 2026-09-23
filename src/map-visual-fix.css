@@ -1,6 +1,7 @@
 /* MAP PATH HISTORY */
-/* Keep the complete generated graph visible. The active path is highlighted separately. */
-.map-lines .map-line{display:block!important}
+/* Connections stay hidden until that segment has actually been chosen. */
+.map-lines .map-line{display:none!important}
+.map-lines .map-line.active{display:block!important}
 
 /* Visited nodes remain active-looking, but clearly darker and non-interactive. */
 .map-node.visited:not(.current){
