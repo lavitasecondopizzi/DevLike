@@ -15,6 +15,8 @@ export type Developer = {
   hp: number;
   maxHp: number;
   stress: number;
+  maxStress: number;
+  tier: number;
   code: number;
   debug: number;
   passive: string;
