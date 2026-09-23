@@ -34,8 +34,8 @@ const MAP_NODE_COST: Partial<Record<NormalNodeType, number>> = {
 };
 
 export class Game {
-  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; inventory:Item[]=[]; bossRewardOptions:BossRewardOption[]=[]; currentEvent:GameEvent|null=null; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
-  start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.bossRewardOptions=[];this.currentEvent=null;this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
+  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; cardCollection:Card[]=[]; inventory:Item[]=[]; bossRewardOptions:BossRewardOption[]=[]; currentEvent:GameEvent|null=null; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
+  start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.cardCollection=[...startingDeck].map(card=>({...card}));this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.bossRewardOptions=[];this.currentEvent=null;this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
   private cloneItem(item:Item):Item{return {...item};}
   private cloneDeveloper(dev:Developer):Developer{return {...dev,items:dev.items.map(x=>this.cloneItem(x))};}
   private randomDevelopers(count:number,excluded:string[]=[]){const pool=developers.filter(d=>!excluded.includes(d.id));return [...pool].sort(()=>Math.random()-.5).slice(0,count).map(d=>this.cloneDeveloper(d));}
@@ -186,7 +186,19 @@ export class Game {
   startBattle(enemy:Enemy){this.combat=new Combat(this.team,enemy,this.deck);this.screen="combat";this.pendingEnemy=null;}
   enterRandomBattle(){this.prepareBattle(this.randomEnemy());}
   enterBoss(){this.prepareBattle(this.scaleEnemy({...boss,intent:{...boss.intent}}));}
-  chooseReward(_cardIndex:number){if(!this.reward)return;this.deck.push({...this.reward});this.reward=null;this.screen="map";this.message="Tool acquisito. Scegli il prossimo nodo.";}
+  chooseReward(_cardIndex:number){
+    if(!this.reward)return;
+    const card={...this.reward};
+    this.cardCollection.push({...card});
+    if(this.deck.length<20){
+      this.deck.push({...card});
+      this.message="Tool acquisito e aggiunto al MAZZO. Scegli il prossimo nodo.";
+    }else{
+      this.message="Tool acquisito e conservato tra le CARTE POSSEDUTE: il MAZZO è già a 20 carte.";
+    }
+    this.reward=null;
+    this.screen="map";
+  }
   private shuffle<T>(items:T[]):T[]{return [...items].sort(()=>Math.random()-.5);}
   private generateBossRewards(){
     const bossItems=this.shuffle(rewardItems.filter(item=>item.codeBonus+item.debugBonus>=4));
@@ -204,8 +216,8 @@ export class Game {
       this.inventory.push(this.cloneItem(option.item));
       this.message=`${option.item.name} ottenuto e messo nello ZAINO.`;
     }else if(option.kind==="tool"&&option.card){
-      this.deck.push({...option.card});
-      this.message=`${option.card.name} aggiunto al MAZZO.`;
+      this.cardCollection.push({...option.card});
+      if(this.deck.length<20){this.deck.push({...option.card});this.message=`${option.card.name} aggiunto al MAZZO.`;}else{this.message=`${option.card.name} ottenuto e conservato nelle CARTE POSSEDUTE: il MAZZO è già a 20 carte.`;}
     }else return;
     this.bossRewardOptions=[];
     this.screen="map";
@@ -233,8 +245,9 @@ export class Game {
         const row=this.currentMapNode?.row??1;
         const maxTier=row<=2?1:row<=4?2:3;
         const reward=randomEventReward("tool",maxTier);
-        this.deck.push({...reward});
-        rewardText=` Tool ${reward.name} aggiunto al MAZZO.`;
+        this.cardCollection.push({...reward});
+        if(this.deck.length<20)this.deck.push({...reward});
+        rewardText=` Tool ${reward.name} ottenuto${this.deck.length<=20?" e aggiunto al MAZZO":" e conservato nelle CARTE POSSEDUTE"}.`;
       }else if(effect.reward==="item"){
         const row=this.currentMapNode?.row??1;
         const maxScore=row<=2?3:row<=4?4:5;
