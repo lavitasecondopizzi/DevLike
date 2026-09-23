@@ -773,3 +773,72 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
 .battle-redesign .hand .combat-card:disabled .poker-card{
   opacity:.45!important;
 }
+
+
+/* COMBAT HUD CARD + ACTION POLISH */
+.battle-redesign .hand{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  min-width:0!important;
+  width:100%!important;
+  overflow:hidden!important;
+}
+.battle-redesign .hand .combat-card{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  border-radius:6px!important;
+}
+.battle-redesign .hand .combat-card .poker-card{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  box-shadow:4px 5px 0 rgba(0,0,0,.22)!important;
+}
+.battle-redesign .combat-card-preview{
+  min-width:0!important;
+  max-width:100%!important;
+}
+.battle-redesign .battle-actions button{
+  position:relative!important;
+  overflow:hidden!important;
+}
+.battle-redesign .battle-actions button b{
+  letter-spacing:.06em!important;
+}
+.battle-redesign .battle-actions button small{
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  max-width:100%!important;
+}
+.battle-redesign .battle-actions button:not(:disabled){
+  border-color:#526985!important;
+}
+.battle-redesign .battle-actions button:not(:disabled)::after{
+  content:"DISPONIBILE";
+  position:absolute!important;
+  top:3px!important;
+  right:5px!important;
+  font-size:8px!important;
+  letter-spacing:.06em!important;
+  color:#7893b2!important;
+  opacity:.8!important;
+}
+.battle-redesign .battle-actions button:disabled{
+  filter:saturate(.35)!important;
+}
+.battle-redesign .end{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.battle-redesign .battle-member-switch-cost{
+  color:#9eacc0!important;
+}
+.battle-redesign .battle-team-member:not(:disabled) .battle-member-switch-cost{
+  color:#b7c9df!important;
+}
