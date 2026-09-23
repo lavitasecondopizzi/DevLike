@@ -7,7 +7,8 @@ import { Combat } from "./Combat";
 
 export type GameScreen = "menu" | "team" | "map" | "battleSetup" | "combat" | "reward" | "itemReward" | "bossReward" | "recruit" | "equipment" | "result";
 type NormalNodeType = Exclude<MapNodeType, "boss">;
-type EquipmentSource = { zone: "dev" | "bag"; devIndex: number; itemIndex: number };\ntype BossRewardOption = { kind: "item" | "tool"; item?: Item; card?: Card };
+type EquipmentSource = { zone: "dev" | "bag"; devIndex: number; itemIndex: number };
+type BossRewardOption = { kind: "item" | "tool"; item?: Item; card?: Card };
 
 const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description: string }>> = {
   battle: [{ title: "BUG", description: "Qualcosa funziona. Quindi sicuramente c'è un bug." }, { title: "MEETING", description: "Poteva essere una mail." }, { title: "LEGACY", description: "Non sai chi l'ha scritto. Non sai perché esiste." }],
