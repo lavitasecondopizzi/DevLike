@@ -89,18 +89,11 @@ export class Game {
     if(current)current.next=[bossNode.id];
   }
 
-  private appendFinalRestOrBoss(){
-    if(this.tempo<=0){
-      this.appendBossNode(8);
-      this.message="TEMPO ESAURITO. La pausa salta: la DEADLINE è arrivata.";
-      return;
-    }
-    const rest:MapNode={id:"rest-final",row:7,col:1,type:"rest",title:"PAUSA FINALE",description:"Ultima pausa prima della Deadline. Recupera il team e preparati allo scontro.",next:[],visited:false,hiddenEncounter:false};
-    const bossNode:MapNode={id:"boss-final",row:8,col:1,type:"boss",title:"DEADLINE",description:"DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.",next:[],visited:false,hiddenEncounter:false,enemyId:"deadline"};
-    this.mapNodes.push(rest,bossNode);
-    rest.next=[bossNode.id];
+  private skipFinalRestForTimeout(){
     const current=this.currentMapNode;
-    if(current)current.next=[rest.id];
+    const bossNode=this.mapNodes.find(n=>n.type==="boss");
+    if(current&&bossNode)current.next=[bossNode.id];
+    this.message="TEMPO ESAURITO. La PAUSA FINALE salta: la DEADLINE è arrivata.";
   }
 
   private generateMap(){
@@ -112,6 +105,11 @@ export class Game {
     const start=this.mapNodes.find(n=>n.id==="start");
     const first=this.mapNodes.filter(n=>n.row===1);
     if(start)start.next=first.map(n=>n.id);
+
+    const finalRest:MapNode={id:"rest-final",row:7,col:1,type:"rest",title:"PAUSA FINALE",description:"Ultima pausa prima della Deadline. Recupera il team e preparati allo scontro.",next:["boss-final"],visited:false,hiddenEncounter:false};
+    const finalBoss:MapNode={id:"boss-final",row:8,col:1,type:"boss",title:"DEADLINE",description:"DOMANI È ONLINE. Naturalmente nessuno l'aveva detto prima.",next:[],visited:false,hiddenEncounter:false,enemyId:"deadline"};
+    this.mapNodes.push(finalRest,finalBoss);
+    this.mapNodes.filter(n=>n.row===6).forEach(n=>n.next=[finalRest.id]);
   }
 
   get currentMapNode(){return this.mapNodes.find(n=>n.id===this.currentMapNodeId)??null;}
@@ -159,10 +157,12 @@ export class Game {
       }
     }
 
-    if(node.row>=6){
-      // The final rest is the only route to Deadline while time remains.
-      // If Tempo is gone, the Deadline replaces it immediately.
-      this.appendFinalRestOrBoss();
+    if(this.tempo<=0){
+      this.skipFinalRestForTimeout();
+    }else if(node.row>=6){
+      this.message="Ultima tappa completata. La PAUSA FINALE è davanti a te.";
+      const finalRest=this.mapNodes.find(n=>n.id==="rest-final");
+      if(finalRest)node.next=[finalRest.id];
     }
   }
 
