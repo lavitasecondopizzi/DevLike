@@ -79,10 +79,10 @@ const effectiveStats=(d:Developer,isActive=false)=>{
   debug=Math.max(0,Math.round(debug*multiplier));
   if(enemy.typeId==="client"&&d.classId==="hacker"){debug=Math.max(0,Math.round(debug*1.2));debugChanges.push("+20% · Hacker contro Client: potenziamento aggiuntivo a DEBUG");}
 
-  const tooltip=(base:number,changes:string[])=>["Base: "+base,...changes.map(x=>"• "+x)].join("\\n");
+  const tooltip=(base:number,changes:string[])=>["Base: "+base,...(changes.length?changes.map(x=>"• "+x):["Nessun modificatore attivo"])].join("\n");
   const codeTip=tooltip(d.code,codeChanges);
   const debugTip=tooltip(d.debug,debugChanges);
-  return {code,debug,codeTip,debugTip,hasCodeTip:codeChanges.length>0,hasDebugTip:debugChanges.length>0};
+  return {code,debug,codeTip,debugTip,hasCodeTip:true,hasDebugTip:true};
 };
 const activeStats=effectiveStats(active,true);
 const memberInfo=(d:Developer,i:number)=>{
