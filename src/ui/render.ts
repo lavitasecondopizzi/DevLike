@@ -47,32 +47,46 @@ function screen(game:Game){
   if(game.screen==="itemReward"&&game.itemReward){const targets=game.team.map((dev,i)=>{const full=dev.items.length>=2;return `<button type="button" class="assignment-card ${game.selectedItemTargetIndex===i?"selected":""}" data-item-target="${i}" ${full?"disabled":""}><div><b>${esc(dev.name)}</b><span>${esc(dev.role)}</span></div><div class="item-target-stats">HP ${dev.hp}/${dev.maxHp} · COD ${dev.code} · DEBUG ${dev.debug}</div><div class="matchup-mini"><strong>VANTAGGI</strong> ${dev.advantages.map(esc).join(" · ")}<br><strong>DEBOLEZZE</strong> ${dev.weaknesses.map(esc).join(" · ")}</div>${equipmentSlots(dev)}<em>${full?"INVENTARIO PIENO — USA LO ZAINO":"CLICCA PER SELEZIONARE"}</em></button>`;}).join("");return `<section class="panel selection-panel"><div class="selection-heading"><div><h2>OGGETTO SBLOCCATO</h2><p>${esc(game.message)}</p></div><span class="random-badge">EQUIPAGGIAMENTO</span></div><div class="item-reward-card"><h2>${esc(game.itemReward.name)}</h2><p>${esc(game.itemReward.description)}</p><div class="item-bonus">+${game.itemReward.codeBonus} CODICE · +${game.itemReward.debugBonus} DEBUG</div></div><h3 class="assign-title">A QUALE DEVELOPER CONSEGNARLO?</h3><div class="assignment-grid">${targets}</div><div class="selection-footer"><div class="selection-hint">${game.selectedItemTargetIndex===null?"Puoi anche metterlo direttamente nello zaino.":`Consegnerai ${esc(game.itemReward.name)} a ${esc(game.team[game.selectedItemTargetIndex]?.name??"")}.`}</div><div class="reward-actions"><button type="button" class="secondary" data-action="store-item">METTI NELLO ZAINO</button><button type="button" class="primary" data-action="confirm-item" ${game.selectedItemTargetIndex!==null?"":"disabled"}>EQUIPAGGIA OGGETTO</button></div></div></section>`;}
   if(game.screen==="equipment")return equipmentScreen(game);
   if(game.screen==="combat"&&game.combat){const c=game.combat;const active=c.active;const enemy=c.enemy;
-const memberInfo=(d:Developer, i:number, activeMember=false)=>{
-  const items=d.items.length?d.items.map(x=>esc(x.name)).join(" · "):"Nessun oggetto";
-  const adv=d.advantages.length?d.advantages.map(x=>esc(x)).join(" · "):"—";
-  const weak=d.weaknesses.length?d.weaknesses.map(x=>esc(x)).join(" · "):"—";
-  return `<button type="button" class="battle-team-member ${activeMember?"active":""}" data-switch="${i}" ${activeMember||d.hp<=0||d.stress>=100?"disabled":""}>
+const effectiveStats=(d:Developer)=>{
+  const codeParts=[`Base: ${d.code}`];
+  const codeItems=d.items.reduce((n,x)=>n+x.codeBonus,0);
+  if(codeItems)codeParts.push(`Oggetti: +${codeItems}`);
+  if(d.classId==="senior")codeParts.push("Senior: +2");
+  if(d.classId==="fullstack")codeParts.push("Fullstack: +1 temporaneo");
+  if(d.classId==="junior"&&d.hp<d.maxHp*.5)codeParts.push("Junior sotto 50% HP: +2 DEBUG");
+  const debugParts=[`Base: ${d.debug}`];
+  const debugItems=d.items.reduce((n,x)=>n+x.debugBonus,0);
+  if(debugItems)debugParts.push(`Oggetti: +${debugItems}`);
+  if(d.classId==="junior"&&d.hp<d.maxHp*.5)debugParts.push("Junior sotto 50% HP: +2");
+  if(d.classId==="hacker"&&enemy.typeId==="client")debugParts.push("Hacker contro Client: +3");
+  const code=d.code+codeItems+(d.classId==="senior"?2:0)+(d.classId==="fullstack"?1:0);
+  const debug=d.debug+debugItems+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
+  return {code,debug,codeTip:codeParts.join(" · "),debugTip:debugParts.join(" · ")};
+};
+const activeStats=effectiveStats(active);
+const memberInfo=(d:Developer,i:number)=>{
+  const stats=effectiveStats(d);
+  const disabled=d.hp<=0||d.stress>=100;
+  return `<button type="button" class="battle-team-member ${i===c.activeIndex?"active":""}" data-switch="${i}" ${i===c.activeIndex||disabled?"disabled":""}>
     <div class="battle-member-head"><strong>${esc(d.name)}</strong><span>${esc(d.role)}</span></div>
     <div class="battle-member-hp"><span>HP ${d.hp}/${d.maxHp}</span><i><em style="width:${pct(d.hp,d.maxHp)}%"></em></i></div>
     <div class="battle-member-stress"><span>STRESS ${d.stress}/100</span><i><em style="width:${d.stress}%"></em></i></div>
-    <div class="battle-member-stats"><span>CODICE <b>${d.code}</b></span><span>DEBUG <b>${d.debug}</b></span></div>
-    <div class="battle-member-ability"><b>ABILITÀ</b> ${esc(d.passive)}</div>
-    <div class="battle-member-matchups"><span><b>+</b> ${adv}</span><span><b>−</b> ${weak}</span></div>
-    <div class="battle-member-items"><b>OGGETTI</b> ${items}</div>
+    <div class="battle-member-stats">
+      <span class="stat-tooltip" data-tooltip="${esc(stats.codeTip)}"><b>CODICE</b><strong>${stats.code}</strong></span>
+      <span class="stat-tooltip" data-tooltip="${esc(stats.debugTip)}"><b>DEBUG</b><strong>${stats.debug}</strong></span>
+    </div>
   </button>`;
 };
 return `<section class="battle battle-redesign">
   <aside class="battle-side battle-team panel">
     <div class="battle-side-title"><span>IL TUO TEAM</span><b>${c.team.length}/3</b></div>
-    <div class="battle-team-list">${c.team.map((d,i)=>memberInfo(d,i,i===c.activeIndex)).join("")}</div>
-    <div class="battle-switch-hint">Seleziona un Developer disponibile per cambiarlo. Qui vedi statistiche, abilità, vantaggi, debolezze e oggetti.</div>
+    <div class="battle-team-list">${c.team.map((d,i)=>memberInfo(d,i)).join("")}</div>
     <div class="battle-log"><div class="battle-log-title">ULTIME AZIONI</div>${c.log.slice(-5).reverse().map(x=>`<div>${esc(x)}</div>`).join("")}</div>
   </aside>
   <section class="battle-main">
-    <div class="battle-turnbar"><div><strong>${esc(active.name)}</strong><span>${esc(active.role)}</span></div><b>TURNO ${c.turn}</b></div>
     <div class="battle-active-card">
       <div class="battle-active-top">
-        <div><span>DEVELOPER ATTIVO</span><h2>${esc(active.name)}</h2><small>${esc(active.description)}</small></div>
+        <div><span>DEVELOPER ATTIVO</span><h2>${esc(active.name)}</h2><small>${esc(active.role)}</small></div>
         <div class="battle-active-ability"><b>ABILITÀ</b><span>${esc(active.passive)}</span></div>
       </div>
       <div class="battle-active-health">
@@ -84,10 +98,8 @@ return `<section class="battle battle-redesign">
         <div class="battle-stressbar"><i style="width:${active.stress}%"></i></div>
       </div>
       <div class="battle-active-details">
-        <div><b>CODICE</b><strong>${active.code}</strong></div><div><b>DEBUG</b><strong>${active.debug}</strong></div>
-        <div><b>VANTAGGI</b><span>${active.advantages.length?active.advantages.map(x=>esc(x)).join(" · "):"—"}</span></div>
-        <div><b>DEBOLEZZE</b><span>${active.weaknesses.length?active.weaknesses.map(x=>esc(x)).join(" · "):"—"}</span></div>
-        <div class="battle-active-items"><b>OGGETTI</b><span>${active.items.length?active.items.map(x=>`${esc(x.name)} (+${x.codeBonus} COD · +${x.debugBonus} DEBUG)`).join(" · "):"Nessun oggetto equipaggiato"}</span></div>
+        <div class="battle-effective-stat stat-tooltip" data-tooltip="${esc(activeStats.codeTip)}"><b>CODICE</b><strong>${activeStats.code}</strong></div>
+        <div class="battle-effective-stat stat-tooltip" data-tooltip="${esc(activeStats.debugTip)}"><b>DEBUG</b><strong>${activeStats.debug}</strong></div>
       </div>
     </div>
     <div class="battle-energy"><span>ENERGIA</span><strong>${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</strong></div>
@@ -110,8 +122,7 @@ return `<section class="battle battle-redesign">
     <div class="battle-ability"><strong>ABILITÀ</strong><span>${esc(enemy.passive)}</span></div>
     <div class="battle-matchups"><div><b>VANTAGGI</b>${enemy.advantages.map(x=>`<span>${esc(x)}</span>`).join("")}</div><div><b>DEBOLEZZE</b>${enemy.weaknesses.map(x=>`<span>${esc(x)}</span>`).join("")}</div></div>
   </aside>
-</section>`;}
-  if(game.screen==="reward"){const card=game.reward!;return `<section class="panel center"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi un Tool al deck.</p><button type="button" class="reward-card" data-action="reward"><b>${esc(card.name)}</b><span>${card.cost} ⚡</span><small>${esc(card.description)}</small></button></section>`;}
+</section>`;}  if(game.screen==="reward"){const card=game.reward!;return `<section class="panel center"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi un Tool al deck.</p><button type="button" class="reward-card" data-action="reward"><b>${esc(card.name)}</b><span>${card.cost} ⚡</span><small>${esc(card.description)}</small></button></section>`;}
   return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${esc(game.message)}</h1><p>Il progetto è andato in produzione. Da qualche parte.</p><button type="button" class="primary" data-action="restart">NUOVO PROGETTO</button></section>`;
 }
 
