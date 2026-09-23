@@ -56,8 +56,8 @@ function dataForCategory(category: string): Array<{ id: string; name: string; su
   }
   if (category === "enemies") {
     return [...enemies, boss]
-      .sort((a, b) => a.name.localeCompare(b.name, "it"))
-      .map(e => ({ id: e.id, name: e.name, subtitle: e.type, details: enemyDetails(e) }));
+      .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "it"))
+      .map(e => ({ id: e.id, name: e.name, tier: e.tier, subtitle: `T${e.tier} · ${e.type}`, details: enemyDetails(e) }));
   }
   if (category === "cards") {
     const all = [...startingDeck, ...rewardCards].filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i);
