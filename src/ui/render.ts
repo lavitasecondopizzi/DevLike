@@ -53,8 +53,10 @@ function renderMap(game:Game){
   const lines=game.mapNodes.flatMap(node=>node.next.map(nextId=>{
     const target=game.mapNodes.find(n=>n.id===nextId);
     if(!target)return "";
+    const unlocked=node.visited&&(target.visited||game.availableMapNodes.some(n=>n.id===target.id));
     const active=node.visited&&target.visited;
     const reachable=node.visited&&game.availableMapNodes.some(n=>n.id===target.id);
+    if(!unlocked)return "";
     return `<line class="map-line ${active?"active":""} ${reachable?"reachable":""}" x1="${x(node.col)}" y1="${y(node.row)}" x2="${x(target.col)}" y2="${y(target.row)}"/>`;
   })).join("");
 
