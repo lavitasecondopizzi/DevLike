@@ -158,7 +158,7 @@ return `<section class="battle battle-redesign">
   <section class="battle-main">
     <div class="battle-turnbar">
       <div><span>COMBATTIMENTO</span><strong>TURNO ${c.turn}</strong></div>
-      <div class="battle-turn-status">${c.energy>0?"IL TUO TURNO":"NESSUNA ENERGIA"}</div>
+      <div class="battle-turn-status">${esc(c.turnStatus)}</div>
       <div><span>NEMICO PRONTO</span><b>${esc(enemy.intent.label)}</b></div>
     </div>
     <div class="battle-active-card">
@@ -182,9 +182,9 @@ return `<section class="battle battle-redesign">
     <div class="battle-energy"><span>ENERGIA</span><strong>${"⚡".repeat(c.energy)}${"·".repeat(3-c.energy)}</strong><small>3 MAX</small></div>
     <div class="battle-feedback"><span>ULTIMA AZIONE</span><b>${esc(c.latestFeedback)}</b></div>
     <div class="battle-actions">
-      <button type="button" data-action="code" ${c.energy<1?"disabled":""}><b>CODICE</b><small>COSTO: 1 ⚡ · ~${c.codePreview} DMG · +3 STRESS</small></button>
-      <button type="button" data-action="debug" ${c.energy<2?"disabled":""}><b>DEBUG</b><small>COSTO: 2 ⚡ · ~${c.debugPreview} DMG · +5 STRESS</small></button>
-      <button type="button" data-action="defend" ${c.energy<1?"disabled":""}><b>DIFESA</b><small>COSTO: 1 ⚡ · +${c.defensePreview} BLOCCO · -3 STRESS</small></button>
+      <button type="button" data-action="code" ${c.canCodeForUi?"":"disabled"}><b>CODICE</b><small>COSTO: 1 ⚡ · ~${c.codePreview} DMG · +3 STRESS</small></button>
+      <button type="button" data-action="debug" ${c.canDebugForUi?"":"disabled"}><b>DEBUG</b><small>COSTO: 2 ⚡ · ~${c.debugPreview} DMG · +5 STRESS</small></button>
+      <button type="button" data-action="defend" ${c.canDefendForUi?"":"disabled"}><b>DIFESA</b><small>${c.active.classId==="architect"&&!c.firstDefenseUsed?"GRATIS":"COSTO: 1 ⚡"} · +${c.defensePreview} BLOCCO · -3 STRESS</small></button>
     </div>
     <div class="battle-hand-label"><span>TOOL IN MANO</span><b>${c.hand.length} CARTE</b><button type="button" class="deck-counter" data-action="toggle-deck">MAZZO · ${c.drawPile.length} DISPONIBILI</button></div>
     <div class="hand">${c.hand.map((card,i)=>{const playable=c.canPlayCardForUi(card);const reason=c.cardPlayReasonForUi(card);return `<button type="button" class="card combat-card ${playable?"":"card-unavailable"}" data-card="${i}" data-poker-rendered="true" ${playable?"":`disabled title="${esc(reason)}"`}>${renderPokerCard(card)}<span class="combat-card-preview">${esc(c.cardPreview(card))}</span>${!playable?`<span class="combat-card-reason">${esc(reason)}</span>`:""}</button>`;}).join("")}</div>
