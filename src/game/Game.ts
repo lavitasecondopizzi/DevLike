@@ -230,11 +230,15 @@ export class Game {
     let rewardText="";
     if(effect.reward){
       if(effect.reward==="tool"){
-        const reward=randomEventReward("tool");
+        const row=this.currentMapNode?.row??1;
+        const maxTier=row<=2?1:row<=4?2:3;
+        const reward=randomEventReward("tool",maxTier);
         this.deck.push({...reward});
         rewardText=` Tool ${reward.name} aggiunto al MAZZO.`;
       }else if(effect.reward==="item"){
-        const reward=randomEventReward("item");
+        const row=this.currentMapNode?.row??1;
+        const maxScore=row<=2?3:row<=4?4:5;
+        const reward=randomEventReward("item",maxScore);
         this.inventory.push(this.cloneItem(reward));
         rewardText=` ${reward.name} messo nello ZAINO.`;
       }
@@ -244,7 +248,13 @@ export class Game {
     this.message=`EVENTO: ${choice.label}. ${choice.description}${rewardText}`;
     if(this.tempo<=0)this.skipFinalRestForTimeout();
   }
-  private rewardTierForStage():number{const row=this.currentMapNode?.row??1;if(row<=2)return 1;if(row<=4)return 2;if(row===5)return 3;return 3;}
+  private rewardTierForStage():number{
+    const node=this.currentMapNode;
+    const row=node?.row??1;
+    let tier=row<=2?1:row<=4?2:3;
+    if(node?.type==="elite")tier=Math.min(4,tier+1);
+    return tier;
+  }
   private randomRewardCard():Card{
     const maxTier=this.rewardTierForStage();
     const pool=rewardCards.filter(card=>(card.tier??1)<=maxTier);
