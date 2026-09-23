@@ -1,5 +1,6 @@
 import { rewardCards } from "./cards";
 import { rewardItems } from "./items";
+import type { Card, Item } from "../entities/types";
 
 export type EventEffect = {
   hp?: number;
@@ -108,7 +109,9 @@ export function randomEvent(): GameEvent {
   return gameEvents[Math.floor(Math.random() * gameEvents.length)];
 }
 
-export function randomEventReward(kind: "tool" | "item") {
+export function randomEventReward(kind: "tool"): Card;
+export function randomEventReward(kind: "item"): Item;
+export function randomEventReward(kind: "tool" | "item"): Card | Item {
   if (kind === "tool") return rewardCards[Math.floor(Math.random() * rewardCards.length)];
   return rewardItems[Math.floor(Math.random() * rewardItems.length)];
 }
