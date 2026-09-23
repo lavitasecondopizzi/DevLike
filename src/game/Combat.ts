@@ -77,12 +77,12 @@ export class Combat {
   get incomingStressPreview():number{
     let stress=this.enemy.intent.stress;
     if(this.enemy.typeId==="bug")stress+=this.enemyScaling+1;
-    if(this.enemy.typeId==="meeting"&&this.active.stress>=50)stress+=3;
+    if(this.enemy.typeId==="meeting"&&this.active.stress>=this.active.maxStress*.5)stress+=3;
     if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;
     if(this.enemy.typeId==="deadline")stress+=this.turn*2;
     return Math.max(0,stress);
   }
-  get incomingLethalPreview():boolean{return this.incomingDamagePreview>=this.active.hp||this.active.stress+this.incomingStressPreview>=100;}
+  get incomingLethalPreview():boolean{return this.incomingDamagePreview>=this.active.hp||this.active.stress+this.incomingStressPreview>=this.active.maxStress;}
   private previewDamage(amount:number,action:"code"|"debug"|"card"):number{
     let adjusted=amount;
     if(this.enemy.typeId==="legacy"&&action==="debug")adjusted=Math.max(0,adjusted-2);
@@ -116,10 +116,10 @@ export class Combat {
     this.endTurn(true);
   }
 
-  switchDeveloper(index:number):boolean{if(this.nuzlockeRules.includes("noSwitch")||this.nuzlockeRules.includes("noBattleSwitch"))return false;if(this.energy<1||index===this.activeIndex||!this.team[index]||this.team[index].hp<=0||this.team[index].stress>=100)return false;this.energy-=1;this.activeIndex=index;this.log.push(`Cambio: entra ${this.active.name} · HP ${this.active.hp}/${this.active.maxHp} · Stress ${this.active.stress}/100.`);this.autoSkipIfNoAction();return true;}
+  switchDeveloper(index:number):boolean{if(this.nuzlockeRules.includes("noSwitch")||this.nuzlockeRules.includes("noBattleSwitch"))return false;if(this.energy<1||index===this.activeIndex||!this.team[index]||this.team[index].hp<=0||this.team[index].stress>=this.team[index].maxStress)return false;this.energy-=1;this.activeIndex=index;this.log.push(`Cambio: entra ${this.active.name} · HP ${this.active.hp}/${this.active.maxHp} · Stress ${this.active.stress}/${this.active.maxStress}.`);this.autoSkipIfNoAction();return true;}
   endTurn(auto=false){if(this.result!=="ongoing")return;this.discardPile.push(...this.hand.splice(0));this.log.push(auto?"Fine turno automatica: nessuna azione disponibile.":"Fine turno: attacco nemico in arrivo.");this.enemyAttack();this.checkBurnout();if(this.result==="ongoing"){this.turn+=1;this.startTurn();}}
-  private enemyAttack(){let raw=this.enemy.intent.damage;let stress=this.enemy.intent.stress;if(this.enemy.typeId==="bug"){this.enemyScaling+=1;stress+=this.enemyScaling;}if(this.enemy.typeId==="meeting"&&this.active.stress>=50)stress+=3;if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;if(this.enemy.typeId==="deadline"){raw+=this.turn*2;stress+=this.turn*2;}raw=Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));const damage=Math.max(0,raw-this.block);this.block=Math.max(0,this.block-raw);this.active.hp=Math.max(0,this.active.hp-damage);const stressBefore=this.active.stress;this.active.stress=Math.min(100,this.active.stress+stress);if(this.active.classId==="intern"&&stressBefore<this.active.maxStress*.75&&this.active.stress>=this.active.maxStress*.75)this.active.stress=Math.max(0,this.active.stress-10);this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${stress} Stress.`);}
+  private enemyAttack(){let raw=this.enemy.intent.damage;let stress=this.enemy.intent.stress;if(this.enemy.typeId==="bug"){this.enemyScaling+=1;stress+=this.enemyScaling;}if(this.enemy.typeId==="meeting"&&this.active.stress>=50)stress+=3;if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;if(this.enemy.typeId==="deadline"){raw+=this.turn*2;stress+=this.turn*2;}raw=Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));const damage=Math.max(0,raw-this.block);this.block=Math.max(0,this.block-raw);this.active.hp=Math.max(0,this.active.hp-damage);const stressBefore=this.active.stress;this.active.stress=Math.min(this.active.maxStress,this.active.stress+stress);if(this.active.classId==="intern"&&stressBefore<this.active.maxStress*.75&&this.active.stress>=this.active.maxStress*.75)this.active.stress=Math.max(0,this.active.stress-10);this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${stress} Stress.`);}
   private checkVictory(){if(this.enemy.hp<=0){this.result="victory";this.log.push(`${this.enemy.name} è stato sconfitto.`);}}
-  private checkBurnout(){if(this.active.stress>=100||this.active.hp<=0){this.log.push(`${this.active.name} è andato in BURNOUT/ESAUSTO.`);const available=this.team.findIndex((d,i)=>i!==this.activeIndex&&d.hp>0&&d.stress<100);if(available>=0){this.active.stress=this.active.maxStress;this.activeIndex=available;this.log.push(`Entra ${this.active.name}.`);}else{this.result="defeat";this.log.push("Tutti i developer sono fuori combattimento.");}}}
+  private checkBurnout(){if(this.active.stress>=this.active.maxStress||this.active.hp<=0){this.log.push(`${this.active.name} è andato in BURNOUT/ESAUSTO.`);const available=this.team.findIndex((d,i)=>i!==this.activeIndex&&d.hp>0&&d.stress<d.maxStress);if(available>=0){this.active.stress=this.active.maxStress;this.activeIndex=available;this.log.push(`Entra ${this.active.name}.`);}else{this.result="defeat";this.log.push("Tutti i developer sono fuori combattimento.");}}}
   private shuffle<T>(items:T[]):T[]{for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}return items;}
 }
