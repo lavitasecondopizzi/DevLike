@@ -98,18 +98,14 @@ GamePrototype.generateMap = function(this: Game) {
   const firstRowTypes: Exclude<MapNodeType, "boss">[] = ["battle", "recruit", "item"];
   firstRowTypes.forEach((type, col) => nodes.push(createNode(this, 1, col, type)));
 
+  // Every stage always contains the complete three-column graph.
+  // The player can only travel along edges that become available from the
+  // currently visited node, but no node is omitted from the map.
   for (let row = 2; row < finalRow; row++) {
-    const previous = rowNodes(row - 1);
-    const reachableCols = [...new Set(
-      previous.flatMap(node => [node.col - 1, node.col, node.col + 1].filter(col => col >= 0 && col <= 2))
-    )].sort(() => Math.random() - 0.5);
+    const typePool: Exclude<MapNodeType, "boss">[] = ["battle", "event", "rest", "reward", "item", "recruit"];
+    if (row === 4) typePool.push("elite");
 
-    const count = Math.min(1 + Math.floor(Math.random() * 3), reachableCols.length);
-    const selectedCols = reachableCols.slice(0, count).sort((a, b) => a - b);
-
-    selectedCols.forEach(col => {
-      const typePool: Exclude<MapNodeType, "boss">[] = ["battle", "event", "rest", "reward", "item", "recruit"];
-      if (row === 4) typePool.push("elite");
+    [0, 1, 2].forEach(col => {
       const type = typePool[Math.floor(Math.random() * typePool.length)];
       nodes.push(createNode(this, row, col, type));
     });
