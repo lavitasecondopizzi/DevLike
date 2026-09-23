@@ -211,7 +211,7 @@ return `<section class="battle battle-redesign">
     <div class="battle-ability"><strong>ABILITÀ</strong><span>${esc(enemy.passive)}</span></div>
     <div class="battle-matchups"><div><b>VANTAGGI</b>${enemy.advantages.map(x=>`<span>${esc(x)}</span>`).join("")}</div><div><b>DEBOLEZZE</b>${enemy.weaknesses.map(x=>`<span>${esc(x)}</span>`).join("")}</div></div>
   </aside>
-</section>`;}  if(game.screen==="reward"){const card=game.reward!;return `<section class="panel center"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi un Tool al deck.</p><button type="button" class="reward-card" data-action="reward"><b>${esc(card.name)}</b><span>${card.cost} ⚡</span><small>${esc(card.description)}</small></button></section>`;}
+</section>`;}  if(game.screen==="reward"){const card=game.reward!;return `<section class="panel center reward-screen"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi questo Tool al MAZZO.</p><button type="button" class="reward-card reward-card-poker" data-action="reward">${renderPokerCard(card)}<span class="reward-card-confirm">AGGIUNGI AL MAZZO · ${card.cost} ⚡</span></button></section>`;}
   if(game.screen==="event"&&game.currentEvent){
     const event=game.currentEvent;
     const choices=event.choices.map((choice,i)=>{
