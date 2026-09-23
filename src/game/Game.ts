@@ -12,12 +12,12 @@ type EquipmentSource = { zone: "dev" | "bag"; devIndex: number; itemIndex: numbe
 const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description: string }>> = {
   battle: [{ title: "BUG", description: "Qualcosa funziona. Quindi sicuramente c'è un bug." }, { title: "MEETING", description: "Poteva essere una mail." }, { title: "LEGACY", description: "Non sai chi l'ha scritto. Non sai perché esiste." }],
   elite: [{ title: "CLIENTE", description: "Una piccola modifica. Solo 47 requisiti nuovi." }, { title: "PROD", description: "È venerdì pomeriggio. La produzione ha altri piani." }],
-  event: [{ title: "EVENTO", description: "Una decisione discutibile potrebbe salvare il progetto." }, { title: "IMPREVISTO", description: "Il cliente ha detto 'non tocco niente'." }],
+  event: [{ title: "EVENTO", description: "Una decisione discutibile potrebbe salvare la commessa." }, { title: "IMPREVISTO", description: "Il cliente ha detto 'non tocco niente'." }],
   rest: [{ title: "PAUSA", description: "Cinque minuti di pausa. Nessuno deve saperlo." }, { title: "CAFFÈ", description: "Il compilatore non si lamenta del caffè." }],
   fullRest: [{ title: "RECUPERO TOTALE", description: "Ricarica completamente HP e Stress di tutto il team." }],
   reward: [{ title: "TOOLBOX", description: "Un nuovo Tool entra nel tuo arsenale." }, { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }],
   item: [{ title: "EQUIPMENT", description: "Hai trovato un oggetto utile. Puoi equipaggiarlo o conservarlo nello zaino." }, { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }],
-  recruit: [{ title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente un progetto." }, { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }]
+  recruit: [{ title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente una commessa." }, { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }]
 };
 const MAP_SCHEMES: NormalNodeType[][] = [
   ["battle","event","item"],
@@ -99,7 +99,7 @@ export class Game {
   }
 
   private generateMap(){
-    this.mapNodes=[{id:"start",row:0,col:1,type:"rest",title:"START",description:"Il progetto parte. Per ora non è ancora esploso.",next:[],visited:true,hiddenEncounter:false}];
+    this.mapNodes=[{id:"start",row:0,col:1,type:"rest",title:"START",description:"La commessa parte. Per ora non è ancora esplosa.",next:[],visited:true,hiddenEncounter:false}];
     this.currentMapNodeId="start";
     this.currentNode=0;
     this.tempo=8;
@@ -193,6 +193,6 @@ export class Game {
   selectEquipmentSource(zone:"dev"|"bag",itemIndex:number,devIndex=-1){const team=this.equipmentTeam;const item=zone==="bag"?this.inventory[itemIndex]:team[devIndex]?.items[itemIndex];if(!item)return;this.equipmentSource={zone,itemIndex,devIndex};}
   moveSelectedEquipment(targetZone:"dev"|"bag",targetDevIndex=-1,targetItemIndex=-1){const source=this.equipmentSource;if(!source)return;const team=this.equipmentTeam;const sourceItems=source.zone==="bag"?this.inventory:team[source.devIndex]?.items;if(!sourceItems||!sourceItems[source.itemIndex])return;if(targetZone==="dev"){const targetItems=team[targetDevIndex]?.items;if(!targetItems||targetItemIndex<0||targetItemIndex>1)return;if(source.zone==="dev"&&source.devIndex===targetDevIndex&&source.itemIndex===targetItemIndex)return;const sourceItem=sourceItems[source.itemIndex],targetItem=targetItems[targetItemIndex];if(source.zone==="dev"&&source.devIndex===targetDevIndex){[targetItems[targetItemIndex],targetItems[source.itemIndex]]=[targetItems[source.itemIndex],targetItems[targetItemIndex]];}else{if(targetItem)sourceItems[source.itemIndex]=targetItem;else sourceItems.splice(source.itemIndex,1);targetItems[targetItemIndex]=sourceItem;}}else if(source.zone==="bag"){if(targetItemIndex>=0&&targetItemIndex<this.inventory.length)[this.inventory[source.itemIndex],this.inventory[targetItemIndex]]=[this.inventory[targetItemIndex],this.inventory[source.itemIndex]];}else{this.inventory.push(sourceItems[source.itemIndex]);sourceItems.splice(source.itemIndex,1);}this.equipmentSource=null;}
   updateTeamFromCombat(){if(this.combat)this.team=this.combat.team;}
-  onCombatFinished(){this.updateTeamFromCombat();if(this.combat?.result==="victory"){if(this.combat.enemy.id==="deadline"){this.team.forEach(dev=>{dev.hp=dev.maxHp;dev.stress=0;});this.projectNumber+=1;this.difficulty+=.5;this.generateMap();this.screen="map";this.message=`MISSIONE COMPLETATA. Team completamente ripristinato: HP e STRESS azzerati. Progetto #${this.projectNumber} · difficoltà x${this.difficulty.toFixed(1)}.`;}else{const winner=this.team.find(dev=>dev.id==="freelancer");if(winner)winner.hp=Math.min(winner.maxHp,winner.hp+5);this.generateReward();}}else if(this.combat?.result==="defeat"){this.screen="result";this.message="PROJECT FAILED.";}}
+  onCombatFinished(){this.updateTeamFromCombat();if(this.combat?.result==="victory"){if(this.combat.enemy.id==="deadline"){this.team.forEach(dev=>{dev.hp=dev.maxHp;dev.stress=0;});this.projectNumber+=1;this.difficulty+=.5;this.generateMap();this.screen="map";this.message=`COMMESSA COMPLETATA. Team completamente ripristinato: HP e STRESS azzerati. Commessa #${this.projectNumber} · difficoltà x${this.difficulty.toFixed(1)}.`;}else{const winner=this.team.find(dev=>dev.id==="freelancer");if(winner)winner.hp=Math.min(winner.maxHp,winner.hp+5);this.generateReward();}}else if(this.combat?.result==="defeat"){this.screen="result";this.message="COMMESSA FALLITA.";}}
   restart(){this.start();}
 }
