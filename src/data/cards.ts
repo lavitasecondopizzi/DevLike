@@ -71,8 +71,7 @@ export const rewardCards:Card[]=[
  {id:"deadline-extension",name:"PROROGA",cost:1,description:"Riduce lo Stress di 12.",effect:{type:"removeStress",amount:12}},
  // TIER 4
  {id:"chatgpt-protocol",name:"CHATGPT PROTOCOL",cost:2,description:"Infligge 22 danni.",effect:{type:"damage",amount:22}},
- {id:"emergency-hotfix",name:"HOTFIX D'EMERGENZA",cost:2,description:"Infligge 20 danni.",effect:{type:"damage",amount:20}}
-
+ {id:"emergency-hotfix",name:"HOTFIX D'EMERGENZA",cost:2,description:"Infligge 20 danni.",effect:{type:"damage",amount:20}},
  // TIER 1 · nuovi Tool
  {id:"grep-log",name:"GREP LOG",cost:1,description:"Infligge 6 danni.",effect:{type:"damage",amount:6}},
  {id:"backup",name:"BACKUP",cost:1,description:"Recupera 7 HP.",effect:{type:"heal",amount:7}},
