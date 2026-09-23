@@ -227,11 +227,12 @@ export class Game {
     if(effect.tempo)this.tempo=Math.max(0,this.tempo+effect.tempo);
     let rewardText="";
     if(effect.reward){
-      const reward=randomEventReward(effect.reward);
-      if(effect.reward==="tool"&&reward){
+      if(effect.reward==="tool"){
+        const reward=randomEventReward("tool");
         this.deck.push({...reward});
         rewardText=` Tool ${reward.name} aggiunto al MAZZO.`;
-      }else if(effect.reward==="item"&&reward){
+      }else if(effect.reward==="item"){
+        const reward=randomEventReward("item");
         this.inventory.push(this.cloneItem(reward));
         rewardText=` ${reward.name} messo nello ZAINO.`;
       }
