@@ -319,32 +319,3 @@ header small,.header-stat{font-size:9px!important;line-height:1.6!important}
 @media(max-width:1000px){.battle{grid-template-columns:150px minmax(0,1fr) minmax(0,1fr)!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.codex-entry{width:100%!important;height:auto!important;min-height:0!important}}
 @media(max-width:760px){.battle{display:grid!important;grid-template-columns:1fr!important;grid-template-areas:"heading" "active" "actions" "enemy" "bench" "energy" "hand" "end"!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}.battle .enemy-team-card{min-height:0!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:42vh!important}}
 @media(max-width:500px){.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.battle .active-dev>.combat-actions{grid-template-columns:1fr!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}}
-
-/* Combat hand: buttons are transparent interaction wrappers; the poker-card itself is the shared template. */
-.battle .active-dev>.hand{
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:12px!important;
-  align-items:stretch!important;
-}
-.battle .hand .combat-card{
-  all:unset!important;
-  display:contents!important;
-}
-.battle .hand .combat-card .poker-card{
-  width:100%!important;
-  min-width:0!important;
-  margin:0!important;
-  cursor:pointer!important;
-}
-.battle .hand .combat-card:disabled .poker-card{opacity:.48!important}
-.battle .hand .combat-card:not(:disabled):hover .poker-card{
-  transform:translateY(-4px)!important;
-  box-shadow:0 0 0 2px #5d88d9,4px 7px 0 rgba(0,0,0,.3),inset 0 0 0 2px #8f8a80!important;
-}
-@media(max-width:760px){
-  .battle .active-dev>.hand{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
-@media(max-width:500px){
-  .battle .active-dev>.hand{grid-template-columns:1fr!important}
-}
