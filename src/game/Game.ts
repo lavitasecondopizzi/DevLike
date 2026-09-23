@@ -43,7 +43,8 @@ export class Game {
   confirmStartingDeveloper(){if(!this.selectedStartingId)return;const c=this.startingCandidates.find(d=>d.id===this.selectedStartingId);if(!c)return;this.team=[{...this.cloneDeveloper(c),hp:c.maxHp,stress:0,items:[]}];this.generateMap();this.screen="map";this.message=`${c.name} è il developer principale. Il primo bivio offre combattimento, evento e oggetto.`;}
   private randomTemplate(type:NormalNodeType){const list=NODE_TEMPLATES[type];return list[Math.floor(Math.random()*list.length)];}
   private enemyForNode(type:"battle"|"elite",row=1){
-    const targetTier=Math.min(4,Math.max(1,Math.ceil(row/2)+(type==="elite"?1:0)));
+    const baseTier=row<=2?1:row<=4?2:row===5?3:4;
+    const targetTier=Math.min(4,baseTier+(type==="elite"?1:0));
     const eligible=enemies.filter(e=>e.tier<=targetTier);
     const tierPool=eligible.filter(e=>e.tier===targetTier);
     const pool=tierPool.length?tierPool:eligible;
