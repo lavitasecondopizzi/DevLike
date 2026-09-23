@@ -36,7 +36,8 @@ export class Combat {
     if(!this.nuzlockeRules.includes("noDefense")&&(this.energy>=1||freeDefense))return true;
     return this.hand.some(card=>this.canPlayCard(card));
   }
-  toggleDeck(){this.showDeck=!this.showDeck;}\n  private autoSkipIfNoAction(){
+  toggleDeck(){this.showDeck=!this.showDeck;}
+  private autoSkipIfNoAction(){
     if(this.result!=="ongoing"||this.hasUsableAction())return;
     this.log.push("Nessuna azione disponibile: turno saltato automaticamente.");
     this.endTurn();
