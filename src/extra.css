@@ -134,3 +134,61 @@ header small,.header-stat{font-size:9px!important;line-height:1.6!important}
 @media(max-width:1000px){.battle{grid-template-columns:150px minmax(0,1fr) minmax(0,1fr)!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.codex-entry{width:100%!important;height:auto!important;min-height:0!important}}
 @media(max-width:760px){.battle{display:grid!important;grid-template-columns:1fr!important;grid-template-areas:"heading" "active" "actions" "enemy" "bench" "energy" "hand" "end"!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}.battle .enemy-team-card{min-height:0!important}.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:42vh!important}}
 @media(max-width:500px){.codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.battle .active-dev>.combat-actions{grid-template-columns:1fr!important}.battle .active-dev>.hand{grid-template-columns:1fr!important}}
+
+
+/* COMBAT CLARITY OVERRIDES */
+.battle-redesign .battle-turnbar{display:none!important}
+.battle-redesign .battle-team{overflow:visible!important}
+.battle-redesign .battle-team-list{overflow:visible!important}
+.battle-redesign .battle-team-member{position:relative!important;padding:9px!important}
+.battle-redesign .battle-member-stats{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;margin-top:7px!important}
+.battle-redesign .battle-member-stats .stat-tooltip,
+.battle-redesign .battle-effective-stat{position:relative!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important;padding:5px!important;border:1px solid #394555!important;background:#111722!important;cursor:help!important}
+.battle-redesign .battle-member-stats b,
+.battle-redesign .battle-effective-stat b{font-size:9px!important;letter-spacing:.08em!important;color:#7f8b9d!important}
+.battle-redesign .battle-member-stats strong,
+.battle-redesign .battle-effective-stat strong{font-size:18px!important;line-height:1!important;color:#f1f5f9!important}
+.battle-redesign .stat-tooltip::after{
+  content:attr(data-tooltip);
+  position:absolute;
+  z-index:50;
+  left:50%;
+  bottom:calc(100% + 8px);
+  transform:translateX(-50%) translateY(4px);
+  width:max-content;
+  max-width:260px;
+  padding:7px 9px;
+  border:1px solid #526176;
+  background:#0b1018;
+  color:#e8edf5;
+  font-size:10px!important;
+  line-height:1.4!important;
+  font-weight:400;
+  text-align:left;
+  white-space:normal;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .12s ease,transform .12s ease;
+}
+.battle-redesign .stat-tooltip:hover::after{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.battle-redesign .battle-active-card{padding:11px!important}
+.battle-redesign .battle-active-top{grid-template-columns:minmax(0,1fr) minmax(180px,30%)!important}
+.battle-redesign .battle-active-top h2{font-size:20px!important;margin:3px 0!important}
+.battle-redesign .battle-active-top small{font-size:11px!important;color:#7f8b9d!important}
+.battle-redesign .battle-active-details{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:8px!important}
+.battle-redesign .battle-effective-stat{min-height:62px!important}
+.battle-redesign .battle-effective-stat strong{font-size:25px!important}
+.battle-redesign .battle-active-ability{font-size:11px!important}
+.battle-redesign .battle-active-ability span{display:block!important}
+.battle-redesign .battle-member-head strong{font-size:13px!important}
+.battle-redesign .battle-member-head span{font-size:10px!important}
+.battle-redesign .battle-member-hp>span,.battle-redesign .battle-member-stress>span{font-size:10px!important}
+.battle-redesign .battle-log{margin-top:auto!important}
+@media(max-width:900px){
+  .battle-redesign .battle-active-top{grid-template-columns:1fr!important}
+  .battle-redesign .battle-active-ability{display:none!important}
+}
