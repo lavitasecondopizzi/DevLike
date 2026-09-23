@@ -76,4 +76,6 @@ export const rewardCards:Card[]=[
 
 export const rewardCardTiers:Record<string,number>={chatgpt:1,jira:1,google:1,"rubber-duck":1,"stackoverflow-copy":1,"npm-install":1,"git-pull":1,"console-log":1,breakpoint:1,"rubber-duck-debug":1,"unit-test":1,sleep:1,documentation:1,"rubber-stamp":1,"git-push":2,"merge-conflict":2,regex:2,refactor:2,"legacy-patch":2,"stackoverflow-answer":2,"integration-test":2,hotfix:2,rollback:2,"meeting-cancel":2,"energy-drink-card":2,"ai-slop":2,"coffee-overdose":3,production:3,"code-review":3,"deadline-extension":3,"chatgpt-protocol":4,"emergency-hotfix":4};
 
+rewardCards.forEach(card=>{card.tier=rewardCardTiers[card.id]??1;});
+
 export function starterDeckForDeveloper(developerId:string):Card[]{const ids=starterDecks[developerId]??starterDecks.junior;return ids.map(id=>startingDeck.find(c=>c.id===id)).filter((c):c is Card=>Boolean(c)).map(c=>({...c,tier:1}));}
