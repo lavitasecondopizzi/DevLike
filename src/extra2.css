@@ -15,14 +15,14 @@
 /* Starting deck preview. */
 .starter-deck-preview{margin-top:18px;padding:18px;border:2px solid #334155;background:#0f172a;box-shadow:5px 5px 0 #050814}
 .starter-deck-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:14px}
-.starter-deck-heading h3{margin:0 0 8px;color:#67e8f9;font-size:10px}
+.starter-deck-heading h3{margin:0 0 8px;color:#67e8f9;font-size:11px}
 .starter-deck-heading p{margin:0;color:#94a3b8;font-family:system-ui,sans-serif;font-size:13px;line-height:1.45}
-.starter-deck-heading>span{flex:0 0 auto;border:1px solid #0891b2;background:#082f49;color:#67e8f9;padding:8px;font-size:7px}
+.starter-deck-heading>span{flex:0 0 auto;border:1px solid #0891b2;background:#082f49;color:#67e8f9;padding:8px;font-size:11px}
 .starter-deck-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
 .starter-card{min-width:0;min-height:105px;padding:11px;border:2px solid #475569;background:#182238;display:flex;flex-direction:column;gap:10px}
 .starter-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:7px}
-.starter-card-top b{font-size:7px;line-height:1.5;color:#facc15;overflow-wrap:anywhere}
-.starter-card-top strong{font-size:7px;color:#67e8f9;white-space:nowrap}
+.starter-card-top b{font-size:11px;line-height:1.5;color:#facc15;overflow-wrap:anywhere}
+.starter-card-top strong{font-size:11px;color:#67e8f9;white-space:nowrap}
 .starter-card p{margin:0;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:11px;line-height:1.4}
 
 @media(max-width:1000px){
