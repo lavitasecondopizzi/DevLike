@@ -27,24 +27,29 @@ function enemyCard(enemy:Enemy) {
 }
 
 const nodeIcon:Record<MapNode["type"],string> = {battle:"⚔",elite:"☠",event:"?",rest:"+",fullRest:"♥",reward:"◆",item:"🔧",recruit:"👤",boss:"☠"};
+
 function nodeClass(node:MapNode,game:Game){
   const available=game.availableMapNodes.some(x=>x.id===node.id);
   const current=game.currentMapNodeId===node.id;
   return ["map-node",`type-${node.type}`,node.visited?"visited":"",available?"available":"",current?"current":"",node.hiddenEncounter?"hidden-encounter":""].filter(Boolean).join(" ");
 }
+
 function renderMapNode(node:MapNode,game:Game){
   const available=game.availableMapNodes.some(x=>x.id===node.id);
   const hidden=node.hiddenEncounter&&(node.type==="battle"||node.type==="elite");
   const label=hidden?"?":node.title;
-  const typeLabel=hidden?"INCONTRO":node.type==="boss"?"BOSS":node.type.toUpperCase();
+  const typeLabel=hidden?"INCONTRO":node.type==="boss"?"DEADLINE":node.type.toUpperCase();
   return `<button type="button" class="${nodeClass(node,game)}" data-map-node="${node.id}" ${available?"":"disabled"} title="${esc(node.description)}"><span class="node-icon">${nodeIcon[node.type]}</span><b>${esc(label)}</b><small>${typeLabel}</small></button>`;
 }
+
 function renderMap(game:Game){
-  const width=960,rowHeight=105;
-  const x=(c:number)=>160+c*320;
-  const y=(row:number)=>48+row*rowHeight;
-  const maxRow=Math.max(8,...game.mapNodes.map(n=>n.row));
-  const height=maxRow*rowHeight+110;
+  const width=900;
+  const rowHeight=108;
+  const rows=Math.max(8,...game.mapNodes.map(n=>n.row));
+  const height=rows*rowHeight+80;
+  const x=(col:number)=>150+col*300;
+  const y=(row:number)=>40+row*rowHeight;
+
   const lines=game.mapNodes.flatMap(node=>node.next.map(nextId=>{
     const target=game.mapNodes.find(n=>n.id===nextId);
     if(!target)return "";
@@ -52,11 +57,11 @@ function renderMap(game:Game){
     const reachable=node.visited&&game.availableMapNodes.some(n=>n.id===target.id);
     return `<line class="map-line ${active?"active":""} ${reachable?"reachable":""}" x1="${x(node.col)}" y1="${y(node.row)}" x2="${x(target.col)}" y2="${y(target.row)}"/>`;
   })).join("");
-  const nodes=game.mapNodes.map(node=>`<div class="map-node-wrap" style="left:${x(node.col)/width*100}%;top:${y(node.row)}px">${renderMapNode(node,game)}</div>`).join("");
-  return `<div class="map-viewport"><div class="map-canvas" style="height:${height}px;width:${width}px;min-width:${width}px"><svg class="map-lines" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${lines}</svg>${nodes}</div></div>`;
-}
-function teamSummary(dev:Developer,i:number){return `<div class="team-summary ${i===0?"main-member":""}">${devCard(dev,i===0,true)}</div>`;}
 
+  const nodes=game.mapNodes.map(node=>`<div class="map-node-wrap" style="left:${x(node.col)/width*100}%;top:${y(node.row)}px">${renderMapNode(node,game)}</div>`).join("");
+
+  return `<div class="map-viewport"><div class="map-canvas" style="height:${height}px"><svg class="map-lines" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${lines}</svg>${nodes}</div></div>`;
+}
 function battleSetup(game:Game){const enemy=game.pendingEnemy!;const team=game.team.map((dev,i)=>`<div class="draggable-dev ${game.selectedBattleStarterIndex===i?"selected":""} ${dev.hp<=0||dev.stress>=100?"disabled-dev":""}" draggable="${dev.hp>0&&dev.stress<100?"true":"false"}" data-battle-dev="${i}"><div class="setup-dev-card"><div class="setup-dev-inner">${devCard(dev,i===game.selectedBattleStarterIndex,true)}</div></div></div>`).join("");return `<section class="panel battle-setup"><div class="selection-heading"><div><h2>SCHIERAMENTO</h2><p>Scegli il Developer da mandare in campo. Puoi cliccarlo oppure trascinarlo nello slot centrale.</p></div><span class="random-badge">PRIMO TURNO</span></div><div class="lineup"><div class="lineup-side team-lineup"><h3>IL TUO TEAM</h3><div class="setup-team">${team}</div></div><div class="battle-drop-zone" data-battle-drop><div class="drop-label">TRASCINA QUI</div><div class="drop-icon">VS</div><div class="drop-selected">${esc(game.team[game.selectedBattleStarterIndex]?.name??"NESSUNO")}</div><small>Questo Developer inizierà il combattimento</small></div><div class="lineup-side enemy-lineup"><h3>NEMICO</h3>${enemyCard(enemy)}</div></div><div class="setup-footer"><span>Clicca un Developer oppure trascinalo al centro.</span><button type="button" class="primary" data-action="confirm-battle">INIZIA COMBATTIMENTO</button></div></section>`;}
 
 function equipmentDeveloper(game:Game,dev:Developer,index:number){const slots=[0,1].map(i=>{const item=dev.items[i],selected=game.equipmentSource?.zone==="dev"&&game.equipmentSource.devIndex===index&&game.equipmentSource.itemIndex===i;return `<button type="button" class="move-slot ${item?"filled":"empty"} ${selected?"selected":""}" data-eq-source-zone="dev" data-eq-source-dev="${index}" data-eq-source-item="${i}"><span>SLOT ${i+1}</span><b>${item?esc(item.name):"VUOTO"}</b><small>${item?`+${item.codeBonus} COD · +${item.debugBonus} DEBUG`:"Slot disponibile"}</small></button>`;}).join("");return `<div class="equipment-developer"><div class="equipment-dev-info">${devCard(dev,false,true)}</div><div class="equipment-move-slots"><h3>OGGETTI EQUIPAGGIATI</h3>${slots}</div></div>`;}
