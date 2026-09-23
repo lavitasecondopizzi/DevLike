@@ -137,7 +137,13 @@ GamePrototype.generateMap = function(this: Game) {
       nodes.push(createNode(this, row, col, type));
     });
 
-    connectAdjacentRows(nodes, row - 1, row);
+    if (row === 1) {
+      const start = nodes.find(node => node.id === "start");
+      const firstRow = nodes.filter(node => node.row === 1);
+      if (start) start.next = firstRow.map(node => node.id);
+    } else {
+      connectAdjacentRows(nodes, row - 1, row);
+    }
   });
 
   const finalRest: MapNode = {
