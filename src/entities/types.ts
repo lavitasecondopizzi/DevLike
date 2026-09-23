@@ -37,6 +37,7 @@ export type Enemy = {
   name: string;
   typeId: string;
   type: string;
+  tier: number;
   description: string;
   hp: number;
   maxHp: number;
