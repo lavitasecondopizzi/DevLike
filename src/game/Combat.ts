@@ -1,7 +1,7 @@
 import type { BattleResult, Card, Developer, Enemy } from "../entities/types";
 
 export class Combat {
-  team: Developer[]; activeIndex = 0; enemy: Enemy; energy = 3; block = 0; codeBoost = 0; temporaryCodeBonus = 0; drawPile: Card[]; discardPile: Card[] = []; hand: Card[] = []; result: BattleResult = "ongoing"; log: string[] = []; turn = 1; firstDefenseUsed = false; firstCardPlayed = false; toolPlayedThisTurn = false; enemyScaling = 0; nuzlockeRules: string[] = [];
+  team: Developer[]; activeIndex = 0; enemy: Enemy; energy = 3; block = 0; codeBoost = 0; temporaryCodeBonus = 0; drawPile: Card[]; discardPile: Card[] = []; hand: Card[] = []; result: BattleResult = "ongoing"; log: string[] = []; turn = 1; firstDefenseUsed = false; firstCardPlayed = false; toolPlayedThisTurn = false; enemyScaling = 0; nuzlockeRules: string[] = []; showDeck = false;
   usedCards = new Set<Card>();
   consumedCards: Card[] = [];
   constructor(team: Developer[], enemy: Enemy, deck: Card[]) { this.team=team.map(d=>({...d,items:d.items.map(item=>({...item}))})); this.enemy={...enemy,intent:{...enemy.intent}}; this.drawPile=this.shuffle([...deck]); this.log.push(`${this.active.name} entra in campo contro ${this.enemy.name}.`); this.startTurn(); }
@@ -36,13 +36,13 @@ export class Combat {
     if(!this.nuzlockeRules.includes("noDefense")&&(this.energy>=1||freeDefense))return true;
     return this.hand.some(card=>this.canPlayCard(card));
   }
-  private autoSkipIfNoAction(){
+  toggleDeck(){this.showDeck=!this.showDeck;}\n  private autoSkipIfNoAction(){
     if(this.result!=="ongoing"||this.hasUsableAction())return;
     this.log.push("Nessuna azione disponibile: turno saltato automaticamente.");
     this.endTurn();
   }
 
-  switchDeveloper(index:number):boolean{if(this.nuzlockeRules.includes("noSwitch")||this.nuzlockeRules.includes("noBattleSwitch"))return false;if(this.energy<1||index===this.activeIndex||!this.team[index]||this.team[index].hp<=0||this.team[index].stress>=100)return false;this.energy-=1;this.activeIndex=index;this.log.push(`Cambio: entra ${this.active.name}.`);return true;}
+  switchDeveloper(index:number):boolean{if(this.nuzlockeRules.includes("noSwitch")||this.nuzlockeRules.includes("noBattleSwitch"))return false;if(this.energy<1||index===this.activeIndex||!this.team[index]||this.team[index].hp<=0||this.team[index].stress>=100)return false;this.energy-=1;this.activeIndex=index;this.log.push(`Cambio: entra ${this.active.name}.`);this.autoSkipIfNoAction();return true;}
   endTurn(){if(this.result!=="ongoing")return;this.discardPile.push(...this.hand.splice(0));this.enemyAttack();this.checkBurnout();if(this.result==="ongoing"){this.turn+=1;this.startTurn();}}
   private enemyAttack(){let raw=this.enemy.intent.damage;let stress=this.enemy.intent.stress;if(this.enemy.typeId==="bug"){this.enemyScaling+=1;stress+=this.enemyScaling;}if(this.enemy.typeId==="meeting"&&this.active.stress>=50)stress+=3;if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;if(this.enemy.typeId==="deadline"){raw+=this.turn*2;stress+=this.turn*2;}raw=Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));const damage=Math.max(0,raw-this.block);this.block=Math.max(0,this.block-raw);this.active.hp=Math.max(0,this.active.hp-damage);const stressBefore=this.active.stress;this.active.stress=Math.min(100,this.active.stress+stress);if(this.active.classId==="intern"&&stressBefore<75&&this.active.stress>=75)this.active.stress=Math.max(0,this.active.stress-10);this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${stress} Stress.`);}
   private checkVictory(){if(this.enemy.hp<=0){this.result="victory";this.log.push(`${this.enemy.name} è stato sconfitto.`);}}
