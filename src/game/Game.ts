@@ -38,13 +38,19 @@ export class Game {
   start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.cardCollection=[...startingDeck].map(card=>({...card}));this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.bossRewardOptions=[];this.currentEvent=null;this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
   private cloneItem(item:Item):Item{return {...item};}
   private cloneDeveloper(dev:Developer):Developer{return {...dev,items:dev.items.map(x=>this.cloneItem(x))};}
-  private randomDevelopers(count:number,excluded:string[]=[]){const pool=developers.filter(d=>!excluded.includes(d.id));return [...pool].sort(()=>Math.random()-.5).slice(0,count).map(d=>this.cloneDeveloper(d));}
+  private currentTier():number{return Math.min(4,Math.floor((Math.max(1,this.projectNumber)-1)/5)+1);}
+  private randomDevelopers(count:number,excluded:string[]=[]){
+    const tier=this.currentTier();
+    const pool=developers.filter(d=>!excluded.includes(d.id)&&d.tier<=tier);
+    const exact=pool.filter(d=>d.tier===tier);
+    const source=exact.length>=count?exact:[...exact,...pool.filter(d=>d.tier!==tier)];
+    return [...source].sort(()=>Math.random()-.5).slice(0,count).map(d=>this.cloneDeveloper(d));
+  }
   selectStartingDeveloper(index:number){const c=this.startingCandidates[index];if(c)this.selectedStartingId=c.id;}
   confirmStartingDeveloper(){if(!this.selectedStartingId)return;const c=this.startingCandidates.find(d=>d.id===this.selectedStartingId);if(!c)return;this.team=[{...this.cloneDeveloper(c),hp:c.maxHp,stress:0,items:[]}];this.generateMap();this.screen="map";this.message=`${c.name} è il developer principale. Il primo bivio offre combattimento, evento e oggetto.`;}
   private randomTemplate(type:NormalNodeType){const list=NODE_TEMPLATES[type];return list[Math.floor(Math.random()*list.length)];}
-  private enemyForNode(type:"battle"|"elite",row=1){
-    const baseTier=row<=2?1:row<=4?2:row===5?3:4;
-    const targetTier=Math.min(4,baseTier+(type==="elite"?1:0));
+  private enemyForNode(type:"battle"|"elite",_row=1){
+    const targetTier=Math.min(4,this.currentTier()+(type==="elite"?1:0));
     const eligible=enemies.filter(e=>e.tier<=targetTier);
     const tierPool=eligible.filter(e=>e.tier===targetTier);
     const pool=tierPool.length?tierPool:eligible;
@@ -208,8 +214,9 @@ export class Game {
   }
   private shuffle<T>(items:T[]):T[]{return [...items].sort(()=>Math.random()-.5);}
   private generateBossRewards(){
-    const bossItems=this.shuffle(rewardItems.filter(item=>item.codeBonus+item.debugBonus>=4));
-    const bossCards=this.shuffle(rewardCards.filter(card=>(card.tier??1)>=2));
+    const tier=this.currentTier();
+    const bossItems=this.shuffle(rewardItems.filter(item=>item.tier===tier));
+    const bossCards=this.shuffle(rewardCards.filter(card=>(card.tier??1)===tier));
     const items=bossItems.slice(0,3).map(item=>({kind:"item" as const,item:this.cloneItem(item)}));
     const tools=bossCards.slice(0,3).map(card=>({kind:"tool" as const,card:{...card}}));
     this.bossRewardOptions=[...items,...tools];
@@ -249,16 +256,14 @@ export class Game {
     let rewardText="";
     if(effect.reward){
       if(effect.reward==="tool"){
-        const row=this.currentMapNode?.row??1;
-        const maxTier=row<=2?1:row<=4?2:3;
-        const reward=randomEventReward("tool",maxTier);
+        const tier=this.currentTier();
+        const reward=randomEventReward("tool",tier);
         this.cardCollection.push({...reward});
         if(this.deck.length<20)this.deck.push({...reward});
         rewardText=` Tool ${reward.name} ottenuto${this.deck.length<=20?" e aggiunto al MAZZO":" e conservato nelle CARTE POSSEDUTE"}.`;
       }else if(effect.reward==="item"){
-        const row=this.currentMapNode?.row??1;
-        const maxScore=row<=2?3:row<=4?4:5;
-        const reward=randomEventReward("item",maxScore);
+        const tier=this.currentTier();
+        const reward=randomEventReward("item",tier);
         this.inventory.push(this.cloneItem(reward));
         rewardText=` ${reward.name} messo nello ZAINO.`;
       }
@@ -270,23 +275,19 @@ export class Game {
   }
   private rewardTierForStage():number{
     const node=this.currentMapNode;
-    const row=node?.row??1;
-    let tier=row<=2?1:row<=4?2:3;
-    if(node?.type==="elite")tier=Math.min(4,tier+1);
-    return tier;
+    return Math.min(4,this.currentTier()+(node?.type==="elite"?1:0));
   }
   private randomRewardCard():Card{
-    const maxTier=this.rewardTierForStage();
-    const pool=rewardCards.filter(card=>(card.tier??1)<=maxTier);
-    const tierPool=pool.filter(card=>(card.tier??1)===maxTier);
-    const source=(tierPool.length&&Math.random()<.72?tierPool:pool);
-    return source[Math.floor(Math.random()*source.length)]??rewardCards[0];
+    const tier=this.rewardTierForStage();
+    const tierPool=rewardCards.filter(card=>(card.tier??1)===tier);
+    const pool=tierPool.length?tierPool:rewardCards.filter(card=>(card.tier??1)<=tier);
+    return pool[Math.floor(Math.random()*pool.length)]??rewardCards[0];
   }
   private randomRewardItem():Item{
-    const row=this.currentMapNode?.row??1;
-    const maxScore=row<=2?3:row<=4?4:5;
-    const pool=rewardItems.filter(item=>item.codeBonus+item.debugBonus<=maxScore);
-    const latePool=pool.filter(item=>item.codeBonus+item.debugBonus>=Math.min(maxScore,4));
+    const tier=this.rewardTierForStage();
+    const tierPool=rewardItems.filter(item=>item.tier===tier);
+    const pool=tierPool.length?tierPool:rewardItems.filter(item=>item.tier<=tier);
+    const latePool=pool.filter(item=>item.tier===tier);
     const source=(latePool.length&&row>=3&&Math.random()<.7?latePool:pool);
     return source[Math.floor(Math.random()*source.length)]??rewardItems[0];
   }
