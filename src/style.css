@@ -245,3 +245,31 @@ header small{font-family:inherit;font-size:10px;color:#7f8b9d;margin-top:4px}
   .developer-choice-grid{grid-template-columns:1fr}
   .selection-footer,.setup-footer,.equipment-footer{flex-direction:column;align-items:stretch}
 }
+
+
+/* ===== DEADLINE REWARDS ===== */
+.boss-reward-panel{max-width:1100px;margin:0 auto}
+.boss-reward-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.boss-reward-card{
+  min-height:180px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  border:1px solid #334155;
+  border-radius:10px;
+  background:#151e2a;
+  padding:18px;
+}
+.boss-reward-card:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.22)}
+.boss-reward-card .boss-reward-kind{font-size:10px;color:#93c5fd;font-weight:700}
+.boss-reward-card b{font-size:15px;color:#f1f5f9;line-height:1.35}
+.boss-reward-card strong{font-size:11px;color:#8bd5ff}
+.boss-reward-card small{font-size:12px;line-height:1.55;color:#9aa7b8;margin-top:auto}
+.boss-item-reward{border-color:#315a76}
+.boss-item-reward:hover:not(:disabled){border-color:#67e8f9}
+.boss-tool-reward{border-color:#4f3f72}
+.boss-tool-reward .boss-reward-kind{color:#c4b5fd}
+.boss-tool-reward:hover:not(:disabled){border-color:#a78bfa}
+@media(max-width:800px){.boss-reward-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.boss-reward-grid{grid-template-columns:1fr}}
