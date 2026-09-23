@@ -92,3 +92,21 @@
   .map-panel>.team-strip{margin-top:10px!important;}
   .map-panel>.map-viewport{min-height:420px!important;}
 }
+
+/* Final map viewport: keep the complete graph inside the visible area. */
+.map-panel>.map-viewport{
+  min-height:760px!important;
+  max-height:calc(100vh - 250px)!important;
+  overflow-x:auto!important;
+  overflow-y:auto!important;
+  padding:8px!important;
+  box-sizing:border-box!important;
+  scroll-padding-top:20px!important;
+}
+.map-panel>.map-viewport .map-canvas{
+  min-height:944px!important;
+  box-sizing:border-box!important;
+}
+.map-panel>.map-viewport .map-lines{
+  pointer-events:none!important;
+}
