@@ -115,6 +115,19 @@ export class Game {
     const cost=MAP_NODE_COST[node.type]??1;
     this.tempo=Math.max(0,this.tempo-cost);
 
+    // Build the next destination set immediately, while keeping it hidden from the UI
+    // until the player returns to the map.
+    if(node.id!=="rest-final"){
+      if(this.tempo<=0){
+        this.appendBossNode(node.row+1);
+        this.message="TEMPO ESAURITO. La DEADLINE è arrivata prima della prossima tappa.";
+      }else if(node.row>=6){
+        this.appendFinalRestOrBoss();
+      }else{
+        this.appendStageChoices(node.row+1);
+      }
+    }
+
     if(node.type==="battle"||node.type==="elite"){
       const source=enemies.find(e=>e.id===node.enemyId)??this.enemyForNode(node.type);
       this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}}));
@@ -140,16 +153,6 @@ export class Game {
       }
     }
 
-    if(this.tempo<=0){
-      this.appendBossNode(node.row+1);
-      this.message="TEMPO ESAURITO. La DEADLINE è arrivata prima della prossima tappa.";
-      return;
-    }
-    if(node.row>=6){
-      this.appendFinalRestOrBoss();
-      return;
-    }
-    this.appendStageChoices(node.row+1);
   }
 
   private prepareBattle(enemy:Enemy){this.pendingEnemy=enemy;this.selectedBattleStarterIndex=this.team.findIndex(d=>d.hp>0&&d.stress<100);if(this.selectedBattleStarterIndex<0)this.selectedBattleStarterIndex=0;this.screen="battleSetup";this.message="Scegli chi manda in campo per primo. Trascinalo nello slot di combattimento.";}
