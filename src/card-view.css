@@ -21,3 +21,7 @@
 .poker-card-management-host{display:flex!important;flex-direction:column!important;gap:8px;box-sizing:border-box}.poker-card-management-host>.poker-card{width:100%}
 .poker-card-management{display:flex;align-items:center;justify-content:space-between;gap:8px}.poker-card-management span{font-size:8px;color:#7f8b9d;line-height:1.2}.poker-card-management button{padding:7px 8px!important;border:1px solid #46536a!important;background:#202a3a!important;color:#e8edf5!important;font-weight:700!important;font-size:9px!important;cursor:pointer}.poker-card-management button:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:800px){.poker-card-name{font-size:11px}.poker-card-art span{font-size:34px}}
+
+/* Removed duplicated description area from all poker cards. */
+.poker-card-flavor{display:none!important}
+.poker-card-effect p{display:none!important}
