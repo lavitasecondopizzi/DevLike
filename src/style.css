@@ -273,3 +273,25 @@ header small{font-family:inherit;font-size:10px;color:#7f8b9d;margin-top:4px}
 .boss-tool-reward:hover:not(:disabled){border-color:#a78bfa}
 @media(max-width:800px){.boss-reward-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.boss-reward-grid{grid-template-columns:1fr}}
+
+
+/* ===== COMMESSA EVENTS ===== */
+.event-panel{max-width:1050px;margin:0 auto}
+.event-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.event-choice-card{
+  min-height:210px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+  border:1px solid #334155;
+  border-radius:10px;
+  background:#151e2a;
+  padding:20px;
+}
+.event-choice-card:hover:not(:disabled){transform:translateY(-2px);border-color:#fb923c;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+.event-choice-number{font-size:9px;color:#fb923c;font-weight:700}
+.event-choice-card b{font-size:15px;color:#f1f5f9;line-height:1.35}
+.event-choice-card small{font-size:12px;line-height:1.55;color:#9aa7b8}
+.event-choice-card strong{margin-top:auto;font-size:10px;color:#fbbf24;line-height:1.5}
+@media(max-width:800px){.event-choice-grid{grid-template-columns:1fr}.event-choice-card{min-height:150px}}
