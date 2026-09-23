@@ -32,7 +32,7 @@ function developerDetails(d: Developer) {
 }
 
 function enemyDetails(e: Enemy) {
-  return `<div class="codex-detail-head"><div><span class="codex-kicker">NEMICO · ${esc(e.type)}</span><h2>${esc(e.name)}</h2></div></div>
+  return `<div class="codex-detail-head"><div><span class="codex-kicker">NEMICO · ${esc(e.type)} · VALORI BASE</span><h2>${esc(e.name)}</h2></div></div>
     <p class="codex-description">${esc(e.description)}</p>
     <div class="codex-stats"><span>HP <b>${e.maxHp}</b></span><span>CODICE <b>${e.code}</b></span><span>DEBUG <b>${e.debug}</b></span><span>DMG <b>${e.intent.damage}</b></span><span>STRESS <b>+${e.intent.stress}</b></span></div>
     <section class="codex-block"><h3>ABILITÀ</h3><p>${esc(e.passive)}</p></section>
@@ -41,11 +41,11 @@ function enemyDetails(e: Enemy) {
 }
 
 function cardDetails(c: Card) {
-  return `<div class="codex-card-detail"><div class="codex-card-preview">${renderPokerCard(c)}</div><div class="codex-card-info"><span class="codex-kicker">DETTAGLIO TOOL</span><h2>${esc(c.name)}</h2><p class="codex-description">${esc(c.description)}</p><div class="codex-stats"><span>COSTO <b>${c.cost} ⚡</b></span><span>EFFETTO <b>${esc(cardEffect(c))}</b></span></div><section class="codex-block"><h3>EFFETTO TECNICO</h3><p>${esc(cardEffect(c))}</p></section></div></div>`;
+  return `<div class="codex-card-detail"><div class="codex-card-preview">${renderPokerCard(c)}</div><div class="codex-card-info"><span class="codex-kicker">DETTAGLIO TOOL · TIER ${c.tier ?? 1}</span><h2>${esc(c.name)}</h2><p class="codex-description">${esc(c.description)}</p><div class="codex-stats"><span>TIER <b>${c.tier ?? 1}</b></span><span>COSTO <b>${c.cost} ⚡</b></span><span>EFFETTO <b>${esc(cardEffect(c))}</b></span></div><section class="codex-block"><h3>EFFETTO TECNICO</h3><p>${esc(cardEffect(c))}</p></section></div></div>`;
 }
 
 function itemDetails(i: Item) {
-  return `<div class="codex-detail-head"><div><span class="codex-kicker">OGGETTO</span><h2>${esc(i.name)}</h2></div></div><p class="codex-description">${esc(i.description)}</p><div class="codex-stats"><span>CODICE <b>+${i.codeBonus}</b></span><span>DEBUG <b>+${i.debugBonus}</b></span><span>SLOT <b>1</b></span></div><section class="codex-block"><h3>EFFETTO</h3><p>${i.codeBonus ? `+${i.codeBonus} CODICE` : "Nessun bonus CODICE"} · ${i.debugBonus ? `+${i.debugBonus} DEBUG` : "Nessun bonus DEBUG"}</p></section>`;
+  return `<div class="codex-detail-head"><div><span class="codex-kicker">OGGETTO · POTENZA ${i.codeBonus + i.debugBonus}</span><h2>${esc(i.name)}</h2></div></div><p class="codex-description">${esc(i.description)}</p><div class="codex-stats"><span>CODICE <b>+${i.codeBonus}</b></span><span>DEBUG <b>+${i.debugBonus}</b></span><span>POTENZA <b>${i.codeBonus + i.debugBonus}</b></span><span>SLOT <b>1</b></span></div><section class="codex-block"><h3>EFFETTO</h3><p>${i.codeBonus ? `+${i.codeBonus} CODICE` : "Nessun bonus CODICE"} · ${i.debugBonus ? `+${i.debugBonus} DEBUG` : "Nessun bonus DEBUG"}</p></section>`;
 }
 
 function dataForCategory(category: string): Array<{ id: string; name: string; subtitle: string; details: string }> {
@@ -53,13 +53,13 @@ function dataForCategory(category: string): Array<{ id: string; name: string; su
   if (category === "enemies") return [...enemies, boss].map(e => ({ id: e.id, name: e.name, subtitle: e.type, details: enemyDetails(e) }));
   if (category === "cards") {
     const all = [...startingDeck, ...rewardCards].filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i);
-    return all.map(c => ({ id: c.id, name: c.name, subtitle: `${c.cost} ⚡ · ${cardEffect(c)}`, details: cardDetails(c) }));
+    return all.map(c => ({ id: c.id, name: c.name, subtitle: `T${c.tier ?? 1} · ${c.cost} ⚡ · ${cardEffect(c)}`, details: cardDetails(c) }));
   }
   return rewardItems.map(i => ({ id: i.id, name: i.name, subtitle: `+${i.codeBonus} COD · +${i.debugBonus} DEBUG`, details: itemDetails(i) }));
 }
 
 function codexMarkup() {
-  return `<div class="feature-overlay codex-overlay" data-feature-overlay="codex"><div class="feature-window codex-window"><div class="feature-titlebar"><div><span class="codex-kicker">DATABASE</span><h2>CODEX DEVLIKE</h2></div><button type="button" class="feature-close" data-feature-close>CHIUDI ×</button></div><nav class="codex-tabs"><button type="button" class="active" data-codex-category="developers">DEVELOPER</button><button type="button" data-codex-category="enemies">NEMICI</button><button type="button" data-codex-category="cards">CARTE</button><button type="button" data-codex-category="items">OGGETTI</button></nav><div class="codex-layout"><aside class="codex-list" data-codex-list></aside><article class="codex-detail" data-codex-detail></article></div></div></div>`;
+  return `<div class="feature-overlay codex-overlay" data-feature-overlay="codex"><div class="feature-window codex-window"><div class="feature-titlebar"><div><span class="codex-kicker">DATABASE</span><h2>CODEX DEVLIKE</h2></div><button type="button" class="feature-close" data-feature-close>CHIUDI ×</button></div><nav class="codex-tabs"><button type="button" class="active" data-codex-category="developers">DEVELOPER</button><button type="button" data-codex-category="enemies">NEMICI</button><button type="button" data-codex-category="cards">TOOL</button><button type="button" data-codex-category="items">OGGETTI</button></nav><div class="codex-layout"><aside class="codex-list" data-codex-list></aside><article class="codex-detail" data-codex-detail></article></div></div></div>`;
 }
 
 function tutorialMarkup() {
