@@ -138,7 +138,7 @@ export class Game {
 
     if(node.type==="battle"||node.type==="elite"){
       const source=enemies.find(e=>e.id===node.enemyId)??this.enemyForNode(node.type);
-      this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}},node.type==="elite"));
+      this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}},node.row,node.type==="elite"));
     }else if(node.type==="reward"){
       this.generateReward();
     }else if(node.type==="item"){
@@ -182,7 +182,7 @@ export class Game {
   selectRecruitTarget(index:number){if(this.team.length<3||!this.team[index])return;this.recruitTargetIndex=index;}
   confirmRecruitment(){if(this.selectedRecruitIndex===null)return;const c=this.recruitCandidates[this.selectedRecruitIndex];if(!c)return;const fresh={...c,hp:c.maxHp,stress:0,items:[]};if(this.team.length<3)this.team.push(fresh);else{if(this.recruitTargetIndex===null)return;this.team[this.recruitTargetIndex]=fresh;}this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.recruitCandidates=[];this.screen="map";this.message=`${c.name} entra nel team. Scegli il prossimo nodo.`;}
   private randomEnemy(elite=false):Enemy{const pool=elite?enemies.filter(e=>e.id==="client"||e.id==="legacy"):enemies;const source=pool[Math.floor(Math.random()*pool.length)]??enemies[0];return this.scaleEnemy({...source,intent:{...source.intent}});}
-  private scaleEnemy(enemy:Enemy,elite=false):Enemy{const m=this.difficulty*(elite?1.3:1);return {...enemy,hp:Math.max(1,Math.round(enemy.maxHp*m)),maxHp:Math.max(1,Math.round(enemy.maxHp*m)),intent:{...enemy.intent,damage:Math.max(1,Math.round(enemy.intent.damage*m)),stress:Math.max(1,Math.round(enemy.intent.stress*(1+(m-1)*.5)))}};}
+  private scaleEnemy(enemy:Enemy,row=6,elite=false):Enemy{const stageMultiplier=Math.min(1.3,0.85+(Math.max(1,Math.min(6,row))-1)*0.09);const m=this.difficulty*stageMultiplier*(elite?1.25:1);return {...enemy,hp:Math.max(1,Math.round(enemy.maxHp*m)),maxHp:Math.max(1,Math.round(enemy.maxHp*m)),intent:{...enemy.intent,damage:Math.max(1,Math.round(enemy.intent.damage*m)),stress:Math.max(1,Math.round(enemy.intent.stress*(1+(m-1)*.5)))}};}
   startBattle(enemy:Enemy){this.combat=new Combat(this.team,enemy,this.deck);this.screen="combat";this.pendingEnemy=null;}
   enterRandomBattle(){this.prepareBattle(this.randomEnemy());}
   enterBoss(){this.prepareBattle(this.scaleEnemy({...boss,intent:{...boss.intent}}));}
