@@ -1,26 +1,14 @@
-/* MAP PATH HISTORY */
-/* Connections stay hidden until that segment has actually been chosen. */
-.map-lines .map-line{display:none!important}
-.map-lines .map-line.active{display:block!important}
-
-/* Visited nodes remain active-looking, but clearly darker and non-interactive. */
-.map-node.visited:not(.current){
-  opacity:.55!important;
-  filter:brightness(.65)!important;
-  cursor:default!important;
-}
-.map-node.visited:not(.current):hover{
-  border-color:inherit!important;
-  background:inherit!important;
-  transform:none!important;
-}
-.map-node.visited:not(.current)[disabled]{
-  opacity:.55!important;
-  filter:brightness(.65)!important;
-}
-
-/* Only currently selectable destinations get the normal active emphasis. */
-.map-node.available:not(.visited){
-  opacity:1!important;
-  filter:none!important;
-}
+/* Strategic map: show the complete six-stage route graph. */
+.map-lines .map-line{display:block!important;stroke:#34465d;stroke-width:4;opacity:.65}
+.map-lines .map-line.active{stroke:#60a5fa;stroke-width:6;opacity:1}
+.map-lines .map-line.reachable{stroke:#93c5fd;stroke-width:5;opacity:.9}
+.map-node-wrap{position:absolute!important;width:180px!important;transform:translate(-50%,-50%)!important;z-index:2}
+.map-node{width:180px!important;min-height:72px!important;box-sizing:border-box}
+.map-node.available:not(.visited){opacity:1!important;filter:none!important}
+.map-node:not(.available):not(.visited){opacity:.68!important;filter:saturate(.65)!important}
+.map-node.visited:not(.current){opacity:.58!important;filter:brightness(.68)!important}
+.map-node.current{border-color:#60a5fa!important;box-shadow:0 0 0 2px #60a5fa inset,0 0 16px rgba(96,165,250,.18)!important}
+.map-node.available:not(.visited){box-shadow:0 0 0 2px rgba(96,165,250,.14),0 0 18px rgba(96,165,250,.12)!important}
+.map-canvas{margin:0 auto!important}
+.map-viewport{overflow-x:auto!important;overflow-y:hidden!important}
+@media(max-width:800px){.map-node-wrap{width:160px!important}.map-node{width:160px!important}}
