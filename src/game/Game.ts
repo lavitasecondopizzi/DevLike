@@ -288,7 +288,7 @@ export class Game {
     const tierPool=rewardItems.filter(item=>item.tier===tier);
     const pool=tierPool.length?tierPool:rewardItems.filter(item=>item.tier<=tier);
     const latePool=pool.filter(item=>item.tier===tier);
-    const source=(latePool.length&&row>=3&&Math.random()<.7?latePool:pool);
+    const source=(latePool.length?latePool:pool);
     return source[Math.floor(Math.random()*source.length)]??rewardItems[0];
   }
   generateReward(){const reward=this.randomRewardCard();if(reward)this.reward={...reward};this.screen="reward";}
