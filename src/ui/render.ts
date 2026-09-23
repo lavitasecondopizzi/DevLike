@@ -194,6 +194,18 @@ return `<section class="battle battle-redesign">
     <div class="battle-matchups"><div><b>VANTAGGI</b>${enemy.advantages.map(x=>`<span>${esc(x)}</span>`).join("")}</div><div><b>DEBOLEZZE</b>${enemy.weaknesses.map(x=>`<span>${esc(x)}</span>`).join("")}</div></div>
   </aside>
 </section>`;}  if(game.screen==="reward"){const card=game.reward!;return `<section class="panel center"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi un Tool al deck.</p><button type="button" class="reward-card" data-action="reward"><b>${esc(card.name)}</b><span>${card.cost} ⚡</span><small>${esc(card.description)}</small></button></section>`;}
+  if(game.screen==="bossReward"){
+    const options=game.bossRewardOptions.map((option,i)=>{
+      if(option.kind==="item"&&option.item)return `<button type="button" class="boss-reward-card boss-item-reward" data-boss-reward="${i}"><span class="boss-reward-kind">OGGETTO · ZAINO</span><b>${esc(option.item.name)}</b><strong>+${option.item.codeBonus} COD · +${option.item.debugBonus} DEBUG</strong><small>${esc(option.item.description)}</small></button>`;
+      const card=option.card!;
+      return `<button type="button" class="boss-reward-card boss-tool-reward" data-boss-reward="${i}"><span class="boss-reward-kind">TOOL · MAZZO</span><b>${esc(card.name)}</b><strong>${card.cost} ⚡</strong><small>${esc(card.description)}</small></button>`;
+    }).join("");
+    return `<section class="panel selection-panel boss-reward-panel">
+      <div class="selection-heading"><div><h2>DROP DELLA DEADLINE</h2><p>Hai completato la commessa. Scegli UNA sola ricompensa tra 3 oggetti da mettere direttamente nello ZAINO e 3 Tool da aggiungere al MAZZO.</p></div><span class="random-badge">6 DROP · 1 SCELTA</span></div>
+      <div class="boss-reward-grid">${options}</div>
+      <div class="selection-footer"><span class="selection-hint">La scelta è definitiva. Gli altri cinque drop vengono persi.</span></div>
+    </section>`;
+  }
   return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${esc(game.message)}</h1><p>La commessa è andata in produzione. Da qualche parte.</p><button type="button" class="primary" data-action="restart">NUOVA COMMESSA</button></section>`;
 }
 
