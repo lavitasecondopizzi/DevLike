@@ -45,10 +45,12 @@ function renderMapNode(node:MapNode,game:Game){
 function renderMap(game:Game){
   const width=900;
   const rowHeight=108;
+  const topPadding=72;
+  const bottomPadding=72;
   const rows=Math.max(8,...game.mapNodes.map(n=>n.row));
-  const height=rows*rowHeight+80;
+  const height=rows*rowHeight+topPadding+bottomPadding;
   const x=(col:number)=>150+col*300;
-  const y=(row:number)=>40+row*rowHeight;
+  const y=(row:number)=>topPadding+row*rowHeight;
 
   const lines=game.mapNodes.flatMap(node=>node.next.map(nextId=>{
     const target=game.mapNodes.find(n=>n.id===nextId);
