@@ -842,3 +842,38 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
 .battle-redesign .battle-team-member:not(:disabled) .battle-member-switch-cost{
   color:#b7c9df!important;
 }
+
+
+/* REWARD CARD PRESENTATION */
+.reward-screen .reward-card-poker{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:14px!important;
+  min-width:260px!important;
+  max-width:300px!important;
+  margin:0 auto!important;
+  background:#121923!important;
+  border:1px solid #334154!important;
+  border-radius:8px!important;
+}
+.reward-screen .reward-card-poker .poker-card{
+  width:100%!important;
+}
+.reward-screen .reward-card-confirm{
+  display:block!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  padding:9px 10px!important;
+  border:1px solid #526985!important;
+  background:#1b2635!important;
+  color:#dbe7f4!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.06em!important;
+}
+.reward-screen .reward-card-poker:hover .reward-card-confirm{
+  border-color:#7dd3fc!important;
+  background:#26364a!important;
+}
