@@ -810,3 +810,27 @@ body::before{
     );
   box-shadow:inset 0 0 80px rgba(92,85,152,.08);
 }
+
+
+/* ===== GLOBAL MINIMUM TEXT SIZE =====
+   No user-facing game text may render below 11px.
+*/
+.game-shell :where(
+  p,span,small,strong,b,label,a,button,input,select,textarea,
+  li,dt,dd,h1,h2,h3,h4,h5,h6,
+  .map-node,.map-node-title,.map-node-description,
+  .map-node-type,.team-summary,.team-summary-name,
+  .team-summary-role,.card-name,.card-description,
+  .poker-card,.poker-card-name,.poker-card-type,
+  .poker-card-effect,.poker-card-cost,.poker-card-tier,
+  .poker-card-bottom,.combat-log,.combat-intent,
+  .tooltip,.stat-tooltip
+){
+  font-size:max(11px, 1em)!important;
+}
+
+/* Preserve intentionally large headings while enforcing the floor. */
+.game-shell h1{font-size:max(11px, 2rem)!important}
+.game-shell h2{font-size:max(11px, 1.5rem)!important}
+.game-shell h3{font-size:max(11px, 1.25rem)!important}
+.game-shell h4{font-size:max(11px, 1.1rem)!important}
