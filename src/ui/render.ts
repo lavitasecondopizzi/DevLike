@@ -62,9 +62,9 @@ function renderMap(game:Game){
   )).map(target=>{
     const unlocked=node.visited&&(target.visited||game.availableMapNodes.some(n=>n.id===target.id));
     const active=node.visited&&target.visited;
-    const reachable=node.visited&&game.availableMapNodes.some(n=>n.id===target.id);
+    const reachable=node.visited&&game.availableMapNodes.some(n=>n.id===target.id);\n    const currentPath=game.currentMapNodeId===node.id&&reachable;
     if(!unlocked)return "";
-    return `<line class="map-line ${active?"active":""} ${reachable?"reachable":""}" x1="${x(node.col)}" y1="${y(node.row)}" x2="${x(target.col)}" y2="${y(target.row)}"/>`;
+    return `<line class="map-line ${active?"active":""} ${reachable?"reachable":""} ${currentPath?"current-path":""}" x1="${x(node.col)}" y1="${y(node.row)}" x2="${x(target.col)}" y2="${y(target.row)}"/>`;
   })).join("");
 
   const nodes=game.mapNodes.map(node=>`<div class="map-node-wrap" style="left:${x(node.col)/width*100}%;top:${y(node.row)}px">${renderMapNode(node,game)}</div>`).join("");
