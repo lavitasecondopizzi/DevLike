@@ -25,7 +25,9 @@ export class Combat {
     const phase=this.deadlinePhaseOrder[next];
     this.log.push("DEADLINE · CAMBIO IMPROVVISO: FASE "+(next+1)+" · "+phase.name+" · "+phase.ability);
   }
+  get deadlinePhaseNumber():number{return this.enemy.typeId==="deadline"?this.deadlinePhaseIndex+1:0;}
   get deadlinePhaseName():string{return this.enemy.typeId==="deadline"?(this.deadlinePhaseOrder[this.deadlinePhaseIndex]?.name??"FASE 1"):"";}
+  get deadlinePhaseSpecialReady():boolean{return this.deadlineSpecialActive();}
   get deadlinePhaseDescription():string{return this.enemy.typeId==="deadline"?(this.deadlinePhaseOrder[this.deadlinePhaseIndex]?.description??""):"";}
   get deadlinePhaseAbility():string{return this.enemy.typeId==="deadline"?(this.deadlinePhaseOrder[this.deadlinePhaseIndex]?.ability??""):"";}
   private deadlinePhase(){return this.enemy.typeId==="deadline"?(this.deadlinePhaseOrder[this.deadlinePhaseIndex]??null):null;}
