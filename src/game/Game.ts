@@ -16,7 +16,6 @@ const NODE_TEMPLATES: Record<NormalNodeType, Array<{ title: string; description:
   elite: [{ title: "CLIENTE", description: "Una piccola modifica. Solo 47 requisiti nuovi." }, { title: "PROD", description: "È venerdì pomeriggio. La produzione ha altri piani." }],
   event: [{ title: "EVENTO", description: "Una decisione discutibile potrebbe salvare la commessa." }, { title: "IMPREVISTO", description: "Il cliente ha detto 'non tocco niente'." }],
   rest: [{ title: "PAUSA", description: "Cinque minuti di pausa. Nessuno deve saperlo." }, { title: "CAFFÈ", description: "Il compilatore non si lamenta del caffè." }],
-  fullRest: [{ title: "RECUPERO TOTALE", description: "Ricarica completamente HP e Stress di tutto il team." }],
   reward: [{ title: "TOOLBOX", description: "Un nuovo Tool entra nel tuo arsenale." }, { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }],
   item: [{ title: "EQUIPMENT", description: "Hai trovato un oggetto utile. Puoi equipaggiarlo o conservarlo nello zaino." }, { title: "SWAG", description: "Merchandising aziendale. Sorprendentemente utile." }],
   recruit: [{ title: "RECLUTAMENTO", description: "Un developer sta cercando disperatamente una commessa." }, { title: "COLLOQUIO", description: "Hai trovato qualcuno che conosce il codice legacy." }]
@@ -30,7 +29,7 @@ const MAP_SCHEMES: NormalNodeType[][] = [
   ["battle","elite","reward"]
 ];
 const MAP_NODE_COST: Partial<Record<NormalNodeType, number>> = {
-  battle:1, elite:2, event:1, rest:0, fullRest:0, reward:1, item:1, recruit:2
+  battle:1, elite:2, event:1, rest:0, reward:1, item:1, recruit:2
 };
 
 export class Game {
@@ -161,8 +160,6 @@ export class Game {
     }else if(node.type==="event"){
       this.openEvent();
       return;
-    }else if(node.type==="fullRest"){
-      this.team.forEach(d=>{d.hp=d.maxHp;d.stress=0;});
       this.message="RECUPERO TOTALE: tutto il team è completamente guarito e senza Stress.";
     }else if(node.type==="rest"){
       this.team.forEach(d=>{d.hp=Math.min(d.maxHp,d.hp+14);d.stress=Math.max(0,d.stress-10);});
