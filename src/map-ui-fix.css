@@ -127,31 +127,58 @@
   transform-origin:center center!important;
 }
 
-/* Final strategic map sizing: the grid row must grow with the full map canvas. */
+/* Final strategic map sizing: keep the graph compact and readable beside the team rail. */
 .map-panel{
   grid-template-rows:auto auto auto auto!important;
 }
 .map-panel>.map-viewport{
   grid-column:2!important;
   grid-row:4!important;
+  width:100%!important;
   height:auto!important;
   min-height:0!important;
   max-height:none!important;
-  overflow:visible!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
   padding:8px 0!important;
   align-self:start!important;
+  border-radius:10px!important;
 }
 .map-panel>.map-viewport .map-canvas{
-  width:900px!important;
-  min-width:900px!important;
-  height:1008px!important;
-  min-height:1008px!important;
+  width:760px!important;
+  min-width:760px!important;
+  height:880px!important;
+  min-height:880px!important;
+  margin:0 auto!important;
 }
 .map-panel>.map-viewport .map-node-wrap{
-  transform:translate(-50%,-50%) scale(.82)!important;
+  width:160px!important;
+  transform:translate(-50%,-50%)!important;
   transform-origin:center center!important;
+}
+.map-panel>.map-viewport .map-node{
+  width:160px!important;
+  min-height:68px!important;
+  padding:9px 8px!important;
 }
 .map-panel>.team-strip{
   grid-row:4!important;
   align-self:start!important;
+}
+@media(max-width:800px){
+  .map-panel>.map-viewport{
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+  }
+  .map-panel>.map-viewport .map-canvas{
+    width:760px!important;
+    min-width:760px!important;
+    height:880px!important;
+    min-height:880px!important;
+    margin-left:0!important;
+  }
+  .map-panel>.map-viewport .map-node-wrap,
+  .map-panel>.map-viewport .map-node{
+    width:150px!important;
+  }
 }
