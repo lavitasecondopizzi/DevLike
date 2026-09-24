@@ -84,7 +84,7 @@ export class Game {
     // sinistra -> sinistra + centro, centro -> tutte e tre, destra -> centro + destra.
     from.forEach(node=>{
       node.next=to
-        .filter(target=>Math.abs(target.col-node.col)<=1)
+        .filter(target=>this.followsMapRoute(node,target))
         .map(target=>target.id);
     });
   }
