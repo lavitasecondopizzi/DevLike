@@ -2,8 +2,8 @@
 .map-lines .map-line{display:block!important;stroke:#34465d;stroke-width:4;opacity:.65}
 .map-lines .map-line.active{stroke:#60a5fa;stroke-width:6;opacity:1}
 .map-lines .map-line.reachable{stroke:#93c5fd;stroke-width:5;opacity:.9}
-.map-node-wrap{position:absolute!important;width:180px!important;transform:translate(-50%,-50%)!important;z-index:2}
-.map-node{width:180px!important;min-height:72px!important;box-sizing:border-box}
+.map-node-wrap{position:absolute!important;width:160px!important;transform:translate(-50%,-50%)!important;z-index:2}
+.map-node{width:160px!important;min-height:68px!important;box-sizing:border-box}
 .map-node.available:not(.visited){opacity:1!important;filter:none!important}
 .map-node:not(.available):not(.visited){opacity:.68!important;filter:saturate(.65)!important}
 .map-node.visited:not(.current){opacity:.58!important;filter:brightness(.68)!important}
