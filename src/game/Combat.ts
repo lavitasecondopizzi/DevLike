@@ -5,12 +5,13 @@ export class Combat {
   usedCards = new Set<Card>();
   private deadlinePhaseOrder: {name:string;description:string;ability:string;outgoing:number;incomingStress:number;playerDamage:number}[] = [];
   private deadlinePhaseIndex = 0;
+  private deadlinePhaseTriggered = new Set<number>();
   constructor(team: Developer[], enemy: Enemy, deck: Card[], nuzlockeRules:string[] = []) { this.team=team.map(d=>({...d,items:d.items.map(item=>({...item}))})); this.enemy={...enemy,intent:{...enemy.intent}}; this.nuzlockeRules=[...nuzlockeRules]; this.drawPile=this.shuffle([...deck]); if(this.enemy.typeId==="deadline")this.setupDeadlinePhases(); const available=this.team.findIndex(d=>d.hp>0&&d.stress<d.maxStress); if(available>=0)this.activeIndex=available; else {this.result="defeat";this.log.push("Nessun developer disponibile all'inizio del combattimento.");return;} this.log.push(`${this.active.name} entra in campo contro ${this.enemy.name}.`); if(this.enemy.typeId==="deadline"){const phase=this.deadlinePhase();if(phase)this.log.push("DEADLINE · FASE 1: "+phase.name+" · "+phase.ability);} this.startTurn(); }
   private setupDeadlinePhases(){
     const phases=[
-      {name:"SCOPE CREEP",description:"Il perimetro continua a cambiare.",ability:"+2 Stress inflitto · la DEADLINE subisce +10% danni.",outgoing:1,incomingStress:2,playerDamage:1.05},
-      {name:"PRODUZIONE CRITICA",description:"Ogni secondo perso costa caro.",ability:"+15% danni inflitti · la DEADLINE subisce +10% danni.",outgoing:1.15,incomingStress:0,playerDamage:1.05},
-      {name:"CONTO ALLA ROVESCIA",description:"La Deadline accelera improvvisamente.",ability:"+20% danni inflitti e +1 Stress · la DEADLINE subisce +15% danni.",outgoing:1.2,incomingStress:1,playerDamage:1.1},
+      {name:"SCOPE CREEP",description:"Il perimetro continua a cambiare.",ability:"+2 Stress inflitto · primo attacco della fase: +4 Stress extra.",outgoing:1,incomingStress:2,playerDamage:1.05,specialDamage:0,specialStress:4,specialBlockPierce:0},
+      {name:"PRODUZIONE CRITICA",description:"Ogni secondo perso costa caro.",ability:"+15% danni inflitti · primo attacco della fase ignora 5 BLOCCO.",outgoing:1.15,incomingStress:0,playerDamage:1.05,specialDamage:0,specialStress:0,specialBlockPierce:5},
+      {name:"CONTO ALLA ROVESCIA",description:"La Deadline accelera improvvisamente.",ability:"+20% danni inflitti e +1 Stress · primo attacco della fase: +5 danni e +2 Stress.",outgoing:1.2,incomingStress:1,playerDamage:1.1,specialDamage:5,specialStress:2,specialBlockPierce:0},
     ];
     this.deadlinePhaseOrder=this.shuffle(phases);
     this.deadlinePhaseIndex=0;
@@ -28,6 +29,8 @@ export class Combat {
   get deadlinePhaseDescription():string{return this.enemy.typeId==="deadline"?(this.deadlinePhaseOrder[this.deadlinePhaseIndex]?.description??""):"";}
   get deadlinePhaseAbility():string{return this.enemy.typeId==="deadline"?(this.deadlinePhaseOrder[this.deadlinePhaseIndex]?.ability??""):"";}
   private deadlinePhase(){return this.enemy.typeId==="deadline"?(this.deadlinePhaseOrder[this.deadlinePhaseIndex]??null):null;}
+  private deadlineSpecialActive(){return this.enemy.typeId==="deadline"&&!this.deadlinePhaseTriggered.has(this.deadlinePhaseIndex);}
+  private markDeadlineSpecial(){if(this.enemy.typeId==="deadline")this.deadlinePhaseTriggered.add(this.deadlinePhaseIndex);}
   get active(): Developer { return this.team[this.activeIndex]; }
   get itemCodeBonus(): number { return this.active.items.reduce((total,item)=>total+item.codeBonus,0); }
   get itemDebugBonus(): number { return this.active.items.reduce((total,item)=>total+item.debugBonus,0); }
@@ -99,8 +102,8 @@ export class Combat {
     return this.previewDamage(Math.round(debug*1.45*(1+this.codeBoost/100)),"debug");
   }
   get defensePreview():number{return 10+(this.teamHasClass("devops")&&!this.devopsDefenseUsed.has("team")?5:0);}
-  get incomingRawPreview():number{let raw=this.enemy.intent.damage;if(this.enemy.typeId==="deadline")raw+=this.turn*2;return Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));}
-  get incomingDamagePreview():number{return Math.max(0,this.incomingRawPreview-this.block);}
+  get incomingRawPreview():number{let raw=this.enemy.intent.damage;if(this.enemy.typeId==="deadline"){const phase=this.deadlinePhase();raw+=this.turn*2+(this.deadlineSpecialActive()?(phase?.specialDamage??0):0);}return Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));}
+  get incomingDamagePreview():number{const phase=this.deadlinePhase();const special=this.deadlineSpecialActive();const pierce=special?(phase?.specialBlockPierce??0):0;return Math.max(0,this.incomingRawPreview-Math.max(0,this.block-pierce));}
   get incomingStressPreview():number{
     let stress=this.enemy.intent.stress;
     if(this.enemy.typeId==="bug")stress+=this.enemyScaling+1;
@@ -154,7 +157,7 @@ export class Combat {
 
   switchDeveloper(index:number):boolean{if(this.nuzlockeRules.includes("noSwitch")||this.nuzlockeRules.includes("noBattleSwitch"))return false;if(this.energy<1||index===this.activeIndex||!this.team[index]||this.team[index].hp<=0||this.team[index].stress>=this.team[index].maxStress)return false;this.energy-=1;this.activeIndex=index;this.temporaryCodeBonus=this.teamHasClass("fullstack")?1:0;this.log.push(`Cambio: entra ${this.active.name} · HP ${this.active.hp}/${this.active.maxHp} · Stress ${this.active.stress}/${this.active.maxStress}.`);this.autoSkipIfNoAction();return true;}
   endTurn(auto=false){if(this.result!=="ongoing")return;this.discardPile.push(...this.hand.splice(0));this.log.push(auto?"Fine turno automatica: nessuna azione disponibile.":"Fine turno: attacco nemico in arrivo.");this.enemyAttack();this.checkBurnout();if(this.result==="ongoing"){this.turn+=1;this.startTurn();}}
-  private enemyAttack(){let raw=this.enemy.intent.damage;let stress=this.enemy.intent.stress;if(this.enemy.typeId==="bug"){this.enemyScaling+=1;stress+=this.enemyScaling;}if(this.enemy.typeId==="meeting"&&this.active.stress>=this.active.maxStress*.5)stress+=3;if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;if(this.enemy.typeId==="deadline"){const phase=this.deadlinePhase();raw+=this.turn*2;stress+=this.turn*2+(phase?.incomingStress??0);}raw=Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));const damage=Math.max(0,raw-this.block);this.block=Math.max(0,this.block-raw);this.active.hp=Math.max(0,this.active.hp-damage);const stressBefore=this.active.stress;this.active.stress=Math.min(this.active.maxStress,this.active.stress+stress);this.applyInternStressPassive(this.active,stressBefore);this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${stress} Stress.`);}
+  private enemyAttack(){let raw=this.enemy.intent.damage;let stress=this.enemy.intent.stress;if(this.enemy.typeId==="bug"){this.enemyScaling+=1;stress+=this.enemyScaling;}if(this.enemy.typeId==="meeting"&&this.active.stress>=this.active.maxStress*.5)stress+=3;if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;if(this.enemy.typeId==="deadline"){const phase=this.deadlinePhase();const special=this.deadlineSpecialActive();raw+=this.turn*2+(special?(phase?.specialDamage??0):0);stress+=this.turn*2+(phase?.incomingStress??0)+(special?(phase?.specialStress??0):0);}raw=Math.max(0,Math.round(raw*this.incomingMultiplier(this.active)));const phase=this.deadlinePhase();const special=this.deadlineSpecialActive();const blockPierce=special?(phase?.specialBlockPierce??0):0;const effectiveBlock=Math.max(0,this.block-blockPierce);const damage=Math.max(0,raw-effectiveBlock);this.block=Math.max(0,this.block-raw);this.active.hp=Math.max(0,this.active.hp-damage);const stressBefore=this.active.stress;this.active.stress=Math.min(this.active.maxStress,this.active.stress+stress);this.applyInternStressPassive(this.active,stressBefore);if(special){this.log.push(`DEADLINE · ABILITÀ FASE: ${phase?.name??""}`);this.markDeadlineSpecial();}this.log.push(`${this.enemy.name}: ${raw} danni. Subiti ${damage}. +${stress} Stress.`);}
   private checkVictory(){if(this.enemy.hp<=0){this.result="victory";this.log.push(`${this.enemy.name} è stato sconfitto.`);}}
   private checkBurnout(){if(this.active.stress>=this.active.maxStress||this.active.hp<=0){this.log.push(`${this.active.name} è andato in BURNOUT/ESAUSTO.`);const available=this.team.findIndex((d,i)=>i!==this.activeIndex&&d.hp>0&&d.stress<d.maxStress);if(available>=0){this.active.stress=this.active.maxStress;this.activeIndex=available;this.log.push(`Entra ${this.active.name}.`);}else{this.result="defeat";this.log.push("Tutti i developer sono fuori combattimento.");}}}
   private shuffle<T>(items:T[]):T[]{for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}return items;}
