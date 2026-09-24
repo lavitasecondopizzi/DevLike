@@ -191,7 +191,7 @@ export class Game {
   confirmRecruitment(){if(this.selectedRecruitIndex===null)return;const c=this.recruitCandidates[this.selectedRecruitIndex];if(!c)return;const fresh={...c,hp:c.maxHp,stress:0,items:[]};if(this.team.length<3)this.team.push(fresh);else{if(this.recruitTargetIndex===null)return;this.team[this.recruitTargetIndex]=fresh;}this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.recruitCandidates=[];this.screen="map";this.message=`${c.name} entra nel team. Scegli il prossimo nodo.`;}
   private randomEnemy(elite=false):Enemy{const source=this.enemyForNode(elite?"elite":"battle",6);return this.scaleEnemy({...source,intent:{...source.intent}},6,elite);}
   private scaleBoss(enemy:Enemy):Enemy{
-    const tierMultiplier=[0.55,0.7,0.85,1][this.currentTier()-1]??1;
+    const tierMultiplier=[0.65,0.8,0.95,1][this.currentTier()-1]??1;
     const difficultyMultiplier=Math.min(1.3,1+(this.difficulty-1)*0.1);
     const multiplier=tierMultiplier*difficultyMultiplier;
     return {...enemy,hp:Math.max(1,Math.round(enemy.maxHp*multiplier)),maxHp:Math.max(1,Math.round(enemy.maxHp*multiplier)),intent:{...enemy.intent,damage:Math.max(1,Math.round(enemy.intent.damage*multiplier)),stress:Math.max(1,Math.round(enemy.intent.stress*(1+(multiplier-1)*.5)))}};}
@@ -204,7 +204,7 @@ export class Game {
     return {...enemy,hp:Math.max(1,Math.round(enemy.maxHp*hpMultiplier)),maxHp:Math.max(1,Math.round(enemy.maxHp*hpMultiplier)),intent:{...enemy.intent,damage:Math.max(1,Math.round(enemy.intent.damage*pressureMultiplier)),stress:Math.max(1,Math.round(enemy.intent.stress*(1+(pressureMultiplier-1)*.5)))}};}
   startBattle(enemy:Enemy){const rules=(this as Game & {nuzlockeActive?:boolean;nuzlockeRules?:string[]});this.combat=new Combat(this.team,enemy,this.deck,rules.nuzlockeActive?rules.nuzlockeRules??[]:[]);this.screen="combat";this.pendingEnemy=null;}
   enterRandomBattle(){this.prepareBattle(this.randomEnemy());}
-  enterBoss(){this.prepareBattle(this.scaleEnemy({...boss,intent:{...boss.intent}}));}
+  enterBoss(){this.prepareBattle(this.scaleBoss({...boss,intent:{...boss.intent}}));}
   chooseReward(_cardIndex:number){
     if(!this.reward)return;
     const card={...this.reward};
