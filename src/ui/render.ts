@@ -26,7 +26,7 @@ function enemyCard(enemy:Enemy) {
   return `<div class="enemy-team-card"><div class="enemy-head"><div><div class="enemy-type">${esc(enemy.type)}</div><div class="enemy-name">${esc(enemy.name)}</div></div><span class="enemy-badge">NEMICO</span></div><p class="enemy-description">${esc(enemy.description)}</p><div class="big-hp">${enemy.hp}/${enemy.maxHp} HP</div><div class="bar"><i style="width:${pct(enemy.hp,enemy.maxHp)}%"></i></div><div class="enemy-stat-grid"><span>CODICE <b>${enemy.code}</b></span><span>DEBUG <b>${enemy.debug}</b></span><span>DMG <b>${enemy.intent.damage}</b></span><span>STRESS <b>+${enemy.intent.stress}</b></span></div><div class="enemy-ability"><strong>ABILITÀ</strong><br>${esc(enemy.passive)}</div><div class="matchup-grid enemy-matchup"><div><strong>VANTAGGI</strong>${advantages}</div><div><strong>DEBOLEZZE</strong>${weaknesses}</div></div></div>`;
 }
 
-const nodeIcon:Record<MapNode["type"],string> = {battle:"⚔",elite:"☠",event:"?",rest:"+",fullRest:"♥",reward:"◆",item:"🔧",recruit:"👤",boss:"☠"};
+const nodeIcon:Record<MapNode["type"],string> = {battle:"⚔",elite:"☠",event:"?",rest:"+",reward:"◆",item:"🔧",recruit:"👤",boss:"☠"};
 
 function nodeClass(node:MapNode,game:Game){
   const available=game.availableMapNodes.some(x=>x.id===node.id);
