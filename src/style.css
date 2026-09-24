@@ -295,3 +295,12 @@ header small{font-family:inherit;font-size:10px;color:#7f8b9d;margin-top:4px}
 .event-choice-card small{font-size:12px;line-height:1.55;color:#9aa7b8}
 .event-choice-card strong{margin-top:auto;font-size:10px;color:#fbbf24;line-height:1.5}
 @media(max-width:800px){.event-choice-grid{grid-template-columns:1fr}.event-choice-card{min-height:150px}}
+
+
+/* DEADLINE · phase transition emphasis */
+.deadline-phase-card{display:grid;gap:4px;margin-top:8px;padding:10px 12px;border:1px solid currentColor;border-radius:8px;animation:deadlinePhaseIn .28s ease-out;}
+.deadline-phase-card strong{letter-spacing:.04em;}
+.deadline-phase-card small,.deadline-phase-card em{font-size:.78rem;}
+.deadline-phase-card em{font-style:normal;font-weight:700;}
+.deadline-phase-card.ready{box-shadow:0 0 0 1px currentColor inset;}
+@keyframes deadlinePhaseIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
