@@ -219,8 +219,8 @@ export class Game {
     this.screen="map";
   }
   private shuffle<T>(items:T[]):T[]{return [...items].sort(()=>Math.random()-.5);}
-  private generateBossRewards(){
-    const tier=this.currentTier();
+  private generateBossRewards(completedTier=this.currentTier()){
+    const tier=completedTier;
     const bossItems=this.shuffle(rewardItems.filter(item=>item.tier===tier));
     const bossCards=this.shuffle(rewardCards.filter(card=>(card.tier??1)===tier));
     const items=bossItems.slice(0,3).map(item=>({kind:"item" as const,item:this.cloneItem(item)}));
@@ -311,12 +311,13 @@ export class Game {
   moveSelectedEquipment(targetZone:"dev"|"bag",targetDevIndex=-1,targetItemIndex=-1){const source=this.equipmentSource;if(!source)return;const team=this.equipmentTeam;const sourceItems=source.zone==="bag"?this.inventory:team[source.devIndex]?.items;if(!sourceItems||!sourceItems[source.itemIndex])return;if(targetZone==="dev"){const targetItems=team[targetDevIndex]?.items;if(!targetItems||targetItemIndex<0||targetItemIndex>=this.equipmentLimit())return;if(source.zone==="dev"&&source.devIndex===targetDevIndex&&source.itemIndex===targetItemIndex)return;const sourceItem=sourceItems[source.itemIndex],targetItem=targetItems[targetItemIndex];if(source.zone==="dev"&&source.devIndex===targetDevIndex){[targetItems[targetItemIndex],targetItems[source.itemIndex]]=[targetItems[source.itemIndex],targetItems[targetItemIndex]];}else{if(targetItem)sourceItems[source.itemIndex]=targetItem;else sourceItems.splice(source.itemIndex,1);targetItems[targetItemIndex]=sourceItem;}}else if(source.zone==="bag"){if(targetItemIndex>=0&&targetItemIndex<this.inventory.length)[this.inventory[source.itemIndex],this.inventory[targetItemIndex]]=[this.inventory[targetItemIndex],this.inventory[source.itemIndex]];}else{this.inventory.push(sourceItems[source.itemIndex]);sourceItems.splice(source.itemIndex,1);}this.equipmentSource=null;}
   updateTeamFromCombat(){if(this.combat)this.team=this.combat.team;}
   onCombatFinished(){this.updateTeamFromCombat();if(this.combat?.result==="victory"){if(this.combat.enemy.id==="deadline"){
+      const completedTier=this.currentTier();
       this.team.forEach(dev=>{dev.hp=dev.maxHp;dev.stress=0;});
       this.projectNumber+=1;
       this.difficulty+=.5;
       this.generateMap();
       this.tempo=8;
-      this.generateBossRewards();
+      this.generateBossRewards(completedTier);
     }else{const winner=this.team.find(dev=>dev.id==="freelancer");if(winner&&winner.hp>0&&!((this as Game & {nuzlockeActive?:boolean;nuzlockeRules?:string[]}).nuzlockeActive&&(this as Game & {nuzlockeRules?:string[]}).nuzlockeRules?.includes("noHealing")))winner.hp=Math.min(winner.maxHp,winner.hp+5);this.generateReward();}}else if(this.combat?.result==="defeat"){this.screen="result";this.message="COMMESSA FALLITA.";}}
   restart(){this.start();}
 }
