@@ -8,9 +8,9 @@ export class Combat {
   constructor(team: Developer[], enemy: Enemy, deck: Card[], nuzlockeRules:string[] = []) { this.team=team.map(d=>({...d,items:d.items.map(item=>({...item}))})); this.enemy={...enemy,intent:{...enemy.intent}}; this.nuzlockeRules=[...nuzlockeRules]; this.drawPile=this.shuffle([...deck]); if(this.enemy.typeId==="deadline")this.setupDeadlinePhases(); const available=this.team.findIndex(d=>d.hp>0&&d.stress<d.maxStress); if(available>=0)this.activeIndex=available; else {this.result="defeat";this.log.push("Nessun developer disponibile all'inizio del combattimento.");return;} this.log.push(`${this.active.name} entra in campo contro ${this.enemy.name}.`); if(this.enemy.typeId==="deadline"){const phase=this.deadlinePhase();if(phase)this.log.push("DEADLINE · FASE 1: "+phase.name+" · "+phase.ability);} this.startTurn(); }
   private setupDeadlinePhases(){
     const phases=[
-      {name:"SCOPE CREEP",description:"Il perimetro continua a cambiare.",ability:"+2 Stress inflitto · la DEADLINE subisce +10% danni.",outgoing:1,incomingStress:2,playerDamage:1.1},
-      {name:"PRODUZIONE CRITICA",description:"Ogni secondo perso costa caro.",ability:"+15% danni inflitti · la DEADLINE subisce +10% danni.",outgoing:1.15,incomingStress:0,playerDamage:1.1},
-      {name:"CONTO ALLA ROVESCIA",description:"La Deadline accelera improvvisamente.",ability:"+20% danni inflitti e +1 Stress · la DEADLINE subisce +15% danni.",outgoing:1.2,incomingStress:1,playerDamage:1.15},
+      {name:"SCOPE CREEP",description:"Il perimetro continua a cambiare.",ability:"+2 Stress inflitto · la DEADLINE subisce +10% danni.",outgoing:1,incomingStress:2,playerDamage:1.05},
+      {name:"PRODUZIONE CRITICA",description:"Ogni secondo perso costa caro.",ability:"+15% danni inflitti · la DEADLINE subisce +10% danni.",outgoing:1.15,incomingStress:0,playerDamage:1.05},
+      {name:"CONTO ALLA ROVESCIA",description:"La Deadline accelera improvvisamente.",ability:"+20% danni inflitti e +1 Stress · la DEADLINE subisce +15% danni.",outgoing:1.2,incomingStress:1,playerDamage:1.1},
     ];
     this.deadlinePhaseOrder=this.shuffle(phases);
     this.deadlinePhaseIndex=0;
