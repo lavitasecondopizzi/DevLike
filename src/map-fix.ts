@@ -20,9 +20,6 @@ const NODE_TEMPLATES: Record<Exclude<MapNodeType, "boss">, Array<{ title: string
     { title: "PAUSA", description: "Cinque minuti di pausa. Nessuno deve saperlo." },
     { title: "CAFFÈ", description: "Il compilatore non si lamenta del caffè." }
   ],
-  fullRest: [
-    { title: "RECUPERO TOTALE", description: "Ricarica completamente HP e Stress di tutto il team." }
-  ],
   reward: [
     { title: "TOOL", description: "Hai trovato un nuovo Tool per il tuo mazzo." },
     { title: "GITHUB", description: "Hai trovato una repository che non è in fiamme." }
