@@ -139,7 +139,7 @@ const effectiveStats=(d:Developer,isActive=false)=>{
 const activeStats=effectiveStats(active,true);
 const memberInfo=(d:Developer,i:number)=>{
   const stats=effectiveStats(d);
-  const disabled=d.hp<=0||d.stress>=100;
+  const disabled=d.hp<=0||d.stress>=d.maxStress;
   return `<button type="button" class="battle-team-member ${i===c.activeIndex?"active":""}" data-switch="${i}" ${i===c.activeIndex||disabled?"disabled":""}>
     <div class="battle-member-head"><strong>${esc(d.name)}</strong><span>${esc(d.role)}</span></div>
     <div class="battle-member-hp"><span>HP ${d.hp}/${d.maxHp}</span><i><em style="width:${pct(d.hp,d.maxHp)}%"></em></i></div>
