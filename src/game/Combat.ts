@@ -17,7 +17,8 @@ export class Combat {
   }
   private updateDeadlinePhase(){
     if(this.enemy.typeId!=="deadline"||this.deadlinePhaseOrder.length<3)return;
-    const next=this.enemy.hp<=this.enemy.maxHp/3?2:this.enemy.hp<=this.enemy.maxHp*2/3?1:0;
+    const threshold=this.enemy.hp<=this.enemy.maxHp/3?2:this.enemy.hp<=this.enemy.maxHp*2/3?1:0;
+    const next=Math.min(this.deadlinePhaseIndex+1,threshold);
     if(next<=this.deadlinePhaseIndex)return;
     this.deadlinePhaseIndex=next;
     const phase=this.deadlinePhaseOrder[next];
