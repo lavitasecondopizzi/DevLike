@@ -112,8 +112,8 @@ const effectiveStats=(d:Developer,isActive=false)=>{
   for(const item of d.items){
     if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name+": bonus CODICE dell'oggetto");}
   }
-  if(teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))codeChanges.push("+2 · Senior: bonus permanente a CODICE per il team");
-  if(teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed)codeChanges.push("+2 · Senior: primo CODICE del turno");
+  if(seniorCodeBonus)codeChanges.push("+2 · Senior: bonus permanente a CODICE per il team");
+  if(seniorQueryBonus)codeChanges.push("+2 · Senior: primo CODICE del turno");
   if(isActive&&c.temporaryCodeBonus)codeChanges.push("+"+c.temporaryCodeBonus+" · Bonus temporaneo: potenziamento attivo a CODICE");
 
   for(const item of d.items){
