@@ -239,7 +239,6 @@ return `<section class="battle battle-redesign">
     return `<section class="panel selection-panel event-panel">
       <div class="selection-heading"><div><h2>${esc(event.title)}</h2><p>${esc(event.description)}</p></div></div>
       <div class="event-choice-grid">${choices}</div>
-      <div class="selection-footer"><span class="selection-hint">La scelta viene applicata immediatamente.</span></div>
     </section>`;
   }
   if(game.screen==="bossReward"){
@@ -251,7 +250,7 @@ return `<section class="battle battle-redesign">
     return `<section class="panel selection-panel boss-reward-panel">
       <div class="selection-heading"><div><h2>DROP DELLA DEADLINE</h2><p>Hai completato la commessa. Scegli UNA sola ricompensa tra 3 oggetti da mettere direttamente nello ZAINO e 3 Tool da aggiungere al MAZZO.</p></div><span class="random-badge">6 DROP · 1 SCELTA</span></div>
       <div class="boss-reward-grid">${options}</div>
-      <div class="selection-footer"><span class="selection-hint">La scelta è definitiva. Gli altri cinque drop vengono persi.</span></div>
+      <p class="selection-hint boss-reward-hint">La scelta è definitiva. Gli altri cinque drop vengono persi.</p>
     </section>`;
   }
   return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${esc(game.message)}</h1><p>La commessa è andata in produzione. Da qualche parte.</p><button type="button" class="primary" data-action="restart">NUOVA COMMESSA</button></section>`;
