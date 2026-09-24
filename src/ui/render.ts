@@ -45,13 +45,13 @@ function renderMapNode(node:MapNode,game:Game){
 }
 
 function renderMap(game:Game){
-  const width=900;
-  const rowHeight=108;
-  const topPadding=72;
-  const bottomPadding=72;
+  const width=760;
+  const rowHeight=96;
+  const topPadding=56;
+  const bottomPadding=56;
   const rows=Math.max(8,...game.mapNodes.map(n=>n.row));
   const height=rows*rowHeight+topPadding+bottomPadding;
-  const x=(col:number)=>150+col*300;
+  const x=(col:number)=>130+col*250;
   const y=(row:number)=>topPadding+row*rowHeight;
 
   const lines=game.mapNodes.flatMap(node=>game.mapNodes.filter(target=>target.id!==node.id&&game.mapNodes.some(n=>n.id===target.id)&&(
