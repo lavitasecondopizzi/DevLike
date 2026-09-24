@@ -94,6 +94,13 @@ header small{font-family:inherit;font-size:11px;color:#7f8b9d;margin-top:4px}
 .selection-heading{margin-bottom:22px}
 .selection-heading h2{font-family:inherit;font-size:20px;font-weight:750;letter-spacing:-.02em;color:#f1f5f9;margin-bottom:6px}
 .selection-heading p{font-size:14px;color:#8f9bad;line-height:1.55}
+/* Unified secondary-screen heading hierarchy: title -> context -> optional badge. */
+.selection-heading h2{min-height:24px}
+.selection-heading p{max-width:760px}
+.selection-heading .random-badge{align-self:flex-start}
+.center h2{font-size:20px;color:#f1f5f9;margin:0 0 10px}
+.center h2 + p{max-width:620px;margin-left:auto;margin-right:auto}
+
 .random-badge{
   border:1px solid #35506f;
   border-radius:999px;
