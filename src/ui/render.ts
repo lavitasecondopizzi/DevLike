@@ -117,7 +117,7 @@ const effectiveStats=(d:Developer,isActive=false)=>{
   if(d.classId==="junior"&&d.hp<d.maxHp*.5)debugChanges.push("+2 · Junior sotto il 50% HP: bonus a DEBUG");
   if(d.classId==="hacker"&&enemy.typeId==="client")debugChanges.push("+3 · Hacker contro Client: bonus a DEBUG");
 
-  const conditionMatches=(condition:string)=>condition==="lowHp"?d.hp<d.maxHp*.5:condition==="highStress"?d.stress>=50:condition==="fullHp"?d.hp>=d.maxHp:condition==="highEnergy"?c.energy>=2:condition==="defending"?c.block>0:condition==="afterTool"?c.toolPlayedThisTurn:condition==="everyTwoTurns"?c.turn%2===0:false;
+  const conditionMatches=(condition:string)=>condition==="lowHp"?d.hp<d.maxHp*.5:condition==="highStress"?d.stress>=d.maxStress*.5:condition==="fullHp"?d.hp>=d.maxHp:condition==="highEnergy"?c.energy>=2:condition==="defending"?c.block>0:condition==="afterTool"?c.toolPlayedThisTurn:condition==="everyTwoTurns"?c.turn%2===0:false;
   let multiplier=1;
   if(d.advantageEnemyIds.includes(enemy.typeId)){multiplier*=1.15;codeChanges.push("+15% · Vantaggio contro questo tipo di nemico");debugChanges.push("+15% · Vantaggio contro questo tipo di nemico");}
   if(d.weaknessEnemyIds.includes(enemy.typeId)){multiplier*=.85;codeChanges.push("-15% · Debolezza contro questo tipo di nemico");debugChanges.push("-15% · Debolezza contro questo tipo di nemico");}
