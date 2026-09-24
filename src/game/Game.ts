@@ -80,10 +80,13 @@ export class Game {
     const from=this.mapNodes.filter(n=>n.row===stage-1);
     const to=this.mapNodes.filter(n=>n.row===stage);
     if(!from.length)return;
-    // Ogni nodo apre tutte e tre le scelte della tappa successiva.
-    // La mappa resta quindi una vera scelta a tre vie: nessun nodo può
-    // rendere irraggiungibile una delle tre opzioni solo per effetto del RNG.
-    from.forEach(node=>{node.next=to.map(target=>target.id);});
+    // I percorsi seguono solo i nodi adiacenti:
+    // sinistra -> sinistra + centro, centro -> tutte e tre, destra -> centro + destra.
+    from.forEach(node=>{
+      node.next=to
+        .filter(target=>Math.abs(target.col-node.col)<=1)
+        .map(target=>target.id);
+    });
   }
 
   private appendBossNode(row:number){
