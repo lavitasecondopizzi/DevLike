@@ -23,7 +23,7 @@ export class Combat {
     const upper=card.name.toUpperCase();
     const cardId=card.id.toLowerCase();
     if(this.nuzlockeRules.includes("noCoffee")&&(cardId.includes("coffee")||upper.includes("CAFFÈ")||upper.includes("COFFEE")))return "CAFFÈ VIETATO";
-    if(this.nuzlockeRules.includes("noAI")&&(cardId.includes("ai")||cardId.includes("chatgpt")||upper.includes("CHATGPT")))return "AI VIETATA";
+    if(this.nuzlockeRules.includes("noAI")&&(cardId==="ai-slop"||cardId.startsWith("chatgpt")||upper.includes("CHATGPT")||upper.split(/[^A-Z0-9À-ÖØ-Ý]+/).includes("AI")))return "AI VIETATA";
     if(this.nuzlockeRules.includes("noGit")&&(cardId==="git"||cardId.startsWith("git-")||upper==="GIT"))return "GIT VIETATO";
     if(this.nuzlockeRules.includes("noHealing")&&card.effect.type==="heal")return "CURE VIETATE";
     if(this.nuzlockeRules.includes("noStressRecovery")&&card.effect.type==="removeStress")return "RECUPERO STRESS VIETATO";
@@ -94,7 +94,7 @@ export class Combat {
     const upper=card.name.toUpperCase();
     const cardId=card.id.toLowerCase();
     if(this.nuzlockeRules.includes("noCoffee")&&(cardId.includes("coffee")||upper.includes("CAFFÈ")||upper.includes("COFFEE")))return false;
-    if(this.nuzlockeRules.includes("noAI")&&(cardId.includes("ai")||cardId.includes("chatgpt")||upper.includes("CHATGPT")))return false;
+    if(this.nuzlockeRules.includes("noAI")&&(cardId==="ai-slop"||cardId.startsWith("chatgpt")||upper.includes("CHATGPT")||upper.split(/[^A-Z0-9À-ÖØ-Ý]+/).includes("AI")))return false;
     if(this.nuzlockeRules.includes("noGit")&&(cardId==="git"||cardId.startsWith("git-")||upper==="GIT"))return false;
     if(this.nuzlockeRules.includes("noHealing")&&card.effect.type==="heal")return false;
     if(this.nuzlockeRules.includes("noStressRecovery")&&card.effect.type==="removeStress")return false;
