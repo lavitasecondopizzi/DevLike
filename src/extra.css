@@ -510,7 +510,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
 
 /* ===== COMBAT COSTS + DECK VIEWER ===== */
 .battle-redesign .battle-energy small{
-  font-size:10px!important;
+  font-size:11px!important;
   color:#8f8350!important;
   letter-spacing:.08em!important;
 }
@@ -523,7 +523,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   padding-top:4px!important;
   border-top:1px solid #303b4a!important;
   color:#8f9aae!important;
-  font-size:10px!important;
+  font-size:11px!important;
   letter-spacing:.04em!important;
 }
 .battle-redesign .battle-hand-label{
@@ -598,7 +598,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
 
 /* COMBAT DECK ZONES */
 .battle-redesign .deck-viewer-tabs{display:flex;gap:6px;min-width:0;flex-wrap:wrap}
-.battle-redesign .deck-viewer-tabs button{padding:5px 8px;border:1px solid #39495e;background:#151e2a;color:#9aa8bb;cursor:pointer;font-size:10px!important}
+.battle-redesign .deck-viewer-tabs button{padding:5px 8px;border:1px solid #39495e;background:#151e2a;color:#9aa8bb;cursor:pointer;font-size:11px!important}
 .battle-redesign .deck-viewer-tabs button.active{border-color:#6b91bd;background:#223047;color:#e7f0fa}
 .battle-redesign .deck-viewer-empty{margin:auto;padding:20px;color:#7f8b9d;text-align:center}
 
@@ -616,10 +616,10 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
 .battle-redesign .battle-turnbar>div{display:flex!important;flex-direction:column!important;gap:2px!important}
 .battle-redesign .battle-turnbar>div:nth-child(2){align-items:center!important;padding:5px 12px!important;border:1px solid #53657c!important;background:#1b2737!important}
 .battle-redesign .battle-turnbar>div:last-child{align-items:flex-end!important}
-.battle-redesign .battle-turnbar span{font-size:9px!important;letter-spacing:.08em!important;color:#748196!important}
+.battle-redesign .battle-turnbar span{font-size:11px!important;letter-spacing:.08em!important;color:#748196!important}
 .battle-redesign .battle-turnbar strong{font-size:16px!important;color:#f1f5f9!important}
 .battle-redesign .battle-turnbar b{font-size:11px!important;color:#d5deea!important}
-.battle-redesign .battle-turn-status{font-size:10px!important;font-weight:700!important;color:#a9c7e7!important;letter-spacing:.04em!important}
+.battle-redesign .battle-turn-status{font-size:11px!important;font-weight:700!important;color:#a9c7e7!important;letter-spacing:.04em!important}
 .battle-redesign .battle-feedback{
   display:flex!important;
   align-items:center!important;
@@ -631,8 +631,8 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   background:#101720!important;
   overflow:hidden!important;
 }
-.battle-redesign .battle-feedback span{font-size:9px!important;letter-spacing:.08em!important;color:#748196!important;white-space:nowrap!important}
-.battle-redesign .battle-feedback b{font-size:10px!important;color:#d7e0eb!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.battle-redesign .battle-feedback span{font-size:11px!important;letter-spacing:.08em!important;color:#748196!important;white-space:nowrap!important}
+.battle-redesign .battle-feedback b{font-size:11px!important;color:#d7e0eb!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
 .battle-redesign .battle-actions button:not(:disabled):hover{border-color:#6d819c!important;background:#243247!important}
 .battle-redesign .battle-actions button:disabled{opacity:.42!important;cursor:not-allowed!important}
 .battle-redesign .end{font-weight:700!important;letter-spacing:.03em!important}
@@ -651,7 +651,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   border-top:1px solid #35465b!important;
   color:#c5d8ec!important;
   background:#101923!important;
-  font-size:10px!important;
+  font-size:11px!important;
   font-weight:800!important;
   letter-spacing:.03em!important;
 }
@@ -660,7 +660,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   padding:4px 6px!important;
   color:#d08a8a!important;
   background:#24171b!important;
-  font-size:9px!important;
+  font-size:11px!important;
   font-weight:800!important;
   letter-spacing:.04em!important;
 }
@@ -676,7 +676,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   display:block!important;
   margin-top:5px!important;
   color:#a9939a!important;
-  font-size:9px!important;
+  font-size:11px!important;
   line-height:1.3!important;
 }
 .battle-redesign .battle-intent.lethal{
@@ -748,7 +748,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   border-top:1px solid #35465b!important;
   background:#101923!important;
   color:#c5d8ec!important;
-  font-size:10px!important;
+  font-size:11px!important;
   font-weight:800!important;
   letter-spacing:.03em!important;
   white-space:nowrap!important;
@@ -819,7 +819,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   position:absolute!important;
   top:3px!important;
   right:5px!important;
-  font-size:8px!important;
+  font-size:11px!important;
   letter-spacing:.06em!important;
   color:#7893b2!important;
   opacity:.8!important;
@@ -869,7 +869,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   border:1px solid #526985!important;
   background:#1b2635!important;
   color:#dbe7f4!important;
-  font-size:10px!important;
+  font-size:11px!important;
   font-weight:900!important;
   letter-spacing:.06em!important;
 }
@@ -888,7 +888,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   margin:5px 0 -2px!important;
   padding:0 3px!important;
   color:#8ea0b6!important;
-  font-size:10px!important;
+  font-size:11px!important;
   font-weight:900!important;
   letter-spacing:.14em!important;
 }
