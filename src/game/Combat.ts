@@ -83,7 +83,15 @@ export class Combat {
     if(this.enemy.typeId==="meeting"&&this.active.stress>=this.active.maxStress*.5)stress+=3;
     if(this.enemy.typeId==="client"&&this.turn%2===0)stress+=2;
     if(this.enemy.typeId==="deadline")stress+=this.turn*2;
-    return Math.max(0,stress);
+    const before=this.active.stress;
+    const projected=Math.min(this.active.maxStress,before+stress);
+    const internTriggers=!this.nuzlockeRules.includes("noStressRecovery")
+      && !this.internStressPassiveUsed.has("team")
+      && this.teamHasClass("intern")
+      && before<this.active.maxStress*.75
+      && projected>=this.active.maxStress*.75;
+    if(internTriggers)stress=Math.max(0,stress-10);
+    return Math.max(0,Math.min(this.active.maxStress-before,stress));
   }
   get incomingLethalPreview():boolean{return this.incomingDamagePreview>=this.active.hp||this.active.stress+this.incomingStressPreview>=this.active.maxStress;}
   private previewDamage(amount:number,action:"code"|"debug"|"card"):number{
