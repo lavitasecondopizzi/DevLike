@@ -102,20 +102,20 @@ function screen(game:Game){
 const effectiveStats=(d:Developer,isActive=false)=>{
   const codeChanges:string[]=[];
   const debugChanges:string[]=[];
-  let code=d.code+(d.classId==="senior"?2:0)+(isActive?c.temporaryCodeBonus:0);
-  let debug=d.debug+(d.classId==="junior"&&d.hp<d.maxHp*.5?2:0)+(d.classId==="hacker"&&enemy.typeId==="client"?3:0);
+  const teamHasAvailable=(classId:string)=>c.team.some(member=>member.classId===classId&&member.hp>0&&member.stress<member.maxStress);\n  const teamHasPassive=(classId:string,passive:string)=>c.team.some(member=>member.classId===classId&&member.passive.includes(passive)&&member.hp>0&&member.stress<member.maxStress);\n  let code=d.code+((teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))?2:0)+((teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed)?2:0)+(isActive?c.temporaryCodeBonus:0);
+  let debug=d.debug+(d.hp<d.maxHp*.5&&teamHasAvailable("junior")?2:0)+(teamHasAvailable("hacker")&&enemy.typeId==="client"?3:0);
 
   for(const item of d.items){
     if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name+": bonus CODICE dell'oggetto");}
   }
-  if(d.classId==="senior")codeChanges.push("+2 · Senior: bonus permanente a CODICE");
+  if(teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))codeChanges.push("+2 · Senior: bonus permanente a CODICE per il team");\n  if(teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed)codeChanges.push("+2 · Senior: primo CODICE del turno");
   if(isActive&&c.temporaryCodeBonus)codeChanges.push("+"+c.temporaryCodeBonus+" · Bonus temporaneo: potenziamento attivo a CODICE");
 
   for(const item of d.items){
     if(item.debugBonus){debug+=item.debugBonus;debugChanges.push("+"+item.debugBonus+" · "+item.name+": bonus DEBUG dell'oggetto");}
   }
-  if(d.classId==="junior"&&d.hp<d.maxHp*.5)debugChanges.push("+2 · Junior sotto il 50% HP: bonus a DEBUG");
-  if(d.classId==="hacker"&&enemy.typeId==="client")debugChanges.push("+3 · Hacker contro Client: bonus a DEBUG");
+  if(d.hp<d.maxHp*.5&&teamHasAvailable("junior"))debugChanges.push("+2 · Junior nel team sotto il 50% HP: bonus a DEBUG");
+  if(teamHasAvailable("hacker")&&enemy.typeId==="client")debugChanges.push("+3 · Hacker nel team contro Client: bonus a DEBUG");
 
   const conditionMatches=(condition:string)=>condition==="lowHp"?d.hp<d.maxHp*.5:condition==="highStress"?d.stress>=d.maxStress*.5:condition==="fullHp"?d.hp>=d.maxHp:condition==="highEnergy"?c.energy>=2:condition==="defending"?c.block>0:condition==="afterTool"?c.toolPlayedThisTurn:condition==="everyTwoTurns"?c.turn%2===0:false;
   let multiplier=1;
