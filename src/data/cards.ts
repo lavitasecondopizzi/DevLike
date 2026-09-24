@@ -18,7 +18,7 @@ export const startingDeck:Card[]=[
  {id:"cache",name:"CACHE",cost:0,description:"Riduce lo Stress di 4.",effect:{type:"removeStress",amount:4}},
  {id:"api-call",name:"API CALL",cost:1,description:"Infligge 5 danni.",effect:{type:"damage",amount:5}},
  {id:"prototype",name:"PROTOTIPO",cost:1,description:"Recupera 6 HP.",effect:{type:"heal",amount:6}},
- {id:"exploit",name:"EXPLOIT",cost:1,description:"Infligge 7 danni e aumenta lo Stress di 3.",effect:{type:"damage",amount:7}},
+ {id:"exploit",name:"EXPLOIT",cost:1,description:"Infligge 7 danni.",effect:{type:"damage",amount:7}},
  {id:"freelance-hustle",name:"HUSTLE",cost:1,description:"Infligge 6 danni.",effect:{type:"damage",amount:6}}
 ];
 
@@ -37,7 +37,7 @@ export const starterDecks:Record<string,string[]>={
 
 export const rewardCards:Card[]=[
  // TIER 1 · difficoltà x1.0–x1.5
- {id:"chatgpt",name:"CHATGPT",cost:2,description:"Infligge 8 danni. Potrebbe essere una soluzione.",effect:{type:"damage",amount:8}},
+ {id:"chatgpt",name:"CHATGPT",cost:2,description:"Infligge 8 danni. Potrebbe essere una soluzione.",effect:{type:"damage",amount:10}},
  {id:"jira",name:"JIRA",cost:1,description:"Infligge 7 danni.",effect:{type:"damage",amount:7}},
  {id:"google",name:"GOOGLE",cost:1,description:"Recupera 8 HP.",effect:{type:"heal",amount:8}},
  {id:"rubber-duck",name:"RUBBER DUCK",cost:0,description:"Riduce lo Stress di 6.",effect:{type:"removeStress",amount:6}},
@@ -50,7 +50,7 @@ export const rewardCards:Card[]=[
  {id:"unit-test",name:"UNIT TEST",cost:1,description:"Blocca 6 danni.",effect:{type:"block",amount:6}},
  {id:"sleep",name:"DORMIRE",cost:1,description:"Recupera 8 HP.",effect:{type:"heal",amount:8}},
  {id:"documentation",name:"DOCUMENTAZIONE",cost:1,description:"Riduce lo Stress di 6.",effect:{type:"removeStress",amount:6}},
- {id:"rubber-stamp",name:"APPROVATO",cost:0,description:"Blocca 5 danni.",effect:{type:"block",amount:5}},
+ {id:"rubber-stamp",name:"APPROVATO",cost:1,description:"Blocca 5 danni.",effect:{type:"block",amount:5}},
  // TIER 2
  {id:"git-push",name:"GIT PUSH --FORCE",cost:2,description:"Infligge 14 danni.",effect:{type:"damage",amount:14}},
  {id:"merge-conflict",name:"MERGE CONFLICT",cost:1,description:"Infligge 10 danni.",effect:{type:"damage",amount:10}},
@@ -66,12 +66,12 @@ export const rewardCards:Card[]=[
  {id:"ai-slop",name:"AI SLOP",cost:0,description:"Aumenta del 15% i danni inflitti per questo turno e aumenta lo Stress di 10.",effect:{type:"codeBoost",amount:15}},
  // TIER 3
  {id:"coffee-overdose",name:"CAFFÈ TRIPLO",cost:0,description:"Aumenta del 20% i danni inflitti per questo turno e aumenta lo Stress di 15.",effect:{type:"codeBoost",amount:20}},
- {id:"production",name:"PRODUZIONE",cost:2,description:"Infligge 18 danni.",effect:{type:"damage",amount:18}},
- {id:"code-review",name:"CODE REVIEW",cost:1,description:"Infligge 11 danni.",effect:{type:"damage",amount:11}},
+ {id:"production",name:"PRODUZIONE",cost:2,description:"Infligge 18 danni.",effect:{type:"damage",amount:19}},
+ {id:"code-review",name:"CODE REVIEW",cost:1,description:"Infligge 11 danni.",effect:{type:"damage",amount:12}},
  {id:"deadline-extension",name:"PROROGA",cost:1,description:"Riduce lo Stress di 12.",effect:{type:"removeStress",amount:12}},
  // TIER 4
- {id:"chatgpt-protocol",name:"CHATGPT PROTOCOL",cost:2,description:"Infligge 22 danni.",effect:{type:"damage",amount:22}},
- {id:"emergency-hotfix",name:"HOTFIX D'EMERGENZA",cost:2,description:"Infligge 20 danni.",effect:{type:"damage",amount:20}},
+ {id:"chatgpt-protocol",name:"CHATGPT PROTOCOL",cost:2,description:"Infligge 22 danni.",effect:{type:"damage",amount:21}},
+ {id:"emergency-hotfix",name:"HOTFIX D'EMERGENZA",cost:2,description:"Infligge 20 danni.",effect:{type:"damage",amount:22}},
  // TIER 1 · nuovi Tool
  {id:"grep-log",name:"GREP LOG",cost:1,description:"Infligge 6 danni.",effect:{type:"damage",amount:6}},
  {id:"backup",name:"BACKUP",cost:1,description:"Recupera 7 HP.",effect:{type:"heal",amount:7}},
