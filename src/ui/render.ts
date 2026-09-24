@@ -104,7 +104,9 @@ const effectiveStats=(d:Developer,isActive=false)=>{
   const debugChanges:string[]=[];
   const teamHasAvailable=(classId:string)=>c.team.some(member=>member.classId===classId&&member.hp>0&&member.stress<member.maxStress);
   const teamHasPassive=(classId:string,passive:string)=>c.team.some(member=>member.classId===classId&&member.passive.includes(passive)&&member.hp>0&&member.stress<member.maxStress);
-  const seniorCodeBonus=(teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))?2:0;\n  const seniorQueryBonus=seniorCodeBonus===0&&teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed?2:0;\n  let code=d.code+seniorCodeBonus+seniorQueryBonus+(isActive?c.temporaryCodeBonus:0);
+  const seniorCodeBonus=(teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))?2:0;
+  const seniorQueryBonus=seniorCodeBonus===0&&teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed?2:0;
+  let code=d.code+seniorCodeBonus+seniorQueryBonus+(isActive?c.temporaryCodeBonus:0);
   let debug=d.debug+(d.hp<d.maxHp*.5&&teamHasAvailable("junior")?2:0)+(teamHasAvailable("hacker")&&enemy.typeId==="client"?3:0);
 
   for(const item of d.items){
