@@ -3,6 +3,8 @@ import type { BattleResult, Card, Developer, Enemy } from "../entities/types";
 export class Combat {
   team: Developer[]; activeIndex = 0; enemy: Enemy; energy = 3; block = 0; codeBoost = 0; temporaryCodeBonus = 0; drawPile: Card[]; discardPile: Card[] = []; hand: Card[] = []; result: BattleResult = "ongoing"; log: string[] = []; turn = 1; architectDefenseUsed = new Set<string>(); devopsDefenseUsed = new Set<string>(); firstCardPlayed = false; toolPlayedThisTurn = false; firstCodeUsed = false; internStressPassiveUsed = new Set<string>(); lastToolDeveloperId: string | null = null; enemyScaling = 0; nuzlockeRules: string[] = []; showDeck = false; deckView: "draw" | "discard" = "draw";
   usedCards = new Set<Card>();
+  private deadlinePhaseOrder: {name:string;description:string;ability:string;outgoing:number;incomingStress:number;playerDamage:number}[] = [];
+  private deadlinePhaseIndex = 0;
   constructor(team: Developer[], enemy: Enemy, deck: Card[], nuzlockeRules:string[] = []) { this.team=team.map(d=>({...d,items:d.items.map(item=>({...item}))})); this.enemy={...enemy,intent:{...enemy.intent}}; this.nuzlockeRules=[...nuzlockeRules]; this.drawPile=this.shuffle([...deck]); if(this.enemy.typeId==="deadline")this.setupDeadlinePhases(); const available=this.team.findIndex(d=>d.hp>0&&d.stress<d.maxStress); if(available>=0)this.activeIndex=available; else {this.result="defeat";this.log.push("Nessun developer disponibile all'inizio del combattimento.");return;} this.log.push(`${this.active.name} entra in campo contro ${this.enemy.name}.`); if(this.enemy.typeId==="deadline"){const phase=this.deadlinePhase();if(phase)this.log.push("DEADLINE · FASE 1: "+phase.name+" · "+phase.ability);} this.startTurn(); }
   private setupDeadlinePhases(){
     const phases=[
