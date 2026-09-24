@@ -41,7 +41,7 @@ function refresh() {
   document.querySelectorAll<HTMLButtonElement>("[data-map-node]").forEach(button => {
     const node = game.mapNodes.find(node => node.id === button.dataset.mapNode);
     if (!node) return;
-    if ((node.type === "rest" || node.type === "fullRest") && has("noRest")) {
+    if (node.type === "rest" && has("noRest")) {
       disable(button, "NUZLOCKE: PAUSA/RECUPERO VIETATI");
     }
     if (node.type === "recruit") {
