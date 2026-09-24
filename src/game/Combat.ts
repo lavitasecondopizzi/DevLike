@@ -105,7 +105,7 @@ export class Combat {
     if(this.result!=="ongoing")return false;
     if(this.energy>=1&&!this.nuzlockeRules.includes("noCode"))return true;
     if(this.energy>=2&&!this.nuzlockeRules.includes("noDebug"))return true;
-    const freeDefense=this.active.classId==="architect"&&!this.firstDefenseUsed;
+    const freeDefense=this.active.classId==="architect"&&!!this.architectDefenseUsed.has(this.active.id);
     if(!this.nuzlockeRules.includes("noDefense")&&(this.energy>=1||freeDefense))return true;
     return this.hand.some(card=>this.canPlayCard(card));
   }
