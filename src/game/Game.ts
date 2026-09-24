@@ -120,10 +120,17 @@ export class Game {
   }
 
   get currentMapNode(){return this.mapNodes.find(n=>n.id===this.currentMapNodeId)??null;}
+  private followsMapRoute(from:MapNode,to:MapNode){
+    if(from.row===0)return to.row===1;
+    if(from.row>=1&&from.row<=5)return to.row===from.row+1&&Math.abs(to.col-from.col)<=1;
+    if(from.row===6)return to.id==="rest-final";
+    if(from.id==="rest-final")return to.id==="boss-final";
+    return false;
+  }
   get availableMapNodes(){
-    const c=this.currentMapNode;
-    if(!c)return [];
-    return c.next.map(id=>this.mapNodes.find(n=>n.id===id)).filter((n):n is MapNode=>n!==undefined&&!n.visited);
+    const current=this.currentMapNode;
+    if(!current)return [];
+    return this.mapNodes.filter(node=>!node.visited&&this.followsMapRoute(current,node));
   }
   selectMapNode(id:string){
     const node=this.mapNodes.find(n=>n.id===id);
