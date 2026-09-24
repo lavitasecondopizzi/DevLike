@@ -80,24 +80,10 @@ export class Game {
     const from=this.mapNodes.filter(n=>n.row===stage-1);
     const to=this.mapNodes.filter(n=>n.row===stage);
     if(!from.length)return;
-    from.forEach(node=>{
-      const candidates=to
-        .filter(target=>Math.abs(target.col-node.col)<=1)
-        .slice()
-        .sort((x,y)=>Math.abs(x.col-node.col)-Math.abs(y.col-node.col)||Math.random()-.5);
-      const count=Math.random()<.55?1:2;
-      candidates.slice(0,count).forEach(target=>node.next.push(target.id));
-    });
-    // Every destination must remain reachable, while preserving crossing paths.
-    to.forEach(target=>{
-      if(!from.some(source=>source.next.includes(target.id))){
-        const source=from
-          .filter(source=>Math.abs(source.col-target.col)<=1)
-          .slice()
-          .sort((x,y)=>Math.abs(x.col-target.col)-Math.abs(y.col-target.col))[0];
-        if(source&&!source.next.includes(target.id))source.next.push(target.id);
-      }
-    });
+    // Ogni nodo apre tutte e tre le scelte della tappa successiva.
+    // La mappa resta quindi una vera scelta a tre vie: nessun nodo può
+    // rendere irraggiungibile una delle tre opzioni solo per effetto del RNG.
+    from.forEach(node=>{node.next=to.map(target=>target.id);});
   }
 
   private appendBossNode(row:number){
