@@ -249,7 +249,7 @@ export class Game {
       this.team.forEach(dev=>dev.hp=Math.max(1,Math.min(dev.maxHp,dev.hp+effect.hp!)));
     }
     if(effect.stress){
-      this.team.forEach(dev=>dev.stress=Math.max(0,Math.min(100,dev.stress+effect.stress!)));
+      this.team.forEach(dev=>dev.stress=Math.max(0,Math.min(dev.maxStress,dev.stress+effect.stress!)));
     }
     if(effect.tempo)this.tempo=Math.max(0,this.tempo+effect.tempo);
     let rewardText="";
