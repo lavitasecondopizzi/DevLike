@@ -11,7 +11,7 @@ export const startingDeck:Card[]=[
  {id:"grep",name:"GREP",cost:1,description:"Infligge 5 danni.",effect:{type:"damage",amount:5}},
  {id:"terminal",name:"TERMINALE",cost:1,description:"Blocca 5 danni.",effect:{type:"block",amount:5}},
  {id:"lint",name:"LINT",cost:1,description:"Riduce lo Stress di 5.",effect:{type:"removeStress",amount:5}},
- {id:"wireframe",name:"WIREFRAME",cost:1,description:"Blocca 4 danni e riduce lo Stress di 2.",effect:{type:"block",amount:4}},
+ {id:"wireframe",name:"WIREFRAME",cost:1,description:"Blocca 4 danni.",effect:{type:"block",amount:4}},
  {id:"quick-fix",name:"QUICK FIX",cost:1,description:"Infligge 5 danni.",effect:{type:"damage",amount:5}},
  {id:"script",name:"SCRIPT",cost:1,description:"Infligge 6 danni.",effect:{type:"damage",amount:6}},
  {id:"monitor",name:"MONITOR",cost:1,description:"Blocca 6 danni.",effect:{type:"block",amount:6}},
