@@ -17,7 +17,6 @@ import "./map-fix";
 import "./map-ui-fix";
 import "./balance-fix";
 import { Game } from "./game/Game";
-import type { Enemy } from "./entities/types";
 import { starterDeckForDeveloper } from "./data/cards";
 import { render } from "./ui/render";
 import { setupFeatures, type FeatureGame } from "./ui/features";
@@ -26,14 +25,13 @@ import { setupDeckFix } from "./deck-fix";
 import { setupTeamToolsFix } from "./team-tools-fix";
 import { setupCardView } from "./card-view";
 
-type NuzGame = Game & { nuzlockeActive:boolean; nuzlockeGraveyard:string[]; nuzlockeRules:NuzlockeRule[]; nuzlockeRecruitCount:number; nuzlockeConsumedCards:import("./entities/types").Card[] };
+type NuzGame = Game & { nuzlockeActive:boolean; nuzlockeGraveyard:string[]; nuzlockeRules:NuzlockeRule[]; nuzlockeRecruitCount:number };
 const game = new Game() as NuzGame & FeatureGame;
 (window as Window & { __devlikeGame?: Game }).__devlikeGame = game;
 game.nuzlockeActive = false;
 game.nuzlockeGraveyard = [];
 game.nuzlockeRules = ["permadeath"];
 game.nuzlockeRecruitCount = 0;
-game.nuzlockeConsumedCards = [];
 
 const openEquipment = game.openEquipment.bind(game);
 game.openEquipment = () => { if (game.screen !== "equipment") game.equipmentReturnScreen = game.screen; openEquipment(); };
@@ -49,17 +47,6 @@ setupDeckFix(game);
 setupTeamToolsFix(game);
 setupCardView();
 
-const originalStartBattle = game.startBattle.bind(game);
-game.startBattle = (enemy: Enemy) => {
-  originalStartBattle(enemy);
-  if (!game.nuzlockeActive || !game.combat) return;
-  game.combat.nuzlockeRules = [...game.nuzlockeRules];
-  if (game.nuzlockeRules.includes("twoEnergy")) game.combat.energy = 2;
-  if (game.nuzlockeRules.includes("smallHand")) {
-    const excess = Math.max(0, game.combat.hand.length - 2);
-    if (excess) game.combat.discardPile.push(...game.combat.hand.splice(2, excess));
-  }
-};
 
 render(game);
 
