@@ -63,7 +63,7 @@ export type CardEffect =
 
 export type Card = { id: string; name: string; cost: number; description: string; effect: CardEffect; tier?: number };
 
-export type MapNodeType = "battle" | "elite" | "event" | "rest" | "fullRest" | "reward" | "item" | "recruit" | "boss";
+export type MapNodeType = "battle" | "elite" | "event" | "rest" | "reward" | "item" | "recruit" | "boss";
 export type MapNode = {
   id: string; row: number; col: number; type: MapNodeType; title: string; description: string;
   next: string[]; visited: boolean; hiddenEncounter: boolean; enemyId?: string;
