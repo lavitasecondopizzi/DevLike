@@ -102,13 +102,16 @@ function screen(game:Game){
 const effectiveStats=(d:Developer,isActive=false)=>{
   const codeChanges:string[]=[];
   const debugChanges:string[]=[];
-  const teamHasAvailable=(classId:string)=>c.team.some(member=>member.classId===classId&&member.hp>0&&member.stress<member.maxStress);\n  const teamHasPassive=(classId:string,passive:string)=>c.team.some(member=>member.classId===classId&&member.passive.includes(passive)&&member.hp>0&&member.stress<member.maxStress);\n  let code=d.code+((teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))?2:0)+((teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed)?2:0)+(isActive?c.temporaryCodeBonus:0);
+  const teamHasAvailable=(classId:string)=>c.team.some(member=>member.classId===classId&&member.hp>0&&member.stress<member.maxStress);
+  const teamHasPassive=(classId:string,passive:string)=>c.team.some(member=>member.classId===classId&&member.passive.includes(passive)&&member.hp>0&&member.stress<member.maxStress);
+  let code=d.code+((teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))?2:0)+((teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed)?2:0)+(isActive?c.temporaryCodeBonus:0);
   let debug=d.debug+(d.hp<d.maxHp*.5&&teamHasAvailable("junior")?2:0)+(teamHasAvailable("hacker")&&enemy.typeId==="client"?3:0);
 
   for(const item of d.items){
     if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name+": bonus CODICE dell'oggetto");}
   }
-  if(teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))codeChanges.push("+2 · Senior: bonus permanente a CODICE per il team");\n  if(teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed)codeChanges.push("+2 · Senior: primo CODICE del turno");
+  if(teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))codeChanges.push("+2 · Senior: bonus permanente a CODICE per il team");
+  if(teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed)codeChanges.push("+2 · Senior: primo CODICE del turno");
   if(isActive&&c.temporaryCodeBonus)codeChanges.push("+"+c.temporaryCodeBonus+" · Bonus temporaneo: potenziamento attivo a CODICE");
 
   for(const item of d.items){
