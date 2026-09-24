@@ -310,6 +310,6 @@ export class Game {
       this.generateMap();
       this.tempo=8;
       this.generateBossRewards();
-    }else{const winner=this.team.find(dev=>dev.id==="freelancer");if(winner&&winner.hp>0)winner.hp=Math.min(winner.maxHp,winner.hp+5);this.generateReward();}}else if(this.combat?.result==="defeat"){this.screen="result";this.message="COMMESSA FALLITA.";}}
+    }else{const winner=this.team.find(dev=>dev.id==="freelancer");if(winner&&winner.hp>0&&!((this as Game & {nuzlockeActive?:boolean;nuzlockeRules?:string[]}).nuzlockeActive&&(this as Game & {nuzlockeRules?:string[]}).nuzlockeRules?.includes("noHealing")))winner.hp=Math.min(winner.maxHp,winner.hp+5);this.generateReward();}}else if(this.combat?.result==="defeat"){this.screen="result";this.message="COMMESSA FALLITA.";}}
   restart(){this.start();}
 }
