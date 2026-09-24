@@ -880,3 +880,28 @@ body::before{
   .map-node{width:155px!important;min-height:76px!important}
   .map-node b{font-size:11px!important}
 }
+
+
+/* ===== UX ARCHITECTURE V1 =====
+   Shared hierarchy: identity -> current context -> compact run status.
+   Keep global chrome informative without competing with the active screen.
+*/
+.brand-block{min-width:0;flex:none}
+.header-context{display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:0;flex-wrap:wrap}
+.header-context-label{display:inline-flex;align-items:center;min-height:30px;padding:7px 10px;border:1px solid var(--dl-border,#304156);background:var(--dl-surface-2,#172333);color:var(--dl-text,#e8eef6);letter-spacing:.5px;white-space:nowrap}
+.header-status{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0;flex-wrap:wrap}
+.header-status span{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:1px solid var(--dl-border-soft,#26364a);background:rgba(15,23,32,.72);color:var(--dl-muted,#9aaabd);white-space:nowrap}
+.header-status b{color:var(--dl-text,#e8eef6);font-weight:700}
+.panel{border-radius:2px}
+.selection-heading,.map-top{position:relative}
+.selection-heading h2{letter-spacing:.2px}
+.selection-heading p{max-width:720px}
+button{transition:border-color .12s ease,background-color .12s ease,transform .12s ease,box-shadow .12s ease}
+button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
+@media (max-width:760px){
+  .game-shell{width:min(100% - 14px,1180px);margin-top:7px}
+  header{padding:11px 12px;align-items:flex-start}
+  .header-context{gap:7px;justify-content:flex-start}
+  .header-status{justify-content:flex-start}
+  .header-status span{padding:5px 6px}
+}
