@@ -54,9 +54,12 @@ function renderMap(game:Game){
   const x=(col:number)=>150+col*300;
   const y=(row:number)=>topPadding+row*rowHeight;
 
-  const lines=game.mapNodes.flatMap(node=>node.next.map(nextId=>{
-    const target=game.mapNodes.find(n=>n.id===nextId);
-    if(!target)return "";
+  const lines=game.mapNodes.flatMap(node=>game.mapNodes.filter(target=>target.id!==node.id&&game.mapNodes.some(n=>n.id===target.id)&&(
+    node.row===0?target.row===1:
+    node.row>=1&&node.row<=5?target.row===node.row+1&&Math.abs(target.col-node.col)<=1:
+    node.row===6?target.id==="rest-final":
+    node.id==="rest-final"&&target.id==="boss-final"
+  )).map(target=>{
     const unlocked=node.visited&&(target.visited||game.availableMapNodes.some(n=>n.id===target.id));
     const active=node.visited&&target.visited;
     const reachable=node.visited&&game.availableMapNodes.some(n=>n.id===target.id);
