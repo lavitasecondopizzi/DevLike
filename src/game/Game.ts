@@ -171,7 +171,7 @@ export class Game {
         this.team.forEach(d=>d.stress=Math.max(0,d.stress-8));
         this.message="EVENTO: hai trovato una soluzione su Stack Overflow. -8 STRESS.";
       }else{
-        this.team.forEach(d=>d.stress=Math.min(100,d.stress+5));
+        this.team.forEach(d=>d.stress=Math.min(d.maxStress,d.stress+5));
         this.message="EVENTO: 'facciamo una call veloce'. +5 STRESS.";
       }
     }
@@ -185,10 +185,10 @@ export class Game {
     }
   }
 
-  private prepareBattle(enemy:Enemy){this.pendingEnemy=enemy;this.selectedBattleStarterIndex=this.team.findIndex(d=>d.hp>0&&d.stress<100);if(this.selectedBattleStarterIndex<0)this.selectedBattleStarterIndex=0;this.screen="battleSetup";this.message="Scegli chi manda in campo per primo. Trascinalo nello slot di combattimento.";}
-  selectBattleStarter(index:number){const d=this.team[index];if(d&&d.hp>0&&d.stress<100)this.selectedBattleStarterIndex=index;}
-  moveBattleStarter(fromIndex:number){const d=this.team[fromIndex];if(!d||d.hp<=0||d.stress>=100)return;const current=this.team.splice(fromIndex,1)[0];if(current)this.team.unshift(current);this.selectedBattleStarterIndex=0;}
-  confirmBattleStarter(){if(!this.pendingEnemy||!this.team[this.selectedBattleStarterIndex]||this.team[this.selectedBattleStarterIndex].hp<=0||this.team[this.selectedBattleStarterIndex].stress>=100)return;const first=this.team.splice(this.selectedBattleStarterIndex,1)[0];if(first)this.team.unshift(first);this.startBattle(this.pendingEnemy);}
+  private prepareBattle(enemy:Enemy){this.pendingEnemy=enemy;this.selectedBattleStarterIndex=this.team.findIndex(d=>d.hp>0&&d.stress<d.maxStress);if(this.selectedBattleStarterIndex<0)this.selectedBattleStarterIndex=0;this.screen="battleSetup";this.message="Scegli chi manda in campo per primo. Trascinalo nello slot di combattimento.";}
+  selectBattleStarter(index:number){const d=this.team[index];if(d&&d.hp>0&&d.stress<d.maxStress)this.selectedBattleStarterIndex=index;}
+  moveBattleStarter(fromIndex:number){const d=this.team[fromIndex];if(!d||d.hp<=0||d.stress>=d.maxStress)return;const current=this.team.splice(fromIndex,1)[0];if(current)this.team.unshift(current);this.selectedBattleStarterIndex=0;}
+  confirmBattleStarter(){if(!this.pendingEnemy||!this.team[this.selectedBattleStarterIndex]||this.team[this.selectedBattleStarterIndex].hp<=0||this.team[this.selectedBattleStarterIndex].stress>=d.maxStress)return;const first=this.team.splice(this.selectedBattleStarterIndex,1)[0];if(first)this.team.unshift(first);this.startBattle(this.pendingEnemy);}
   private openRecruitment(){this.recruitCandidates=this.randomDevelopers(3,this.team.map(d=>d.id));this.selectedRecruitIndex=null;this.recruitTargetIndex=this.team.length>=3?null:0;this.screen="recruit";this.message=this.team.length>=3?"Hai già 3 developer. Scegli un candidato e poi chi sostituire.":"Scegli un nuovo developer da aggiungere al team.";}
   selectRecruitCandidate(index:number){if(!this.recruitCandidates[index])return;this.selectedRecruitIndex=index;if(this.team.length<3)this.confirmRecruitment();}
   selectRecruitTarget(index:number){if(this.team.length<3||!this.team[index])return;this.recruitTargetIndex=index;}
