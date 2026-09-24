@@ -90,8 +90,7 @@ function screen(game:Game){
     const choiceText=choices.map(node=>`${nodeIcon[node.type]} ${node.hiddenEncounter?"?":node.title} — ${esc(node.description)}`).join("<br>");
     return `<section class="panel map-panel">
       <div class="map-top">
-        <div><b>COMMESSA #${game.projectNumber}</b><br><small>${esc(game.message||"Scegli il prossimo nodo.")}</small></div>
-        <div class="map-status"><span class="tempo-badge ${tempoState.toLowerCase()}">TEMPO <b>${game.tempo}</b></span><span class="map-progress">TAPPA <b>${progress}/6</b></span></div>
+        <div><small>${esc(game.message||"Scegli il prossimo nodo.")}</small></div>
       </div>
       <div class="map-objective"><strong>OBIETTIVO</strong><span>Segui il percorso, gestisci il Tempo e arriva alla PAUSA FINALE prima della DEADLINE.</span></div>
       <div class="roguelike-help"><span>⚔ BATTAGLIA</span><span>☠ ELITE</span><span>? EVENTO</span><span>◆ TOOL</span><span>🔧 OGGETTO</span><span>👤 RECLUTA</span><span>+ PAUSA</span><span>☠ DEADLINE</span></div>
