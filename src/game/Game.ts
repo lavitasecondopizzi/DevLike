@@ -39,8 +39,10 @@ export class Game {
   private cloneDeveloper(dev:Developer):Developer{return {...dev,items:dev.items.map(x=>this.cloneItem(x))};}
   private currentTier():number{return Math.min(4,Math.floor((Math.max(1,this.projectNumber)-1)/5)+1);}
   private randomDevelopers(count:number,excluded:string[]=[]){
+    const nuz=this as Game & {nuzlockeActive?:boolean;nuzlockeGraveyard?:string[]};
+    const banned=[...excluded,...(nuz.nuzlockeActive?nuz.nuzlockeGraveyard??[]:[])];
     const tier=this.currentTier();
-    const pool=developers.filter(d=>!excluded.includes(d.id)&&d.tier<=tier);
+    const pool=developers.filter(d=>!banned.includes(d.id)&&d.tier<=tier);
     const exact=pool.filter(d=>d.tier===tier);
     const source=exact.length>=count?exact:[...exact,...pool.filter(d=>d.tier!==tier)];
     return [...source].sort(()=>Math.random()-.5).slice(0,count).map(d=>this.cloneDeveloper(d));
