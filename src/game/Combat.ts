@@ -91,9 +91,10 @@ export class Combat {
     if(this.nuzlockeRules.includes("oneTool")&&this.toolPlayedThisTurn)return false;
     if(this.nuzlockeRules.includes("battleCardLock")&&this.usedCards.has(card))return false;
     const upper=card.name.toUpperCase();
-    if(this.nuzlockeRules.includes("noCoffee")&&upper.includes("CAFFÈ"))return false;
-    if(this.nuzlockeRules.includes("noAI")&&(upper.includes("AI")||upper.includes("CHATGPT")))return false;
-    if(this.nuzlockeRules.includes("noGit")&&upper.includes("GIT"))return false;
+    const cardId=card.id.toLowerCase();
+    if(this.nuzlockeRules.includes("noCoffee")&&(cardId.includes("coffee")||upper.includes("CAFFÈ")||upper.includes("COFFEE")))return false;
+    if(this.nuzlockeRules.includes("noAI")&&(cardId.includes("ai")||cardId.includes("chatgpt")||upper.includes("CHATGPT")))return false;
+    if(this.nuzlockeRules.includes("noGit")&&(cardId==="git"||cardId.startsWith("git-")||upper==="GIT"))return false;
     if(this.nuzlockeRules.includes("noHealing")&&card.effect.type==="heal")return false;
     if(this.nuzlockeRules.includes("noStressRecovery")&&card.effect.type==="removeStress")return false;
     const costReduction=this.active.classId==="designer"&&!this.firstCardPlayed?1:0;
