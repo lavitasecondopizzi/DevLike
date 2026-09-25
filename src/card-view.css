@@ -298,3 +298,11 @@
   gap:2px!important;
   box-sizing:border-box!important;
 }
+
+/* Cost content spacing: reserve visible inner padding for number and energy icon. */
+.card-template .card-template-cost{
+  padding:0 5px!important;
+  gap:3px!important;
+  justify-content:center!important;
+}
+.card-template .card-template-cost i{flex:0 0 auto!important}
