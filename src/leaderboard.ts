@@ -2,6 +2,7 @@ import type { Card, Developer } from "./entities/types";
 import { Game } from "./game/Game";
 
 export type LeaderboardEntry = {
+  score:number;
   nickname:string;
   team:{developerId:string;name:string}[];
   commessa:number;
@@ -40,6 +41,7 @@ export function buildLeaderboardEntry(game:Game,nickname:string):LeaderboardEntr
   const combat=game.combat;
   const team:Developer[]=combat?.team?.length?combat.team:game.team;
   return {
+    score:game.score,
     nickname:nickname.trim(),
     team:team.map(dev=>({developerId:dev.id,name:dev.name})),
     commessa:game.projectNumber,
