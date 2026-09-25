@@ -1,0 +1,28 @@
+/* SAVE / LEADERBOARD */
+.leaderboard-window{width:min(900px,92vw);max-height:86vh;}
+.leaderboard-body{display:flex;flex-direction:column;gap:14px;min-height:0;padding:18px;overflow:auto;}
+.leaderboard-status{font-size:12px;font-weight:700;letter-spacing:.08em;color:#9fb1c7;}
+.leaderboard-list{display:flex;flex-direction:column;gap:8px;}
+.leaderboard-row{display:grid;grid-template-columns:52px minmax(0,1fr) 180px;gap:14px;align-items:center;width:100%;padding:14px 16px;border:1px solid #31445a;background:#101923;color:inherit;text-align:left;cursor:pointer;}
+.leaderboard-row:hover{border-color:#607895;background:#152231;}
+.leaderboard-rank{font-size:16px;font-weight:800;color:#8da6c3;}
+.leaderboard-main{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.leaderboard-main b{font-size:14px;}
+.leaderboard-main small,.leaderboard-cause{font-size:11px;color:#9fb1c7;}
+.leaderboard-cause{text-align:right;}
+.leaderboard-detail{display:flex;flex-direction:column;gap:6px;margin:-1px 0 8px 52px;padding:14px 16px;border:1px solid #31445a;border-top:0;background:#0b1219;}
+.leaderboard-detail b{font-size:14px;}
+.leaderboard-detail span{font-size:11px;color:#aebdcd;line-height:1.5;}
+.result-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:min(760px,100%);margin:14px auto;}
+.result-summary span{display:flex;flex-direction:column;gap:5px;padding:10px;border:1px solid #31445a;background:#101923;font-size:11px;}
+.result-summary b{font-size:13px;}
+.leaderboard-submit{display:grid;grid-template-columns:140px minmax(180px,320px) auto;align-items:center;justify-content:center;gap:8px;width:min(760px,100%);margin:8px auto 12px;}
+.leaderboard-submit label{font-size:11px;font-weight:800;text-align:right;}
+.leaderboard-submit input{min-height:40px;padding:0 12px;border:1px solid #607895;background:#0b1219;color:#fff;font-size:12px;}
+.leaderboard-submit small{grid-column:1/-1;min-height:16px;font-size:11px;color:#9fb1c7;}
+@media(max-width:700px){
+  .leaderboard-row{grid-template-columns:42px minmax(0,1fr);}.leaderboard-cause{grid-column:2;text-align:left;}
+  .leaderboard-detail{margin-left:42px;}
+  .result-summary{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .leaderboard-submit{grid-template-columns:1fr;}.leaderboard-submit label{text-align:left;}.leaderboard-submit small{grid-column:auto;}
+}
