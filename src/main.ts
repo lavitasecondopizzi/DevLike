@@ -18,6 +18,7 @@ import "./balance-fix";
 import { Game } from "./game/Game";
 import { starterDeckForDeveloper } from "./data/cards";
 import { render } from "./ui/render";
+import { clearLocalSave, hasLocalSave, loadGame, saveGame } from "./save";
 import { setupFeatures, type FeatureGame } from "./ui/features";
 import { setupNuzlocke, type NuzlockeRule } from "./ui/nuzlocke";
 import { setupDeckFix } from "./deck-fix";
