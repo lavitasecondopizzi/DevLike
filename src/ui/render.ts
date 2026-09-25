@@ -130,21 +130,31 @@ function equipmentScreen(game:Game){const bag=game.inventory.map((item,i)=>`<but
 export function render(game:Game){root.innerHTML=`<main class="game-shell"><header class="game-header"><div class="brand-block"><div class="logo">DEV<span>LIKE</span></div><small>SHIP IT OR BURN OUT.</small></div><div class="header-progress" aria-label="Stato commessa"><div class="header-phase"><span class="header-phase-label">FASE</span><b>${screenLabel(game.screen)}</b></div><div class="header-metrics"><div class="header-metric"><span>COMMESSA</span><b>#${game.projectNumber}</b></div><div class="header-metric"><span>TAPPA</span><b>${Math.min(game.currentNode,6)}<i>/6</i></b></div><div class="header-metric"><span>TEMPO</span><b>${game.tempo}</b></div><div class="header-metric header-metric-difficulty"><span>DIFFICOLTÀ</span><b>x${game.difficulty.toFixed(1)}</b></div><div class="header-metric header-metric-score"><span>PUNTEGGIO</span><b>${game.score.toLocaleString("it-IT")}</b><small>x${game.scoreMultiplier.toFixed(2)} MOLTIPLICATORE</small></div>${(game as RenderGame).nuzlockeActive?`<button type="button" class="header-nuzlocke" data-action="nuzlocke-rules"><span>NUZLOCKE</span><b>${(game as RenderGame).nuzlockeRules?.length??0} REGOLE</b></button>`:""}</div><button type="button" class="header-menu-button" data-action="menu">MENU</button></div></header>${screen(game)}</main>`;bind(game);}
 function screenLabel(screen:Game["screen"]):string{const labels:Record<Game["screen"],string>={menu:"MENU",team:"SCELTA DEVELOPER",map:"MAPPA",battleSetup:"SCHIERAMENTO",recruit:"RECLUTAMENTO",itemReward:"OGGETTO",equipment:"EQUIPMENT",combat:"COMBATTIMENTO",reward:"RICOMPENSA",bossReward:"RICOMPENSA DEADLINE",event:"EVENTO",result:"RISULTATO"};return labels[screen]??"DEVLIKE";}
 
-function screen(game:Game){
-  if(game.screen==="menu")return `<section class="panel menu-screen">
+function renderMainMenu(game:Game):string{
+  const hasSave=hasLocalSave();
+  const primaryActions=hasSave
+    ? '<button type="button" class="primary menu-action-primary" data-action="continue"><span class="menu-action-icon">▶</span><span><b>CONTINUA COMMESSA</b><small>RIPRENDI IL SALVATAGGIO</small></span></button><button type="button" class="secondary menu-action-secondary" data-action="start"><span class="menu-action-icon">↻</span><span><b>NUOVA COMMESSA</b><small>RICOMINCIA DA ZERO</small></span></button>'
+    : '<button type="button" class="primary menu-action-primary menu-action-single" data-action="start"><span class="menu-action-icon">▶</span><span><b>NUOVA COMMESSA</b><small>INIZIA UNA NUOVA RUN</small></span></button>';
+  return `<section class="panel menu-screen">
     <div class="menu-hero">
       <div class="menu-brand">
         <span class="menu-kicker">PROJECT // DEVLIKE</span>
         <div class="menu-logo">DEV<span>LIKE</span></div>
         <div class="menu-tagline">SHIP IT OR BURN OUT.</div>
         <p>Un roguelike deckbuilder dove ogni commessa può diventare un incidente di produzione.</p>
-        ${hasLocalSave() ? `<div class="menu-primary-actions"><button type="button" class="primary menu-start" data-action="continue"><span>▶</span> CONTINUA COMMESSA</button><button type="button" class="secondary menu-new-run" data-action="start"><span>↻</span> NUOVA COMMESSA</button></div><div class="menu-secondary-actions"><button type="button" class="feature-menu-item menu-leaderboard-action" data-action="leaderboard-open"><span>CLASSIFICA</span><small>RECORD ONLINE</small></button></div>` : `<div class="menu-primary-actions"><button type="button" class="primary menu-start" data-action="start"><span>▶</span> NUOVA COMMESSA</button></div><div class="menu-secondary-actions"><button type="button" class="feature-menu-item menu-leaderboard-action" data-action="leaderboard-open"><span>CLASSIFICA</span><small>RECORD ONLINE</small></button></div>`}
-        <nav class="feature-menu menu-feature-nav" aria-label="Strumenti e modalità"><button type="button" class="feature-menu-item" data-feature-open="tutorial"><span>TUTORIAL</span><small>GUIDA COMPLETA</small></button>
-          <button type="button" class="feature-menu-item" data-feature-open="nuzlocke"><span>NUZLOCKE</span><small>MODALITÀ SPECIALE</small></button>
-          <button type="button" class="feature-menu-item" data-feature-open="codex"><span>CODEX</span><small>DATABASE DEVLIKE</small></button>
-        </nav>
+        <div class="menu-actions">
+          <div class="menu-primary-row">${primaryActions}</div>
+          <div class="menu-secondary-row">
+            <button type="button" class="menu-action-link" data-action="leaderboard-open"><span class="menu-action-icon">▤</span><span><b>CLASSIFICA</b><small>RECORD ONLINE</small></span></button>
+          </div>
+          <nav class="menu-feature-nav" aria-label="Strumenti e modalità">
+            <button type="button" class="feature-menu-item" data-feature-open="tutorial"><span>TUTORIAL</span><small>GUIDA COMPLETA</small></button>
+            <button type="button" class="feature-menu-item" data-feature-open="nuzlocke"><span>NUZLOCKE</span><small>MODALITÀ SPECIALE</small></button>
+            <button type="button" class="feature-menu-item" data-feature-open="codex"><span>CODEX</span><small>DATABASE DEVLIKE</small></button>
+          </nav>
+        </div>
       </div>
-      <div class="menu-terminal">
+      <div class="menu-terminal" aria-label="Stato del sistema">
         <div class="terminal-bar"><span></span><span></span><span></span><b>production.log</b></div>
         <div class="terminal-body">
           <div><span class="terminal-prompt">&gt;</span> avvio commessa...</div>
@@ -162,6 +172,10 @@ function screen(game:Game){
     </div>
     <div class="menu-footer"><span>BUILD 0.1 · PROTOTYPE</span><span>NESSUN CLIENTE È STATO SODDISFATTO DURANTE IL TEST</span></div>
   </section>`;
+}
+
+function screen(game:Game){
+  if(game.screen==="menu")return renderMainMenu(game);
   if(game.screen==="team")return `<section class="panel selection-panel team-selection">
     <div class="team-selection-hero">
       <div class="team-selection-copy"><span class="team-selection-kicker">AVVIO COMMESSA · SELEZIONE TEAM</span><h2>SCEGLI IL DEVELOPER PRINCIPALE</h2><p>La prima scelta definisce il tuo punto di partenza. Valuta statistiche, abilità, vantaggi e debolezze prima di confermare.</p></div>
