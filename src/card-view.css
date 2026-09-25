@@ -291,3 +291,10 @@
   box-shadow:none!important;
 }
 .card-template .card-template-cost i{font-size:11px!important}
+
+/* Cost badge: add internal breathing room while keeping the same compact square. */
+.card-template .card-template-cost{
+  padding:0 3px!important;
+  gap:2px!important;
+  box-sizing:border-box!important;
+}
