@@ -321,14 +321,14 @@ return `<section class="battle battle-redesign">
   const resultActive=game.combat?.active;
   const cause=resultGame.lossCause??(resultActive&&resultActive.stress>=resultActive.maxStress?"BURNOUT":resultActive&&resultActive.hp<=0?"KO":"SCONFITTA");
   const status=resultGame.leaderboardStatus??"";
-  return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${esc(game.message)}</h1><div class="result-summary"><span>COMMESSA <b>#${game.projectNumber}</b></span><span>TAPPA <b>${Math.min(game.currentNode,6)}</b></span><span>DIFFICOLTÀ <b>x${game.difficulty.toFixed(1)}</b></span><span>CAUSA <b>${esc(cause)}</b></span></div><p>La commessa è andata in produzione. Da qualche parte.</p><div class="leaderboard-submit"><label for="leaderboard-nickname">NICKNAME</label><input id="leaderboard-nickname" maxlength="20" autocomplete="nickname" placeholder="Inserisci nickname"><button type="button" class="primary" data-action="leaderboard-submit">SALVA NELLA CLASSIFICA</button><small>${esc(status)}</small></div><button type="button" class="secondary" data-action="leaderboard-open">VEDI CLASSIFICA</button><button type="button" class="primary" data-action="restart">NUOVA COMMESSA</button></section>`;
+  return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${esc(game.message)}</h1><div class="result-summary"><span>PUNTEGGIO <b>${game.score.toLocaleString("it-IT")}</b></span><span>COMMESSA <b>#${game.projectNumber}</b></span><span>TAPPA <b>${Math.min(game.currentNode,6)}</b></span><span>DIFFICOLTÀ <b>x${game.difficulty.toFixed(1)}</b></span><span>CAUSA <b>${esc(cause)}</b></span></div><p>La commessa è andata in produzione. Da qualche parte.</p><div class="leaderboard-submit"><label for="leaderboard-nickname">NICKNAME</label><input id="leaderboard-nickname" maxlength="20" autocomplete="nickname" placeholder="Inserisci nickname"><button type="button" class="primary" data-action="leaderboard-submit">SALVA NELLA CLASSIFICA</button><small>${esc(status)}</small></div><button type="button" class="secondary" data-action="leaderboard-open">VEDI CLASSIFICA</button><button type="button" class="primary" data-action="restart">NUOVA COMMESSA</button></section>`;
 }
 
 function leaderboardDetail(entry:LeaderboardEntry):string {
   const team=entry.team.map(dev=>esc(dev.name)).join(" · ")||"—";
   const deck=entry.mazzo.map(card=>esc(card.name)+(card.quantity>1?" ×"+card.quantity:"")).join(" · ")||"—";
   const rules=entry.nuzlocke.enabled?(entry.nuzlocke.rules.map(esc).join(" · ")||"PERMADEATH"):"DISATTIVO";
-  return '<div class="leaderboard-detail"><b>'+esc(entry.nickname)+'</b><span>COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · DIFFICOLTÀ x'+entry.difficolta.toFixed(1)+'</span><span>CAUSA: '+esc(entry.causaPerdita)+'</span><span>TEAM: '+team+'</span><span>MAZZO: '+deck+'</span><span>NUZLOCKE: '+rules+'</span></div>';
+  return '<div class="leaderboard-detail"><b>'+esc(entry.nickname)+'</b><span>PUNTEGGIO '+entry.score.toLocaleString("it-IT")+' · COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · DIFFICOLTÀ x'+entry.difficolta.toFixed(1)+'</span><span>CAUSA: '+esc(entry.causaPerdita)+'</span><span>TEAM: '+team+'</span><span>MAZZO: '+deck+'</span><span>NUZLOCKE: '+rules+'</span></div>';
 }
 async function openLeaderboard(game:Game){
   const shell=document.querySelector<HTMLElement>(".game-shell");
@@ -341,7 +341,7 @@ async function openLeaderboard(game:Game){
     const status=document.querySelector<HTMLElement>(".leaderboard-status");
     if(!list||!status)return;
     status.textContent=entries.length?entries.length+" RUN REGISTRATE":"NESSUN RECORD";
-    list.innerHTML=entries.map((entry,index)=>'<button type="button" class="leaderboard-row" data-leaderboard-index="'+index+'"><span class="leaderboard-rank">'+String(index+1).padStart(2,"0")+'</span><span class="leaderboard-main"><b>'+esc(entry.nickname)+'</b><small>COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · x'+entry.difficolta.toFixed(1)+'</small></span><span class="leaderboard-cause">'+esc(entry.causaPerdita)+'</span></button>').join("");
+    list.innerHTML=entries.map((entry,index)=>'<button type="button" class="leaderboard-row" data-leaderboard-index="'+index+'"><span class="leaderboard-rank">'+String(index+1).padStart(2,"0")+'</span><span class="leaderboard-main"><b>'+esc(entry.nickname)+'</b><small>PUNTEGGIO '+entry.score.toLocaleString("it-IT")+' · COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · x'+entry.difficolta.toFixed(1)+'</small></span><span class="leaderboard-cause">'+esc(entry.causaPerdita)+'</span></button>').join("");
     list.querySelectorAll<HTMLElement>("[data-leaderboard-index]").forEach(row=>row.onclick=()=>{const entry=entries[Number(row.dataset.leaderboardIndex)];if(!entry)return;const existing=row.nextElementSibling;if(existing?.classList.contains("leaderboard-detail")){existing.remove();return;}row.insertAdjacentHTML("afterend",leaderboardDetail(entry));});
   }catch(error){
     const status=document.querySelector<HTMLElement>(".leaderboard-status");
