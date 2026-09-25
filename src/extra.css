@@ -1206,3 +1206,41 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
     align-items:center!important;
   }
 }
+
+
+/* FINAL COMBAT VERTICAL RHYTHM — reserve the full physical card height before end-turn. */
+.battle-redesign .battle-main{
+  grid-template-rows:auto auto auto auto auto auto 190px auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:visible!important;
+  align-content:start!important;
+}
+.battle-redesign .hand{
+  height:190px!important;
+  min-height:190px!important;
+  max-height:190px!important;
+  overflow:visible!important;
+  align-items:flex-start!important;
+}
+.battle-redesign .hand .combat-card,
+.battle-redesign .hand .combat-card .card-template{
+  height:190px!important;
+  min-height:190px!important;
+  max-height:190px!important;
+}
+.battle-redesign .end{
+  position:relative!important;
+  z-index:2!important;
+  margin-top:0!important;
+}
+@media(max-width:800px){
+  .battle-redesign .battle-main{
+    grid-template-rows:auto auto auto auto auto auto auto auto!important;
+  }
+  .battle-redesign .hand{
+    height:auto!important;
+    min-height:190px!important;
+    max-height:none!important;
+  }
+}
