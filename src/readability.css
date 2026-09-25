@@ -1017,6 +1017,7 @@ button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
   background:#12131d!important;
 }
 .game-shell > .game-header .header-metric-difficulty b{color:#c7c9d5!important}
+.game-shell > .game-header .header-metrics:has(.header-nuzlocke){grid-template-columns:repeat(5,minmax(76px,auto)) auto!important;}
 .game-shell > .game-header .header-nuzlocke{min-width:86px;display:flex;flex-direction:column;justify-content:center;gap:3px;padding:8px 10px;border:1px solid #7b5a91;border-radius:8px;background:#20172a;color:#e9ddf2;text-align:left;cursor:pointer;box-sizing:border-box;}
 .game-shell > .game-header .header-nuzlocke span{font-size:11px;font-weight:800;line-height:1.1;letter-spacing:.06em;white-space:nowrap;}
 .game-shell > .game-header .header-nuzlocke b{font-size:11px;line-height:1.1;white-space:nowrap;}
@@ -1039,8 +1040,9 @@ button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
   .game-shell > .game-header .header-phase{flex:0 0 auto!important}
   .game-shell > .game-header .header-metrics{
     flex:1 1 auto!important;
-    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) auto!important;
   }
+  .game-shell > .game-header .header-metrics:has(.header-nuzlocke){grid-template-columns:repeat(5,minmax(0,1fr)) auto!important;} 
   .game-shell > .game-header .header-metric{min-width:0!important}
 }
 @media(max-width:640px){
