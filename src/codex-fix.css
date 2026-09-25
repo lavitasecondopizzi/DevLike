@@ -1,4 +1,65 @@
-.codex-window{height:92vh!important;max-height:92vh!important;display:grid!important;grid-template-rows:auto auto minmax(0,1fr)!important;overflow:hidden!important}.codex-layout{display:grid!important;grid-template-columns:430px minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;flex:none!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important}.codex-list{display:grid!important;grid-template-columns:repeat(3,120px)!important;grid-auto-rows:120px!important;align-content:start!important;justify-content:start!important;gap:10px!important;overflow-y:auto!important;overflow-x:hidden!important;padding:14px!important;border-right:2px solid #343b4b!important;border-bottom:0!important;width:100%!important;height:100%!important;max-height:none!important;min-height:0!important;box-sizing:border-box!important}.codex-entry{width:120px!important;height:120px!important;min-height:120px!important;margin:0!important;padding:10px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;text-align:left!important;overflow:hidden!important;box-sizing:border-box!important}.codex-entry b{font-size:11px!important;line-height:1.35!important;width:100%!important;overflow-wrap:anywhere!important}.codex-entry small{font-size:11px!important;line-height:1.4!important;margin-top:6px!important;width:100%!important;overflow-wrap:anywhere!important}.codex-detail{min-width:0!important;min-height:0!important;height:100%!important;max-height:none!important;overflow:auto!important;padding:28px 32px!important;box-sizing:border-box!important}.codex-empty{height:100%!important;display:grid!important;place-items:center!important;opacity:.5!important;font-size:14px!important;letter-spacing:1px!important}.codex-detail:has(.codex-empty){display:grid!important;place-items:center!important}@media(max-width:800px){.codex-window{height:auto!important;max-height:96vh!important;display:flex!important;flex-direction:column!important}.codex-layout{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto minmax(0,1fr)!important;height:auto!important;max-height:none!important;overflow:auto!important}.codex-list{grid-template-columns:repeat(3,100px)!important;grid-auto-rows:100px!important;max-height:none!important;height:auto!important;border-right:0!important;border-bottom:2px solid #343b4b!important}.codex-entry{width:100px!important;height:100px!important;min-height:100px!important}.codex-entry b{font-size:11px!important}.codex-entry small{font-size:11px!important}}
-
-/* Codex card details use the same shared poker-card component as the rest of the game. */
-.codex-card-detail{display:grid!important;grid-template-columns:minmax(220px,280px) minmax(0,1fr)!important;gap:28px!important;align-items:start!important;max-width:760px!important;margin:0 auto!important}.codex-card-preview{width:100%!important;max-width:280px!important;justify-self:center!important}.codex-card-preview .devlike-poker-card{width:100%!important}.codex-card-info{min-width:0!important}.codex-card-info h2{margin:4px 0 12px!important}.codex-card-info .codex-description{margin-bottom:18px!important}@media(max-width:800px){.codex-card-detail{grid-template-columns:minmax(180px,240px)!important;justify-content:center!important;gap:20px!important}.codex-card-preview{max-width:240px!important}.codex-card-info{width:100%!important}}
+.codex-window{
+  width:min(1180px,96vw)!important;
+  height:min(900px,92vh)!important;
+  max-width:1180px!important;
+  max-height:92vh!important;
+  display:grid!important;
+  grid-template-rows:auto auto minmax(0,1fr)!important;
+  overflow:hidden!important;
+}
+.codex-window .feature-titlebar{padding:20px 24px 16px!important;border-bottom:1px solid #30394a!important;background:#101620!important}
+.codex-window .codex-kicker{font-size:11px!important;letter-spacing:2px!important;opacity:.55!important}
+.codex-window .feature-titlebar h2{margin:4px 0 0!important;font-size:22px!important;letter-spacing:1.5px!important}
+.codex-tabs{display:flex!important;gap:0!important;padding:0 18px!important;border-bottom:1px solid #30394a!important;background:#0c1119!important;overflow-x:auto!important}
+.codex-tabs button{min-height:44px!important;padding:0 18px!important;border:0!important;border-bottom:2px solid transparent!important;background:transparent!important;color:inherit!important;font-size:11px!important;letter-spacing:1.2px!important;opacity:.62!important;cursor:pointer!important}
+.codex-tabs button:hover{opacity:1!important;background:#121a25!important}
+.codex-tabs button.active{opacity:1!important;border-bottom-color:currentColor!important;background:#151d29!important}
+.codex-layout{display:grid!important;grid-template-columns:390px minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+.codex-list{display:flex!important;flex-direction:column!important;gap:6px!important;overflow:auto!important;padding:14px!important;border-right:1px solid #30394a!important;background:#0a0f16!important;min-width:0!important}
+.codex-tier-divider{display:flex!important;align-items:center!important;gap:10px!important;margin:8px 2px 2px!important;color:inherit!important;opacity:.5!important;font-size:11px!important;letter-spacing:1.8px!important}
+.codex-tier-divider:after{content:""!important;flex:1!important;height:1px!important;background:#30394a!important}
+.codex-entry{width:100%!important;min-height:68px!important;margin:0!important;padding:11px 12px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;gap:5px!important;text-align:left!important;border:1px solid #252e3d!important;background:#101620!important;color:inherit!important;cursor:pointer!important;box-sizing:border-box!important}
+.codex-entry:hover{border-color:#5b687d!important;background:#151e2b!important}
+.codex-entry.selected{border-color:#8c99af!important;background:#1a2331!important;box-shadow:inset 3px 0 currentColor!important}
+.codex-entry b{font-size:11px!important;line-height:1.35!important;width:100%!important;overflow-wrap:anywhere!important}
+.codex-entry small{font-size:11px!important;line-height:1.35!important;width:100%!important;overflow-wrap:anywhere!important;opacity:.62!important}
+.codex-detail{min-width:0!important;min-height:0!important;height:100%!important;overflow:auto!important;padding:30px 34px!important;box-sizing:border-box!important;background:#0e141d!important}
+.codex-detail-head{padding-bottom:18px!important;border-bottom:1px solid #30394a!important}
+.codex-detail-head h2,.codex-card-info h2{margin:5px 0 4px!important;font-size:24px!important;line-height:1.2!important}
+.codex-detail-head b{font-size:11px!important;opacity:.65!important}
+.codex-description{font-size:11px!important;line-height:1.65!important;opacity:.75!important;max-width:760px!important}
+.codex-stats{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(105px,1fr))!important;gap:8px!important;margin:18px 0!important}
+.codex-stats>span{padding:10px!important;border:1px solid #293343!important;background:#111823!important;font-size:11px!important;line-height:1.35!important}
+.codex-stats b{display:block!important;margin-top:4px!important;font-size:13px!important}
+.codex-block{margin-top:16px!important;padding:15px!important;border:1px solid #293343!important;background:#111823!important}
+.codex-block h3{margin:0 0 9px!important;font-size:11px!important;letter-spacing:1.5px!important;opacity:.6!important}
+.codex-block p{margin:0!important;font-size:11px!important;line-height:1.55!important}
+.codex-two{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important}
+.codex-two .codex-block{min-width:0!important}
+.codex-two .codex-block p{padding:6px 0!important;border-bottom:1px solid #252e3d!important}
+.codex-two .codex-block p:last-child{border-bottom:0!important}
+.codex-card-detail{display:grid!important;grid-template-columns:minmax(220px,280px) minmax(0,1fr)!important;gap:30px!important;align-items:start!important;max-width:850px!important;margin:0 auto!important}
+.codex-card-preview{width:100%!important;max-width:280px!important;justify-self:center!important}
+.codex-card-preview .devlike-poker-card{width:100%!important}
+.codex-card-info{min-width:0!important}
+.codex-empty{height:100%!important;display:grid!important;place-items:center!important;opacity:.5!important;font-size:11px!important;letter-spacing:1px!important}
+.codex-detail:has(.codex-empty){display:grid!important;place-items:center!important}
+@media(max-width:850px){
+  .codex-window{height:94vh!important;max-height:94vh!important}
+  .codex-layout{grid-template-columns:1fr!important;grid-template-rows:minmax(180px,34vh) minmax(0,1fr)!important;overflow:hidden!important}
+  .codex-list{border-right:0!important;border-bottom:1px solid #30394a!important;display:grid!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important;align-content:start!important}
+  .codex-entry{min-height:70px!important}
+  .codex-detail{padding:22px!important}
+}
+@media(max-width:600px){
+  .codex-window{width:96vw!important}
+  .codex-window .feature-titlebar{padding:16px!important}
+  .codex-tabs{padding:0 8px!important}
+  .codex-tabs button{padding:0 12px!important}
+  .codex-layout{grid-template-rows:minmax(160px,30vh) minmax(0,1fr)!important}
+  .codex-list{grid-template-columns:1fr 1fr!important;padding:10px!important}
+  .codex-detail{padding:18px!important}
+  .codex-two{grid-template-columns:1fr!important}
+  .codex-card-detail{grid-template-columns:minmax(170px,240px)!important;justify-content:center!important;gap:20px!important}
+  .codex-card-preview{max-width:240px!important}
+}
