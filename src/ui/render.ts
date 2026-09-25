@@ -1,6 +1,8 @@
 import { Game } from "../game/Game";
 import { getDeveloperStatBreakdown } from "../game/Combat";
 import { renderCard } from "../card-view";
+import { hasLocalSave } from "../save";
+import { buildLeaderboardEntry, fetchLeaderboard, submitLeaderboardEntry, type LeaderboardEntry } from "../leaderboard";
 import type { Developer, Enemy, MapNode } from "../entities/types";
 
 const root = document.querySelector<HTMLDivElement>("#app")!;
@@ -135,8 +137,8 @@ function screen(game:Game){
         <div class="menu-logo">DEV<span>LIKE</span></div>
         <div class="menu-tagline">SHIP IT OR BURN OUT.</div>
         <p>Un roguelike deckbuilder dove ogni commessa può diventare un incidente di produzione.</p>
-        <button type="button" class="primary menu-start" data-action="start"><span>▶</span> NUOVA COMMESSA</button>
-        <nav class="feature-menu menu-feature-nav" aria-label="Strumenti e modalità">
+        <button type="button" class="primary menu-start" data-action="continue"><span>▶</span> CONTINUA COMMESSA</button><button type="button" class="primary menu-start" data-action="start"><span>▶</span> NUOVA COMMESSA</button>
+        <nav class="feature-menu menu-feature-nav" aria-label="Strumenti e modalità"><button type="button" class="feature-menu-item" data-action="leaderboard-open"><span>CLASSIFICA</span><small>RECORD ONLINE</small></button>
           <button type="button" class="feature-menu-item" data-feature-open="tutorial"><span>TUTORIAL</span><small>GUIDA COMPLETA</small></button>
           <button type="button" class="feature-menu-item" data-feature-open="nuzlocke"><span>NUZLOCKE</span><small>MODALITÀ SPECIALE</small></button>
           <button type="button" class="feature-menu-item" data-feature-open="codex"><span>CODEX</span><small>DATABASE DEVLIKE</small></button>
@@ -315,11 +317,38 @@ return `<section class="battle battle-redesign">
       <p class="selection-hint boss-reward-hint">La scelta è definitiva. Gli altri cinque drop vengono persi.</p>
     </section>`;
   }
-  return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${esc(game.message)}</h1><p>La commessa è andata in produzione. Da qualche parte.</p><button type="button" class="primary" data-action="restart">NUOVA COMMESSA</button></section>`;
+  const resultGame=game as Game&{lossCause?:string;leaderboardStatus?:string};
+  const cause=resultGame.lossCause??(game.combat?.active?.stress>=game.combat?.active?.maxStress?"BURNOUT":game.combat?.active?.hp<=0?"KO":"SCONFITTA");
+  const status=resultGame.leaderboardStatus??"";
+  return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${esc(game.message)}</h1><div class="result-summary"><span>COMMESSA <b>#${game.projectNumber}</b></span><span>TAPPA <b>${Math.min(game.currentNode,6)}</b></span><span>DIFFICOLTÀ <b>x${game.difficulty.toFixed(1)}</b></span><span>CAUSA <b>${esc(cause)}</b></span></div><p>La commessa è andata in produzione. Da qualche parte.</p><div class="leaderboard-submit"><label for="leaderboard-nickname">NICKNAME</label><input id="leaderboard-nickname" maxlength="20" autocomplete="nickname" placeholder="Inserisci nickname"><button type="button" class="primary" data-action="leaderboard-submit">SALVA NELLA CLASSIFICA</button><small>${esc(status)}</small></div><button type="button" class="secondary" data-action="leaderboard-open">VEDI CLASSIFICA</button><button type="button" class="primary" data-action="restart">NUOVA COMMESSA</button></section>`;
 }
 
+function leaderboardDetail(entry:LeaderboardEntry):string {
+  const team=entry.team.map(dev=>esc(dev.name)).join(" · ")||"—";
+  const deck=entry.mazzo.map(card=>esc(card.name)+(card.quantity>1?" ×"+card.quantity:"")).join(" · ")||"—";
+  const rules=entry.nuzlocke.enabled?(entry.nuzlocke.rules.map(esc).join(" · ")||"PERMADEATH"):"DISATTIVO";
+  return '<div class="leaderboard-detail"><b>'+esc(entry.nickname)+'</b><span>COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · DIFFICOLTÀ x'+entry.difficolta.toFixed(1)+'</span><span>CAUSA: '+esc(entry.causaPerdita)+'</span><span>TEAM: '+team+'</span><span>MAZZO: '+deck+'</span><span>NUZLOCKE: '+rules+'</span></div>';
+}
+async function openLeaderboard(game:Game){
+  const shell=document.querySelector<HTMLElement>(".game-shell");
+  if(!shell||document.querySelector("[data-leaderboard-overlay]"))return;
+  shell.insertAdjacentHTML("beforeend",'<div class="feature-overlay" data-leaderboard-overlay><div class="feature-window leaderboard-window"><div class="feature-titlebar"><div><span class="codex-kicker">DEVLIKE // ONLINE</span><h2>CLASSIFICA</h2><small>Le run concluse condivise dai giocatori.</small></div><button type="button" class="feature-close" data-leaderboard-close>CHIUDI ×</button></div><div class="leaderboard-body"><div class="leaderboard-status">CARICAMENTO...</div><div class="leaderboard-list"></div></div></div></div>');
+  try{
+    const entries=await fetchLeaderboard();
+    const list=document.querySelector<HTMLElement>(".leaderboard-list");
+    const status=document.querySelector<HTMLElement>(".leaderboard-status");
+    if(!list||!status)return;
+    status.textContent=entries.length?entries.length+" RUN REGISTRATE":"NESSUN RECORD";
+    list.innerHTML=entries.map((entry,index)=>'<button type="button" class="leaderboard-row" data-leaderboard-index="'+index+'"><span class="leaderboard-rank">'+String(index+1).padStart(2,"0")+'</span><span class="leaderboard-main"><b>'+esc(entry.nickname)+'</b><small>COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · x'+entry.difficolta.toFixed(1)+'</small></span><span class="leaderboard-cause">'+esc(entry.causaPerdita)+'</span></button>').join("");
+    list.querySelectorAll<HTMLElement>("[data-leaderboard-index]").forEach(row=>row.onclick=()=>{const entry=entries[Number(row.dataset.leaderboardIndex)];if(entry)row.insertAdjacentHTML("afterend",leaderboardDetail(entry));});
+  }catch(error){
+    const status=document.querySelector<HTMLElement>(".leaderboard-status");
+    if(status)status.textContent=error instanceof Error&&error.message==="LEADERBOARD_API_URL_NOT_CONFIGURED"?"CLASSIFICA ONLINE NON CONFIGURATA":"ERRORE NEL CARICAMENTO DELLA CLASSIFICA";
+  }
+}
 function bind(game:Game){
-  root.querySelectorAll<HTMLElement>("[data-action]").forEach(el=>el.onclick=()=>{const a=el.dataset.action;if(a==="start")game.start();if(a==="confirm-start")game.confirmStartingDeveloper();if(a==="confirm-battle")game.confirmBattleStarter();if(a==="code")game.combat?.basicAction("code");if(a==="debug")game.combat?.basicAction("debug");if(a==="defend")game.combat?.basicAction("defend");if(a==="toggle-deck")game.combat?.toggleDeck();if(a==="end-turn")game.combat?.endTurn();if(a==="reward")game.chooseReward(0);if(a==="confirm-recruit")game.confirmRecruitment();if(a==="confirm-item")game.confirmItemReward();if(a==="store-item")game.storeItemReward();if(a==="open-equipment")game.openEquipment();if(a==="close-equipment")game.closeEquipment();if(a==="restart")game.restart();render(game);if(game.screen==="combat"&&game.combat?.result!=="ongoing"){game.onCombatFinished();render(game);}});
+  root.querySelectorAll<HTMLElement>("[data-leaderboard-close]").forEach(el=>el.onclick=()=>document.querySelector("[data-leaderboard-overlay]")?.remove());
+  root.querySelectorAll<HTMLElement>("[data-action]").forEach(el=>el.onclick=()=>{const a=el.dataset.action;if(a==="start"){game.start();}if(a==="continue"){window.dispatchEvent(new CustomEvent("devlike-load-save"));return;}if(a==="leaderboard-open"){void openLeaderboard(game);return;}if(a==="confirm-start")game.confirmStartingDeveloper();if(a==="confirm-battle")game.confirmBattleStarter();if(a==="code")game.combat?.basicAction("code");if(a==="debug")game.combat?.basicAction("debug");if(a==="defend")game.combat?.basicAction("defend");if(a==="toggle-deck")game.combat?.toggleDeck();if(a==="end-turn")game.combat?.endTurn();if(a==="reward")game.chooseReward(0);if(a==="confirm-recruit")game.confirmRecruitment();if(a==="confirm-item")game.confirmItemReward();if(a==="store-item")game.storeItemReward();if(a==="open-equipment")game.openEquipment();if(a==="close-equipment")game.closeEquipment();if(a==="leaderboard-submit"){const input=document.querySelector<HTMLInputElement>("#leaderboard-nickname");const nickname=input?.value.trim()??"";const state=game as Game&{leaderboardStatus?:string};if(!nickname){state.leaderboardStatus="INSERISCI UN NICKNAME.";render(game);return;}state.leaderboardStatus="INVIO...";render(game);void submitLeaderboardEntry(buildLeaderboardEntry(game,nickname)).then(()=>{state.leaderboardStatus="RECORD SALVATO.";render(game);}).catch(()=>{state.leaderboardStatus="ERRORE: CLASSIFICA ONLINE NON DISPONIBILE.";render(game);});return;}if(a==="restart")game.restart();render(game);if(game.screen==="combat"&&game.combat?.result!=="ongoing"){game.onCombatFinished();render(game);}});
   root.querySelectorAll<HTMLElement>("[data-deck-view]").forEach(el=>el.onclick=()=>{game.combat?.setDeckView((el.dataset.deckView||"draw") as "draw"|"discard");render(game);});
    root.querySelectorAll<HTMLElement>("[data-event-choice]").forEach(el=>el.onclick=()=>{game.chooseEvent(Number(el.dataset.eventChoice));render(game);});
   root.querySelectorAll<HTMLElement>("[data-boss-reward]").forEach(el=>el.onclick=()=>{game.chooseBossReward(Number(el.dataset.bossReward));render(game);});
