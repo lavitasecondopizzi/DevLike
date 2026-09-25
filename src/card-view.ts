@@ -26,7 +26,6 @@ export function renderCard(card:Card,options:CardRenderOptions={}){
       <div class="card-template-name">${esc(card.name)}</div>
       <div class="card-template-art"><span>${esc(getCardArt(card))}</span></div>
       <div class="card-template-effect"><b>${esc(getCardEffectLabel(card))}</b></div>
-      <footer class="card-template-footer"><span>DEVLIKE</span></footer>
     </div>
   </article>`;
 }
