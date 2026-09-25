@@ -334,6 +334,7 @@ async function openLeaderboard(game:Game){
   const shell=document.querySelector<HTMLElement>(".game-shell");
   if(!shell||document.querySelector("[data-leaderboard-overlay]"))return;
   shell.insertAdjacentHTML("beforeend",'<div class="feature-overlay" data-leaderboard-overlay><div class="feature-window leaderboard-window"><div class="feature-titlebar"><div><span class="codex-kicker">DEVLIKE // ONLINE</span><h2>CLASSIFICA</h2><small>Le run concluse condivise dai giocatori.</small></div><button type="button" class="feature-close" data-leaderboard-close>CHIUDI ×</button></div><div class="leaderboard-body"><div class="leaderboard-status">CARICAMENTO...</div><div class="leaderboard-list"></div></div></div></div>');
+  shell.querySelector<HTMLElement>("[data-leaderboard-close]")?.addEventListener("click",()=>shell.querySelector("[data-leaderboard-overlay]")?.remove());
   try{
     const entries=await fetchLeaderboard();
     const list=document.querySelector<HTMLElement>(".leaderboard-list");
@@ -364,4 +365,3 @@ function bind(game:Game){
   if(game.screen==="battleSetup"){let dragged:number|null=null;root.querySelectorAll<HTMLElement>("[data-battle-dev]").forEach(el=>{const index=Number(el.dataset.battleDev);el.onclick=e=>{e.preventDefault();game.selectBattleStarter(index);render(game);};el.ondragstart=e=>{dragged=index;e.dataTransfer?.setData("text/plain",String(index));if(e.dataTransfer)e.dataTransfer.effectAllowed="move";el.classList.add("dragging");};el.ondragend=()=>{dragged=null;el.classList.remove("dragging");};});root.querySelectorAll<HTMLElement>("[data-battle-order]").forEach(el=>{el.ondragover=e=>{e.preventDefault();el.classList.add("drag-over");};el.ondragleave=()=>el.classList.remove("drag-over");el.ondrop=e=>{e.preventDefault();el.classList.remove("drag-over");const raw=e.dataTransfer?.getData("text/plain");const from=raw?Number(raw):dragged;const to=Number(el.dataset.battleOrder);if(from!==null&&Number.isInteger(from)&&Number.isInteger(to))game.moveBattleStarter(from,to);render(game);};});
 }
 }
-  document.querySelector<HTMLElement>("[data-leaderboard-close]")?.addEventListener("click",()=>document.querySelector("[data-leaderboard-overlay]")?.remove());
