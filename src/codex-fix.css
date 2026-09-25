@@ -275,3 +275,79 @@
   .codex-detail-grid{row-gap:12px!important}
   .codex-card-detail{gap:20px!important}
 }
+
+
+/* Final Codex layout override: neutralize legacy compact-layout limits from extra.css. */
+.codex-window .codex-layout{
+  display:grid!important;
+  grid-template-columns:430px minmax(0,1fr)!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:hidden!important;
+}
+.codex-window .codex-list-panel{
+  min-height:0!important;
+  height:100%!important;
+  max-height:none!important;
+  overflow:hidden!important;
+}
+.codex-window .codex-list{
+  height:100%!important;
+  max-height:none!important;
+  min-height:0!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  grid-auto-rows:minmax(96px,auto)!important;
+  gap:14px!important;
+  padding:14px!important;
+  overflow:auto!important;
+  border-right:0!important;
+  border-bottom:0!important;
+}
+.codex-window .codex-entry{
+  min-height:96px!important;
+  height:auto!important;
+  aspect-ratio:auto!important;
+  padding:11px!important;
+}
+.codex-window .codex-detail{
+  height:100%!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow:auto!important;
+  padding:24px 28px 32px!important;
+}
+.codex-window .codex-detail-grid{
+  column-gap:18px!important;
+  row-gap:18px!important;
+}
+.codex-window .codex-block{
+  padding:16px 17px!important;
+}
+.codex-window .codex-list-values p{
+  padding:9px 0!important;
+}
+@media(max-width:1000px){
+  .codex-window .codex-layout{grid-template-columns:350px minmax(0,1fr)!important}
+  .codex-window .codex-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+  .codex-window .codex-layout{
+    grid-template-columns:1fr!important;
+    grid-template-rows:minmax(220px,42%) minmax(0,1fr)!important;
+  }
+  .codex-window .codex-list{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    height:100%!important;
+    max-height:none!important;
+  }
+  .codex-window .codex-detail{height:100%!important;max-height:none!important}
+}
+@media(max-width:560px){
+  .codex-window .codex-list{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-rows:minmax(86px,auto)!important;
+  }
+}
