@@ -342,3 +342,30 @@
   gap:2px!important;
   box-sizing:border-box!important;
 }
+
+/* Starter deck: centered row with comfortable spacing between cards. */
+.starter-deck-cards.starter-deck-full-cards{
+  grid-template-columns:repeat(5,132px)!important;
+  justify-content:center!important;
+  gap:10px!important;
+}
+@media(max-width:900px){
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:repeat(3,132px)!important;
+    justify-content:center!important;
+    gap:10px!important;
+  }
+}
+@media(max-width:640px){
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:repeat(2,132px)!important;
+    justify-content:center!important;
+    gap:10px!important;
+  }
+}
+@media(max-width:420px){
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:132px!important;
+    justify-content:center!important;
+  }
+}
