@@ -13,7 +13,8 @@ export type LeaderboardEntry = {
   createdAt:string;
 };
 
-export const LEADERBOARD_API_URL = (import.meta.env.VITE_LEADERBOARD_API_URL as string|undefined)?.trim() ?? "";
+const viteEnv=(import.meta as unknown as {env?:Record<string,string|undefined>}).env;
+export const LEADERBOARD_API_URL = viteEnv?.VITE_LEADERBOARD_API_URL?.trim() ?? "";
 
 const NUZLOCKE_LABELS:Record<string,string> = {
   permadeath:"PERMADEATH",noHealing:"NIENTE GUARIGIONE",noRecruit:"TEAM BLOCCATO",limitedRecruit:"UN SOLO RECLUTAMENTO",
