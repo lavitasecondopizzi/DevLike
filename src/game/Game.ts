@@ -160,8 +160,7 @@ export class Game {
       return;
       this.message="RECUPERO TOTALE: tutto il team è completamente guarito e senza Stress.";
     }else if(node.type==="rest"){
-      this.team.forEach(d=>{d.hp=Math.min(d.maxHp,d.hp+14);d.stress=Math.max(0,d.stress-10);});
-      this.message=node.id==="rest-final"?"PAUSA FINALE: +14 HP e -10 STRESS al team. La Deadline aspetta.":"PAUSA: +14 HP e -10 STRESS al team.";
+      if(node.id==="rest-final"){this.team.forEach(d=>{d.hp=d.maxHp;d.stress=0;});this.message="PAUSA FINALE: recupero totale del team. HP e Stress completamente ripristinati. La Deadline aspetta.";}else{this.team.forEach(d=>{d.hp=Math.min(d.maxHp,d.hp+14);d.stress=Math.max(0,d.stress-10);});this.message="PAUSA: +14 HP e -10 STRESS al team.";}
     }else{
       if(Math.random()<.5){
         this.team.forEach(d=>d.stress=Math.max(0,d.stress-8));
