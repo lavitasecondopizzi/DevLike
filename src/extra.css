@@ -1134,3 +1134,75 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
 .nuzlocke-footer{flex:none!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:15px!important;padding:11px 18px!important;border-top:1px solid #2b394b!important;background:#0b121a!important}.nuzlocke-selection{min-width:0!important}.nuzlocke-selection>span{display:block!important;color:#68778b!important;font-size:11px!important;font-weight:800!important;letter-spacing:.08em!important}.nuzlocke-selection strong{display:block!important;max-width:700px!important;margin-top:3px!important;overflow:hidden!important;color:#b9c9da!important;font-size:11px!important;white-space:nowrap!important;text-overflow:ellipsis!important}.nuzlocke-start{flex:none!important;min-width:190px!important;min-height:38px!important;font-size:11px!important}.nuzlocke-start span{font-size:13px!important}
 @media(max-width:800px){.nuzlocke-redesign{width:calc(100vw - 18px)!important;height:calc(100vh - 18px)!important}.nuzlocke-body{grid-template-columns:1fr!important}.nuzlocke-sidebar{display:none!important}.nuzlocke-rule-grid{grid-template-columns:1fr!important}.nuzlocke-groups{padding:13px!important}}
 @media(max-width:560px){.nuzlocke-header{padding:15px!important}.nuzlocke-header h2{font-size:18px!important}.nuzlocke-toolbar{align-items:stretch!important;flex-direction:column!important;padding:11px 13px!important}.nuzlocke-random-controls{width:100%!important}.nuzlocke-random-controls label{flex:0 0 68px!important}.nuzlocke-random-button{flex:1!important}.nuzlocke-footer{align-items:stretch!important;flex-direction:column!important;padding:10px 13px!important}.nuzlocke-selection strong{max-width:100%!important}.nuzlocke-start{width:100%!important}}
+
+
+/* FINAL COMBAT HAND OVERRIDE — use the real fixed-size card, never stretch or clip it. */
+.battle-redesign .battle-main{
+  overflow:visible!important;
+}
+.battle-redesign .hand{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+  align-content:flex-start!important;
+  gap:10px!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:190px!important;
+  max-height:none!important;
+  padding:4px 0!important;
+  overflow:visible!important;
+}
+.battle-redesign .hand .combat-card{
+  all:unset!important;
+  display:flex!important;
+  flex:0 0 132px!important;
+  width:132px!important;
+  min-width:132px!important;
+  max-width:132px!important;
+  height:190px!important;
+  min-height:190px!important;
+  max-height:190px!important;
+  box-sizing:border-box!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  overflow:visible!important;
+  cursor:pointer!important;
+}
+.battle-redesign .hand .combat-card .card-template{
+  display:block!important;
+  flex:0 0 132px!important;
+  width:132px!important;
+  min-width:132px!important;
+  max-width:132px!important;
+  height:190px!important;
+  min-height:190px!important;
+  max-height:190px!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+}
+.battle-redesign .hand .combat-card-preview,
+.battle-redesign .hand .combat-card-reason{
+  display:none!important;
+}
+.battle-redesign .hand .combat-card:not(:disabled):hover .card-template{
+  transform:translateY(-3px)!important;
+}
+.battle-redesign .hand .combat-card:disabled .card-template{
+  opacity:.45!important;
+}
+@media(max-width:800px){
+  .battle-redesign .hand{
+    flex-wrap:wrap!important;
+    gap:10px!important;
+    min-height:0!important;
+  }
+}
+@media(max-width:450px){
+  .battle-redesign .hand{
+    flex-direction:column!important;
+    align-items:center!important;
+  }
+}
