@@ -85,7 +85,7 @@ function battleSetup(game:Game){
   const enemy=game.pendingEnemy!;
   const selected=game.team[game.selectedBattleStarterIndex];
   const setupEffectiveStats=(d:Developer)=>{
-    const breakdown=getDeveloperTeamStatBreakdown(game.team,d,enemy);
+    const breakdown=getDeveloperTeamStatBreakdown(game.team,d,enemy,d.id===selected?.id);
     return {
       code:breakdown.code,
       debug:breakdown.debug,
