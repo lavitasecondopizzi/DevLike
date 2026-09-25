@@ -152,3 +152,41 @@
 .map-objective strong{flex:none!important;font-size:11px!important;letter-spacing:.7px!important;color:#7f9fbe!important}
 .map-objective span{font-size:11px!important;line-height:1.4!important;color:#8f9bad!important}
 @media(max-width:800px){.map-objective{align-items:flex-start!important;flex-direction:column!important;gap:3px!important}}
+
+/* Map team summary: keep the team visible without competing with the route. */
+.map-panel>.team-strip{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin-top:10px!important;
+  padding-top:26px!important;
+}
+.map-panel>.team-strip:before{
+  content:"TEAM";
+  position:absolute;
+  top:0;
+  left:2px;
+  color:#6f8094;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+.map-panel>.team-strip .team-summary{
+  min-width:0!important;
+  padding:7px!important;
+  border:1px solid #2c3b4e!important;
+  border-radius:8px!important;
+  background:#101923!important;
+}
+.map-panel>.team-strip .team-summary.main-member{border-color:#4f79a3!important}
+.map-panel>.team-strip .dev-card{padding:7px!important}
+.map-panel>.team-strip .dev-description,
+.map-panel>.team-strip .ability,
+.map-panel>.team-strip .matchup-grid{display:none!important}
+.map-panel>.team-strip .dev-head{margin-bottom:6px!important}
+.map-panel>.team-strip .stat-grid{margin:6px 0 0!important;gap:5px!important}
+.map-panel>.team-strip .stat-grid span{padding:5px!important}
+@media(max-width:800px){
+  .map-panel>.team-strip{grid-template-columns:1fr!important}
+}
