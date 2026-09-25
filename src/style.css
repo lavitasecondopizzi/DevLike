@@ -1006,7 +1006,8 @@ header small{font-family:inherit;font-size:11px;color:#7f8b9d;margin-top:4px}
 }
 @media(max-width:520px){
   .menu-primary-actions{flex-direction:column;max-width:none}
-  .menu-leaderboard-action{flex:1 1 auto}
+  .menu-secondary-actions{max-width:none}
+  .menu-secondary-actions .menu-leaderboard-action{width:100%}
   .menu-feature-nav{grid-template-columns:1fr;max-width:none}
   .menu-feature-nav .feature-menu-item{min-height:52px}
 }
