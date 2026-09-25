@@ -265,3 +265,13 @@
 @media(max-width:900px){.starter-deck-cards.starter-deck-full-cards{grid-template-columns:repeat(3,132px)!important;justify-content:center!important}.starter-card-slot{width:132px!important;min-width:132px!important}}
 @media(max-width:640px){.starter-deck-cards.starter-deck-full-cards{grid-template-columns:repeat(2,132px)!important;justify-content:center!important}}
 @media(max-width:420px){.starter-deck-cards.starter-deck-full-cards{grid-template-columns:132px!important;justify-content:center!important}}
+
+/* Starter cards inherit the compact universal header/effect rules. */
+.starter-card-slot .card-template-header{height:15px!important;flex-basis:15px!important}
+.starter-card-slot .card-template-cost{min-width:18px!important;width:18px!important;height:16px!important;font-size:11px!important}
+.starter-card-slot .card-template-cost i{font-size:11px!important}
+.starter-card-slot .card-template-tier{padding:2px 3px!important;font-size:11px!important}
+.starter-card-slot .card-template-name{margin:2px 0 4px!important;height:18px!important;min-height:18px!important;flex-basis:18px!important}
+.starter-card-slot .card-template-effect{min-height:28px!important;padding:4px!important;align-items:flex-start!important}
+.starter-card-slot .card-template-effect b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.2!important}
+.starter-card-slot .card-template-footer{display:none!important}
