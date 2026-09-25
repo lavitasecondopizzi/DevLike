@@ -910,7 +910,7 @@ button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
 /* ===== GAME HEADER REFACTOR ===== */
 .game-shell > .game-header{
   display:grid!important;
-  grid-template-columns:minmax(240px,1fr) auto!important;
+  grid-template-columns:minmax(180px,auto) minmax(0,1fr)!important;
   align-items:center!important;
   gap:28px!important;
   min-height:74px!important;
@@ -945,12 +945,15 @@ button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
   line-height:1.2!important;
   letter-spacing:.02em!important;
 }
+.game-shell > .game-header .header-menu-button{flex:0 0 auto;align-self:stretch;min-width:58px;padding:8px 10px;border:1px solid #3a4658;border-radius:8px;background:#111a25;color:#aebdcd;font-size:11px;font-weight:800;letter-spacing:.06em;cursor:pointer;}
+.game-shell > .game-header .header-menu-button:hover{border-color:#607895;background:#172438;color:#e4eaf2;}
 .game-shell > .game-header .header-progress{
   min-width:0!important;
   display:flex!important;
   align-items:stretch!important;
   justify-content:flex-end!important;
   gap:8px!important;
+  width:100%!important;
 }
 .game-shell > .game-header .header-phase{
   min-width:96px!important;
