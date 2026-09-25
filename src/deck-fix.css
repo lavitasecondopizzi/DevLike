@@ -28,3 +28,180 @@
 .collection-card.devlike-poker-management-host{background:#111a26!important}
 .deck-columns>.deck-section{min-width:0}
 @media(max-width:800px){.deck-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px}.devlike-poker-management-host .poker-card{max-width:190px!important}}
+
+
+/* ===== STARTER DECK PREVIEW REFACTOR ===== */
+.starter-deck-preview{
+  margin:18px 0 0!important;
+  padding:0!important;
+  background:transparent!important;
+  text-align:left!important;
+}
+.starter-deck-panel{
+  padding:16px 18px 18px!important;
+  border:1px solid #303d4f!important;
+  border-radius:10px!important;
+  background:
+    linear-gradient(135deg,rgba(24,32,45,.96),rgba(13,19,28,.98))!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.14)!important;
+}
+.starter-deck-header{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:18px!important;
+}
+.starter-deck-kicker{
+  display:block!important;
+  margin-bottom:5px!important;
+  color:#718096!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  letter-spacing:1.2px!important;
+}
+.starter-deck-header h3{
+  margin:0 0 4px!important;
+  color:#e7edf5!important;
+  font-size:16px!important;
+  line-height:1.25!important;
+}
+.starter-deck-header p{
+  margin:0!important;
+  color:#8997aa!important;
+  font-family:system-ui,sans-serif!important;
+  font-size:11px!important;
+  line-height:1.45!important;
+}
+.starter-deck-header p b{color:#cbd8e8!important}
+.starter-deck-count{
+  flex:none!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  padding:7px 10px!important;
+  border:1px solid #35465e!important;
+  border-radius:7px!important;
+  background:#0b121b!important;
+}
+.starter-deck-count strong{
+  color:#8fc8ff!important;
+  font-size:20px!important;
+  line-height:1!important;
+}
+.starter-deck-count span{
+  color:#718096!important;
+  font-size:11px!important;
+  line-height:1.15!important;
+  letter-spacing:.7px!important;
+}
+.starter-deck-divider{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  margin:15px 0 12px!important;
+}
+.starter-deck-divider span{
+  flex:none!important;
+  color:#91a0b3!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  letter-spacing:.8px!important;
+  white-space:nowrap!important;
+}
+.starter-deck-divider i{
+  flex:1!important;
+  height:1px!important;
+  background:#293546!important;
+}
+.starter-deck-divider small{
+  flex:none!important;
+  color:#59687b!important;
+  font-size:11px!important;
+  white-space:nowrap!important;
+}
+.starter-deck-cards.starter-deck-full-cards{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:10px!important;
+  overflow:visible!important;
+  padding:2px 0 0!important;
+  align-items:start!important;
+}
+.starter-card-slot{
+  position:relative!important;
+  min-width:0!important;
+  padding-top:8px!important;
+}
+.starter-card-index{
+  position:absolute!important;
+  top:0!important;
+  left:8px!important;
+  z-index:3!important;
+  min-width:20px!important;
+  padding:2px 5px!important;
+  border:1px solid #40536c!important;
+  border-radius:4px!important;
+  background:#111b28!important;
+  color:#8fa6c0!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  line-height:1.2!important;
+  text-align:center!important;
+}
+.starter-card-slot .poker-card{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  aspect-ratio:2.5/3.5!important;
+  border-radius:8px!important;
+  padding:3px!important;
+  box-shadow:3px 4px 0 rgba(0,0,0,.22)!important;
+}
+.starter-card-slot .poker-card-inner{
+  padding:5px!important;
+}
+.starter-card-slot .poker-card-name{
+  margin:5px 0 4px!important;
+  min-height:21px!important;
+  font-size:11px!important;
+}
+.starter-card-slot .poker-card-art{
+  min-height:44px!important;
+  margin-bottom:4px!important;
+}
+.starter-card-slot .poker-card-art span{
+  font-size:27px!important;
+}
+.starter-card-slot .poker-card-effect{
+  margin-top:4px!important;
+}
+.starter-card-slot .poker-card-effect b{
+  font-size:11px!important;
+  line-height:1.15!important;
+}
+.starter-card-slot .poker-card-bottom{
+  margin-top:4px!important;
+}
+@media(max-width:900px){
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  .starter-deck-divider small{display:none!important}
+}
+@media(max-width:640px){
+  .starter-deck-panel{padding:14px!important}
+  .starter-deck-header{align-items:flex-start!important}
+  .starter-deck-count{padding:6px 8px!important}
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+}
+@media(max-width:420px){
+  .starter-deck-header{flex-direction:column!important}
+  .starter-deck-count{align-self:flex-start!important}
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:1fr!important;
+  }
+  .starter-card-slot .poker-card{max-width:230px!important;margin:0 auto!important}
+}
