@@ -1,5 +1,5 @@
 import { Game } from "../game/Game";
-import { getDeveloperTeamStatBreakdown } from "../game/Combat";
+import { getDeveloperStatBreakdown } from "../game/Combat";
 import { renderPokerCard } from "../card-view";
 import type { Developer, Enemy, MapNode } from "../entities/types";
 
@@ -85,7 +85,15 @@ function battleSetup(game:Game){
   const enemy=game.pendingEnemy!;
   const selected=game.team[game.selectedBattleStarterIndex];
   const setupEffectiveStats=(d:Developer)=>{
-    const breakdown=getDeveloperTeamStatBreakdown(game.team,d,enemy,d.id===selected?.id);
+    const breakdown=getDeveloperStatBreakdown(game.team,d,enemy,{
+      energy:3,
+      block:0,
+      toolPlayedThisTurn:false,
+      turn:1,
+      temporaryCodeBonus:0,
+      firstCodeUsed:false,
+      isActive:d.id===selected?.id
+    });
     return {
       code:breakdown.code,
       debug:breakdown.debug,
@@ -139,46 +147,24 @@ function screen(game:Game){
   if(game.screen==="equipment")return equipmentScreen(game);
   if(game.screen==="combat"&&game.combat){const c=game.combat;const active=c.active;const enemy=c.enemy;
 const effectiveStats=(d:Developer,isActive=false)=>{
-  const codeChanges:string[]=[];
-  const debugChanges:string[]=[];
-  const teamHasAvailable=(classId:string)=>c.team.some(member=>member.classId===classId&&member.hp>0&&member.stress<member.maxStress);
-  const teamHasPassive=(classId:string,passive:string)=>c.team.some(member=>member.classId===classId&&member.passive.includes(passive)&&member.hp>0&&member.stress<member.maxStress);
-  const seniorCodeBonus=(teamHasPassive("senior","Esperienza")||teamHasPassive("senior","Legacy Whisperer"))?2:0;
-  const seniorQueryBonus=seniorCodeBonus===0&&teamHasPassive("senior","Query Optimizer")&&!c.firstCodeUsed?2:0;
-  let code=d.code+seniorCodeBonus+seniorQueryBonus+(isActive?c.temporaryCodeBonus:0);
-  let debug=d.debug+(d.hp<d.maxHp*.5&&teamHasAvailable("junior")?2:0)+(teamHasAvailable("hacker")&&enemy.typeId==="client"?3:0);
-
-  for(const item of d.items){
-    if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name+": bonus CODICE dell'oggetto");}
-  }
-  if(seniorCodeBonus)codeChanges.push("+2 · Senior: bonus permanente a CODICE per il team");
-  if(seniorQueryBonus)codeChanges.push("+2 · Senior: primo CODICE del turno");
-  if(isActive&&c.temporaryCodeBonus)codeChanges.push("+"+c.temporaryCodeBonus+" · Bonus temporaneo: potenziamento attivo a CODICE");
-
-  for(const item of d.items){
-    if(item.debugBonus){debug+=item.debugBonus;debugChanges.push("+"+item.debugBonus+" · "+item.name+": bonus DEBUG dell'oggetto");}
-  }
-  if(d.hp<d.maxHp*.5&&teamHasAvailable("junior"))debugChanges.push("+2 · Junior nel team sotto il 50% HP: bonus a DEBUG");
-  if(teamHasAvailable("hacker")&&enemy.typeId==="client")debugChanges.push("+3 · Hacker nel team contro Client: bonus a DEBUG");
-
-  const conditionMatches=(condition:string)=>condition==="lowHp"?d.hp<d.maxHp*.5:condition==="highStress"?d.stress>=d.maxStress*.5:condition==="fullHp"?d.hp>=d.maxHp:condition==="highEnergy"?c.energy>=2:condition==="defending"?c.block>0:condition==="afterTool"?c.toolPlayedThisTurn:condition==="everyTwoTurns"?c.turn%2===0:false;
-  let multiplier=1;
-  if(d.advantageEnemyIds.includes(enemy.typeId)){multiplier*=1.15;codeChanges.push("+15% · Vantaggio contro questo tipo di nemico");debugChanges.push("+15% · Vantaggio contro questo tipo di nemico");}
-  if(d.weaknessEnemyIds.includes(enemy.typeId)){multiplier*=.85;codeChanges.push("-15% · Debolezza contro questo tipo di nemico");debugChanges.push("-15% · Debolezza contro questo tipo di nemico");}
-  if(d.advantageConditions.some(x=>conditionMatches(x))){multiplier*=1.1;codeChanges.push("+10% · Condizione favorevole attiva");debugChanges.push("+10% · Condizione favorevole attiva");}
-  if(d.weaknessConditions.some(x=>conditionMatches(x))){multiplier*=.9;codeChanges.push("-10% · Condizione sfavorevole attiva");debugChanges.push("-10% · Condizione sfavorevole attiva");}
-  if(enemy.weaknessDeveloperIds.includes(d.classId)){multiplier*=1.15;codeChanges.push("+15% · Il nemico è debole contro questa classe");debugChanges.push("+15% · Il nemico è debole contro questa classe");}
-  if(enemy.advantageDeveloperIds.includes(d.classId)){multiplier*=.9;codeChanges.push("-10% · Il nemico è avvantaggiato contro questa classe");debugChanges.push("-10% · Il nemico è avvantaggiato contro questa classe");}
-
-  if(enemy.typeId==="legacy"){debug=Math.max(0,debug-2);debugChanges.push("-2 · Legacy: penalità a DEBUG");}
-  code=Math.max(0,Math.round(code*multiplier));
-  debug=Math.max(0,Math.round(debug*multiplier));
-  if(enemy.typeId==="client"&&d.classId==="hacker"){debug=Math.max(0,Math.round(debug*1.2));debugChanges.push("+20% · Hacker contro Client: potenziamento aggiuntivo a DEBUG");}
-
+  const breakdown=getDeveloperStatBreakdown(c.team,d,enemy,{
+    energy:c.energy,
+    block:c.block,
+    toolPlayedThisTurn:c.toolPlayedThisTurn,
+    turn:c.turn,
+    temporaryCodeBonus:c.temporaryCodeBonus,
+    firstCodeUsed:c.firstCodeUsed,
+    isActive
+  });
   const tooltip=(base:number,changes:string[])=>["Base: "+base,...(changes.length?changes.map(x=>"• "+x):["Nessun modificatore attivo"])].join("\n");
-  const codeTip=tooltip(d.code,codeChanges);
-  const debugTip=tooltip(d.debug,debugChanges);
-  return {code,debug,codeTip,debugTip,hasCodeTip:true,hasDebugTip:true};
+  return {
+    code:breakdown.code,
+    debug:breakdown.debug,
+    codeTip:tooltip(d.code,breakdown.codeChanges),
+    debugTip:tooltip(d.debug,breakdown.debugChanges),
+    hasCodeTip:true,
+    hasDebugTip:true
+  };
 };
 const activeStats=effectiveStats(active,true);
 const memberInfo=(d:Developer,i:number)=>{
