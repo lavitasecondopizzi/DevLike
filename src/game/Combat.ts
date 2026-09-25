@@ -2,7 +2,7 @@ import type { BattleResult, Card, Developer, Enemy } from "../entities/types";
 
 export type DeveloperStatBreakdown = { code:number; debug:number; codeChanges:string[]; debugChanges:string[] };
 
-export function getDeveloperTeamStatBreakdown(team:Developer[], dev:Developer, enemy:Enemy):DeveloperStatBreakdown {
+export function getDeveloperTeamStatBreakdown(team:Developer[], dev:Developer, enemy:Enemy, isActive=false):DeveloperStatBreakdown {
   const activeTeam=team.filter(member=>member.hp>0&&member.stress<member.maxStress);
   const hasClass=(classId:string)=>activeTeam.some(member=>member.classId===classId);
   const hasPassive=(classId:string,passive:string)=>activeTeam.some(member=>member.classId===classId&&member.passive.includes(passive));
@@ -17,23 +17,23 @@ export function getDeveloperTeamStatBreakdown(team:Developer[], dev:Developer, e
     if(item.debugBonus){debug+=item.debugBonus;debugChanges.push("+"+item.debugBonus+" · "+item.name);}
   }
 
-  if(hasClass("fullstack")){
+  if(isActive&&hasClass("fullstack")){
     code+=1;
     codeChanges.push("+1 · Fullstack: bonus temporaneo a CODICE");
   }
   if(hasPassive("senior","Esperienza")||hasPassive("senior","Legacy Whisperer")){
     code+=2;
     codeChanges.push("+2 · Senior: bonus di team a CODICE");
-  }else if(hasPassive("senior","Query Optimizer")){
+  }else if(isActive&&hasPassive("senior","Query Optimizer")){
     code+=2;
     codeChanges.push("+2 · Senior: Query Optimizer, primo CODICE del turno");
   }
 
-  if(dev.hp<dev.maxHp*.5&&hasClass("junior")){
+  if(isActive&&dev.hp<dev.maxHp*.5&&hasClass("junior")){
     debug+=2;
     debugChanges.push("+2 · Junior: Developer sotto il 50% HP");
   }
-  if(hasClass("hacker")&&enemy.typeId==="client"){
+  if(isActive&&hasClass("hacker")&&enemy.typeId==="client"){
     debug+=3;
     debugChanges.push("+3 · Hacker: bonus contro Client");
   }
