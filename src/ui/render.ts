@@ -92,7 +92,7 @@ function screen(game:Game){
         <div><small>${esc(game.message||"Scegli il prossimo nodo.")}</small></div>
       </div>
       <div class="map-objective"><strong>OBIETTIVO</strong><span>Segui il percorso, gestisci il Tempo e arriva alla PAUSA FINALE prima della DEADLINE.</span></div>
-      <div class="roguelike-help"><span>⚔ BATTAGLIA</span><span>☠ ELITE</span><span>? EVENTO</span><span>◆ TOOL</span><span>🔧 OGGETTO</span><span>👤 RECLUTA</span><span>+ PAUSA</span><span>☠ DEADLINE</span></div>
+      <div class="roguelike-help" aria-label="Legenda mappa"><span>⚔ BATTAGLIA</span><span>☠ ELITE</span><span>? EVENTO</span><span>◆ TOOL</span><span>🔧 OGGETTO</span><span>👤 RECLUTA</span><span>＋ PAUSA</span><span>☠ DEADLINE</span></div>
       ${renderMap(game)}
       <div class="team-strip">${game.team.map((dev,i)=>teamSummary(dev,i,nuzlockeEquipmentLimit(game))).join("")}</div>
     </section>`;
