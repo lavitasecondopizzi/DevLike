@@ -249,3 +249,19 @@
 .starter-card-slot .card-template-cost i{font-size:11px!important}
 .starter-card-slot .card-template-tier{padding:2px 4px!important;font-size:11px!important}
 .starter-card-slot .card-template-name{margin:2px 0 2px!important;min-height:18px!important}
+
+
+/* FINAL CARD TEMPLATE OVERRIDE — fixed size, centered, no viewport stretching. */
+.starter-deck-cards.starter-deck-full-cards{display:grid!important;grid-template-columns:repeat(5,132px)!important;justify-content:space-between!important;align-items:start!important;gap:12px!important}
+.starter-card-slot{width:132px!important;min-width:132px!important;padding-top:8px!important;display:flex!important;justify-content:center!important}
+.starter-card-slot .card-template{--card-w:132px!important;--card-h:190px!important;width:132px!important;height:190px!important;min-width:132px!important;min-height:190px!important;max-width:132px!important;max-height:190px!important;aspect-ratio:auto!important}
+.starter-card-slot .card-template-inner{padding:5px!important}
+.starter-card-slot .card-template-header{height:20px!important;flex-basis:20px!important}
+.starter-card-slot .card-template-name{height:17px!important;min-height:17px!important;flex-basis:17px!important;margin:2px 0 3px!important;font-size:11px!important}
+.starter-card-slot .card-template-art{height:52px!important;min-height:52px!important;flex-basis:52px!important;margin-bottom:5px!important}
+.starter-card-slot .card-template-art span{font-size:29px!important}
+.starter-card-slot .card-template-effect{min-height:25px!important;padding:4px!important}
+.starter-card-slot .card-template-footer{margin-top:auto!important;padding-top:4px!important}
+@media(max-width:900px){.starter-deck-cards.starter-deck-full-cards{grid-template-columns:repeat(3,132px)!important;justify-content:center!important}.starter-card-slot{width:132px!important;min-width:132px!important}}
+@media(max-width:640px){.starter-deck-cards.starter-deck-full-cards{grid-template-columns:repeat(2,132px)!important;justify-content:center!important}}
+@media(max-width:420px){.starter-deck-cards.starter-deck-full-cards{grid-template-columns:132px!important;justify-content:center!important}}
