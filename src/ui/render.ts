@@ -45,32 +45,39 @@ function renderMapNode(node:MapNode,game:Game){
 }
 
 function renderMap(game:Game){
-  const width=760;
+  // SVG e nodi condividono la stessa griglia. Il vecchio SVG da 760px veniva
+  // stirato sul canvas da 900px, spostando progressivamente le linee rispetto alle card.
+  const width=900;
   const rowHeight=96;
   const topPadding=56;
   const bottomPadding=56;
   const rows=Math.max(8,...game.mapNodes.map(n=>n.row));
   const height=rows*rowHeight+topPadding+bottomPadding;
-  const x=(col:number)=>130+col*250;
+  const x=(col:number)=>150+col*300;
   const y=(row:number)=>topPadding+row*rowHeight;
+  const nodeEdge=34;
 
-  const lines=game.mapNodes.flatMap(node=>game.mapNodes.filter(target=>target.id!==node.id&&game.mapNodes.some(n=>n.id===target.id)&&(
-    node.row===0?target.row===1:
-    node.row>=1&&node.row<=5?target.row===node.row+1&&Math.abs(target.col-node.col)<=1:
-    node.row===6?target.id==="rest-final":
-    node.id==="rest-final"&&target.id==="boss-final"
+  const lines=game.mapNodes.flatMap(node=>game.mapNodes.filter(target=>(
+    target.id!==node.id&&(
+      node.row===0?target.row===1:
+      node.row>=1&&node.row<=5?target.row===node.row+1&&Math.abs(target.col-node.col)<=1:
+      node.row===6?target.id==="rest-final":
+      node.id==="rest-final"&&target.id==="boss-final"
+    )
   )).map(target=>{
     const unlocked=node.visited&&(target.visited||game.availableMapNodes.some(n=>n.id===target.id));
     const active=node.visited&&target.visited;
     const reachable=node.visited&&game.availableMapNodes.some(n=>n.id===target.id);
     const currentPath=game.currentMapNodeId===node.id&&reachable;
     if(!unlocked)return "";
-    return `<line class="map-line ${active?"active":""} ${reachable?"reachable":""} ${currentPath?"current-path":""}" x1="${x(node.col)}" y1="${y(node.row)}" x2="${x(target.col)}" y2="${y(target.row)}"/>`;
+    return `<line class="map-line ${active?"active":""} ${reachable?"reachable":""} ${currentPath?"current-path":""}" x1="${x(node.col)}" y1="${y(node.row)+nodeEdge}" x2="${x(target.col)}" y2="${y(target.row)-nodeEdge}" vector-effect="non-scaling-stroke"/>`;
   })).join("");
 
-  const nodes=game.mapNodes.map(node=>`<div class="map-node-wrap" style="left:${x(node.col)/width*100}%;top:${y(node.row)}px">${renderMapNode(node,game)}</div>`).join("");
+  const nodes=game.mapNodes.map(node=>
+    `<div class="map-node-wrap" style="left:${x(node.col)}px;top:${y(node.row)}px">${renderMapNode(node,game)}</div>`
+  ).join("");
 
-  return `<div class="map-viewport"><div class="map-canvas" style="height:${height}px"><svg class="map-lines" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${lines}</svg>${nodes}</div></div>`;
+  return `<div class="map-viewport"><div class="map-canvas" style="height:${height}px"><svg class="map-lines" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${lines}</svg>${nodes}</div></div>`;
 }
 function teamSummary(dev:Developer,i:number,equipmentLimit=2){return `<div class="team-summary ${i===0?"main-member":""}">${devCard(dev,i===0,true,true,equipmentLimit)}</div>`;}
 function battleSetup(game:Game){const enemy=game.pendingEnemy!;const equipmentLimit=nuzlockeEquipmentLimit(game);const team=game.team.map((dev,i)=>`<div class="draggable-dev ${game.selectedBattleStarterIndex===i?"selected":""} ${dev.hp<=0||dev.stress>=dev.maxStress?"disabled-dev":""}" draggable="${dev.hp>0&&dev.stress<dev.maxStress?"true":"false"}" data-battle-dev="${i}"><div class="setup-dev-card"><div class="setup-dev-inner">${devCard(dev,i===game.selectedBattleStarterIndex,true,true,equipmentLimit)}</div></div></div>`).join("");return `<section class="panel battle-setup"><div class="selection-heading"><div><h2>SCHIERAMENTO</h2><p>Scegli il Developer da mandare in campo. Puoi cliccarlo oppure trascinarlo nello slot centrale.</p></div><span class="random-badge">PRIMO TURNO</span></div><div class="lineup"><div class="lineup-side team-lineup"><h3>IL TUO TEAM</h3><div class="setup-team">${team}</div></div><div class="battle-drop-zone" data-battle-drop><div class="drop-label">TRASCINA QUI</div><div class="drop-icon">VS</div><div class="drop-selected">${esc(game.team[game.selectedBattleStarterIndex]?.name??"NESSUNO")}</div><small>Questo Developer inizierà il combattimento</small></div><div class="lineup-side enemy-lineup"><h3>NEMICO</h3>${enemyCard(enemy)}</div></div><div class="setup-footer"><span>Clicca un Developer oppure trascinalo al centro.</span><button type="button" class="primary" data-action="confirm-battle">INIZIA COMBATTIMENTO</button></div></section>`;}
