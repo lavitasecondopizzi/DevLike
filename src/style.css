@@ -660,8 +660,8 @@ header small{font-family:inherit;font-size:11px;color:#7f8b9d;margin-top:4px}
   justify-content:space-between;
   align-items:center;
   gap:16px;
-  margin-top:18px;
-  padding-top:15px;
+  margin-top:30px;
+  padding-top:18px;
   border-top:1px solid #26364a;
 }
 .battle-setup-footer>div{
