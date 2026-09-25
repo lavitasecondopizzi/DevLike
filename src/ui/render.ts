@@ -170,7 +170,7 @@ function renderMainMenu(game:Game):string{
       <div><span class="menu-loop-number">02</span><div><b>AFFRONTA LA COMMESSA</b><small>Combatti, usa i Tool e gestisci energia, HP e stress.</small></div></div>
       <div><span class="menu-loop-number">03</span><div><b>ARRIVA ALLA DEADLINE</b><small>Adatta la strategia e porta il progetto fino alla consegna.</small></div></div>
     </div>
-    <div class="menu-footer"><span>BUILD 0.1 · PROTOTYPE</span><span>NESSUN CLIENTE È STATO SODDISFATTO DURANTE IL TEST</span></div>
+    <div class="menu-footer"><span>DEVLIKE</span><span>CREATO DA EMANUELE CAPIZZI</span><span>NESSUN CLIENTE È STATO SODDISFATTO DURANTE IL TEST</span></div>
   </section>`;
 }
 
