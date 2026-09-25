@@ -369,3 +369,10 @@
     justify-content:center!important;
   }
 }
+
+.starter-card-slot .card-template .card-template-cost{
+  padding:0 5px!important;
+  gap:3px!important;
+  justify-content:center!important;
+}
+.starter-card-slot .card-template .card-template-cost i{flex:0 0 auto!important}
