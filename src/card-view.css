@@ -321,3 +321,68 @@
   justify-content:center!important;
 }
 .card-template .card-template-cost i{font-size:11px!important;flex:0 0 auto!important}
+
+
+/* COMBAT HAND — the card is larger than its button wrapper; never clip it. */
+.hand{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+  gap:16px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:190px!important;
+  overflow:visible!important;
+  padding:4px 0!important;
+}
+.hand .combat-card{
+  flex:0 0 132px!important;
+  width:132px!important;
+  min-width:132px!important;
+  max-width:132px!important;
+  height:190px!important;
+  min-height:190px!important;
+  max-height:190px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  overflow:visible!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  text-align:left!important;
+}
+.hand .combat-card:hover:not(:disabled){
+  transform:none!important;
+  background:transparent!important;
+  border:0!important;
+}
+.hand .combat-card > .card-template{
+  flex:0 0 132px!important;
+  margin:0!important;
+}
+.hand .combat-card .combat-card-preview,
+.hand .combat-card .combat-card-reason{
+  display:none!important;
+}
+
+@media(max-width:800px){
+  .hand{
+    flex-wrap:wrap!important;
+    gap:12px!important;
+    min-height:0!important;
+  }
+  .hand .combat-card{
+    flex-basis:132px!important;
+  }
+}
+
+@media(max-width:520px){
+  .hand{
+    gap:10px!important;
+  }
+}
