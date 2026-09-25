@@ -6,7 +6,7 @@ export type FeatureGame = Game & { nuzlockeActive: boolean; nuzlockeGraveyard: s
 const esc = (v: string) => v.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
 function tutorialMarkup() {
-  return `<div class="feature-overlay" data-feature-overlay="tutorial"><div class="feature-window tutorial-window"><div class="feature-titlebar"><div><span class="codex-kicker">MANUALE OPERATIVO</span><h2>TUTORIAL COMPLETO</h2><small>Dalla scelta del Developer alla DEADLINE.</small></div><button type="button" class="feature-close" data-feature-close>CHIUDI ×</button></div><div class="tutorial-layout"><aside class="tutorial-nav" data-tutorial-nav></aside><section class="tutorial-main"><div class="tutorial-progress"><span data-tutorial-progress>1 / 23</span><div><i data-tutorial-bar></i></div></div><div class="tutorial-content">
+  return `<div class="feature-overlay" data-feature-overlay="tutorial"><div class="feature-window tutorial-window"><div class="feature-titlebar"><div><span class="codex-kicker">MANUALE OPERATIVO</span><h2>TUTORIAL COMPLETO</h2><small>Dalla scelta del Developer alla DEADLINE.</small></div><button type="button" class="feature-close" data-feature-close>SALTA TUTORIAL ×</button></div><div class="tutorial-layout"><aside class="tutorial-nav" data-tutorial-nav></aside><section class="tutorial-main"><div class="tutorial-progress"><span data-tutorial-progress>1 / 23</span><div><i data-tutorial-bar></i></div></div><div class="tutorial-content">
     <section class="tutorial-section"><span class="tutorial-number">01</span><div><h3>OBIETTIVO DELLA RUN</h3><p>Parti con un Developer, attraversa la mappa e arriva alla DEADLINE. Sconfiggere la DEADLINE completa la COMMESSA, ripristina completamente il team, aumenta il numero di COMMESSA e genera una nuova mappa con difficoltà aumentata.</p></div></section>
     <section class="tutorial-section"><span class="tutorial-number">02</span><div><h3>SCELTA DEL DEVELOPER</h3><p>All'inizio vengono proposti 3 Developer casuali. Scegline uno in base a HP, CODICE, DEBUG, abilità, vantaggi e debolezze. Ogni Developer appartiene a una classe con una passiva specifica.</p></div></section>
     <section class="tutorial-section"><span class="tutorial-number">03</span><div><h3>IL TEAM</h3><p>Il team può contenere fino a 3 Developer. Prima di ogni combattimento puoi <b>riordinare il team trascinando i membri</b>: il Developer in prima posizione entra per primo, poi gli altri seguono automaticamente in caso di KO o BURNOUT. I Developer possono essere cambiati durante il combattimento quando CAMBIO è disponibile. <b>Le abilità passive dei Developer sono abilità di squadra:</b> quando un membro disponibile possiede una passiva, il suo effetto può beneficiare anche il Developer attivo.</p></div></section>
@@ -57,6 +57,20 @@ function tutorialRefresh(index: number) {
   if (content) content.scrollTop = 0;
 }
 
+const TUTORIAL_SEEN_KEY = "devlike-tutorial-seen-v1";
+
+function openTutorial() {
+  if (document.querySelector('[data-feature-overlay="tutorial"]')) return;
+  const shell = document.querySelector<HTMLElement>(".game-shell");
+  if (!shell) return;
+  shell.insertAdjacentHTML("beforeend", tutorialMarkup());
+  tutorialInit();
+}
+
+function markTutorialSeen() {
+  localStorage.setItem(TUTORIAL_SEEN_KEY, "1");
+}
+
 function tutorialInit() {
   const overlay = document.querySelector<HTMLElement>('[data-feature-overlay="tutorial"]');
   if (!overlay) return;
@@ -82,15 +96,19 @@ export function setupFeatures(game: FeatureGame) {
       event.preventDefault();
       event.stopPropagation();
       const kind = open.dataset.featureOpen;
-            if (kind === "tutorial") { document.querySelector<HTMLElement>(".game-shell")?.insertAdjacentHTML("beforeend", tutorialMarkup()); tutorialInit(); }
+            if (kind === "tutorial") { openTutorial(); }
       return;
     }
-    if (close) { event.preventDefault(); event.stopPropagation(); overlay?.remove(); return; }
+    if (close) { event.preventDefault(); event.stopPropagation(); if (overlay?.dataset.featureOverlay === "tutorial") markTutorialSeen(); overlay?.remove(); return; }
     const tutorialStep = target.closest<HTMLButtonElement>("[data-tutorial-step]");
     if (tutorialStep) { event.preventDefault(); event.stopPropagation(); tutorialRefresh(Number(tutorialStep.dataset.tutorialStep ?? 0)); return; }
     if (target.closest("[data-tutorial-prev]")) { event.preventDefault(); event.stopPropagation(); tutorialRefresh(Number(overlay?.dataset.tutorialIndex ?? 0) - 1); return; }
-    if (target.closest("[data-tutorial-next]")) { event.preventDefault(); event.stopPropagation(); const current = Number(overlay?.dataset.tutorialIndex ?? 0); if (current >= document.querySelectorAll("[data-feature-overlay=\"tutorial\"] .tutorial-section").length - 1) overlay?.remove(); else tutorialRefresh(current + 1); return; }
+    if (target.closest("[data-tutorial-next]")) { event.preventDefault(); event.stopPropagation(); const current = Number(overlay?.dataset.tutorialIndex ?? 0); if (current >= document.querySelectorAll("[data-feature-overlay=\"tutorial\"] .tutorial-section").length - 1) { markTutorialSeen(); overlay?.remove(); } else tutorialRefresh(current + 1); return; }
   }, true);
 
   setupCodex();
+
+  if (localStorage.getItem(TUTORIAL_SEEN_KEY) !== "1") {
+    window.setTimeout(() => openTutorial(), 0);
+  }
 }
