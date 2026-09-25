@@ -128,7 +128,33 @@ export function render(game:Game){root.innerHTML=`<main class="game-shell"><head
 function screenLabel(screen:Game["screen"]):string{const labels:Record<Game["screen"],string>={menu:"MENU",team:"SCELTA DEVELOPER",map:"MAPPA",battleSetup:"SCHIERAMENTO",recruit:"RECLUTAMENTO",itemReward:"OGGETTO",equipment:"EQUIPMENT",combat:"COMBATTIMENTO",reward:"RICOMPENSA",bossReward:"RICOMPENSA DEADLINE",event:"EVENTO",result:"RISULTATO"};return labels[screen]??"DEVLIKE";}
 
 function screen(game:Game){
-  if(game.screen==="menu")return `<section class="panel center"><div class="pixel-icon">⌨</div><h1>DEVLIKE</h1><p>Un roguelike dove il vero boss è il cliente.</p><button type="button" class="primary" data-action="start">NUOVA COMMESSA</button></section>`;
+  if(game.screen==="menu")return `<section class="panel menu-screen">
+    <div class="menu-hero">
+      <div class="menu-brand">
+        <span class="menu-kicker">PROJECT // DEVLIKE</span>
+        <div class="menu-logo">DEV<span>LIKE</span></div>
+        <div class="menu-tagline">SHIP IT OR BURN OUT.</div>
+        <p>Un roguelike deckbuilder dove ogni commessa può diventare un incidente di produzione.</p>
+        <button type="button" class="primary menu-start" data-action="start"><span>▶</span> NUOVA COMMESSA</button>
+      </div>
+      <div class="menu-terminal">
+        <div class="terminal-bar"><span></span><span></span><span></span><b>production.log</b></div>
+        <div class="terminal-body">
+          <div><span class="terminal-prompt">&gt;</span> avvio commessa...</div>
+          <div><span class="terminal-ok">OK</span> team pronto</div>
+          <div><span class="terminal-ok">OK</span> tool caricati</div>
+          <div><span class="terminal-warn">!!</span> cliente in attesa</div>
+          <div class="terminal-cursor">&gt;_</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-loop">
+      <div><span class="menu-loop-number">01</span><div><b>ASSEMBLA IL TEAM</b><small>Scegli i Developer e sfrutta abilità, vantaggi ed equipaggiamento.</small></div></div>
+      <div><span class="menu-loop-number">02</span><div><b>AFFRONTA LA COMMESSA</b><small>Combatti, usa i Tool e gestisci energia, HP e stress.</small></div></div>
+      <div><span class="menu-loop-number">03</span><div><b>ARRIVA ALLA DEADLINE</b><small>Adatta la strategia e porta il progetto fino alla consegna.</small></div></div>
+    </div>
+    <div class="menu-footer"><span>BUILD 0.1 · PROTOTYPE</span><span>NESSUN CLIENTE È STATO SODDISFATTO DURANTE IL TEST</span></div>
+  </section>`;
   if(game.screen==="team")return `<section class="panel selection-panel"><div class="selection-heading"><div><h2>SCEGLI IL DEVELOPER PRINCIPALE</h2><p>Ogni commessa parte con un solo developer. Gli altri arriveranno lungo il percorso.</p></div><span class="random-badge">3 CANDIDATI CASUALI</span></div><div class="developer-choice-grid">${game.startingCandidates.map(dev=>`<button type="button" class="developer-choice ${game.selectedStartingId===dev.id?"selected":""}" data-dev="${dev.id}">${devCard(dev,game.selectedStartingId===dev.id,false,false)}</button>`).join("")}</div><div class="selection-footer"><div class="selection-hint">${game.selectedStartingId?"Developer selezionato. Controlla statistiche, abilità, vantaggi e debolezze, poi conferma.":"Clicca una scheda per selezionare il tuo protagonista."}</div><button type="button" class="primary" data-action="confirm-start" ${game.selectedStartingId?"":"disabled"}>INIZIA LA COMMESSA</button></div></section>`;
   if(game.screen==="map"){
     return `<section class="panel map-panel">
