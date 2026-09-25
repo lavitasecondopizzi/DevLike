@@ -16,7 +16,8 @@ const json = (body:unknown,status=200) => new Response(JSON.stringify(body),{sta
 function validEntry(value:unknown):value is Record<string,unknown> {
   if(!value || typeof value!=="object") return false;
   const v=value as Record<string,unknown>;
-  return typeof v.nickname==="string" && v.nickname.trim().length>=1 && v.nickname.trim().length<=20
+  return typeof v.score==="number" && Number.isInteger(v.score) && v.score>=0
+    && typeof v.nickname==="string" && v.nickname.trim().length>=1 && v.nickname.trim().length<=20
     && Array.isArray(v.team) && typeof v.commessa==="number" && Number.isInteger(v.commessa)
     && v.commessa>=1 && v.commessa<=999999
     && typeof v.tappa==="number" && Number.isInteger(v.tappa) && v.tappa>=0 && v.tappa<=6
@@ -27,6 +28,7 @@ function validEntry(value:unknown):value is Record<string,unknown> {
 
 function mapEntry(v:Record<string,unknown>) {
   return {
+    score:v.score,
     nickname:(v.nickname as string).trim(),
     team:v.team,
     commessa:v.commessa,
@@ -44,14 +46,15 @@ Deno.serve(async req => {
     if(req.method==="GET"){
       const {data,error}=await supabase
         .from("leaderboard_runs")
-        .select("nickname,team,commessa,tappa,causa_perdita,difficolta,mazzo,nuzlocke,created_at")
+        .select("score,nickname,team,commessa,tappa,causa_perdita,difficolta,mazzo,nuzlocke,created_at")
+        .order("score",{ascending:false})
         .order("commessa",{ascending:false})
         .order("tappa",{ascending:false})
         .order("created_at",{ascending:true})
         .limit(100);
       if(error) return json({error:"READ_FAILED"},500);
       return json((data??[]).map(row=>({
-        nickname:row.nickname,team:row.team,commessa:row.commessa,tappa:row.tappa,
+        score:Number(row.score),nickname:row.nickname,team:row.team,commessa:row.commessa,tappa:row.tappa,
         causaPerdita:row.causa_perdita,difficolta:Number(row.difficolta),
         mazzo:row.mazzo,nuzlocke:row.nuzlocke,createdAt:row.created_at
       })));
