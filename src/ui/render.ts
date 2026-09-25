@@ -136,6 +136,11 @@ function screen(game:Game){
         <div class="menu-tagline">SHIP IT OR BURN OUT.</div>
         <p>Un roguelike deckbuilder dove ogni commessa può diventare un incidente di produzione.</p>
         <button type="button" class="primary menu-start" data-action="start"><span>▶</span> NUOVA COMMESSA</button>
+        <nav class="feature-menu menu-feature-nav" aria-label="Strumenti e modalità">
+          <button type="button" class="feature-menu-item" data-feature-open="tutorial"><span>TUTORIAL</span><small>GUIDA COMPLETA</small></button>
+          <button type="button" class="feature-menu-item" data-feature-open="nuzlocke"><span>NUZLOCKE</span><small>MODALITÀ SPECIALE</small></button>
+          <button type="button" class="feature-menu-item" data-feature-open="codex"><span>CODEX</span><small>DATABASE DEVLIKE</small></button>
+        </nav>
       </div>
       <div class="menu-terminal">
         <div class="terminal-bar"><span></span><span></span><span></span><b>production.log</b></div>
