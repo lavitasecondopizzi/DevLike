@@ -72,5 +72,17 @@ export async function fetchLeaderboard():Promise<LeaderboardEntry[]> {
   const response=await fetch(LEADERBOARD_API_URL);
   if(!response.ok) throw new Error("LEADERBOARD_FETCH_FAILED");
   const data=await response.json();
-  return Array.isArray(data)?data:[];
+  if(!Array.isArray(data)) return [];
+  return data.map((entry:Partial<LeaderboardEntry>)=>({
+    score:Number(entry.score??0),
+    nickname:String(entry.nickname??"—"),
+    team:Array.isArray(entry.team)?entry.team:[],
+    commessa:Number(entry.commessa??0),
+    tappa:Number(entry.tappa??0),
+    causaPerdita:String(entry.causaPerdita??"SCONFITTA"),
+    difficolta:Number(entry.difficolta??1),
+    mazzo:Array.isArray(entry.mazzo)?entry.mazzo:[],
+    nuzlocke:entry.nuzlocke&&typeof entry.nuzlocke==="object"?entry.nuzlocke:{enabled:false,rules:[]},
+    createdAt:String(entry.createdAt??"")
+  }));
 }
