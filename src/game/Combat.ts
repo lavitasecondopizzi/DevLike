@@ -1,5 +1,46 @@
 import type { BattleResult, Card, Developer, Enemy } from "../entities/types";
 
+export type DeveloperStatBreakdown = { code:number; debug:number; codeChanges:string[]; debugChanges:string[] };
+
+export function getDeveloperTeamStatBreakdown(team:Developer[], dev:Developer, enemy:Enemy):DeveloperStatBreakdown {
+  const activeTeam=team.filter(member=>member.hp>0&&member.stress<member.maxStress);
+  const hasClass=(classId:string)=>activeTeam.some(member=>member.classId===classId);
+  const hasPassive=(classId:string,passive:string)=>activeTeam.some(member=>member.classId===classId&&member.passive.includes(passive));
+
+  let code=dev.code;
+  let debug=dev.debug;
+  const codeChanges:string[]=[];
+  const debugChanges:string[]=[];
+
+  for(const item of dev.items){
+    if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name);}
+    if(item.debugBonus){debug+=item.debugBonus;debugChanges.push("+"+item.debugBonus+" · "+item.name);}
+  }
+
+  if(hasClass("fullstack")){
+    code+=1;
+    codeChanges.push("+1 · Fullstack: bonus temporaneo a CODICE");
+  }
+  if(hasPassive("senior","Esperienza")||hasPassive("senior","Legacy Whisperer")){
+    code+=2;
+    codeChanges.push("+2 · Senior: bonus di team a CODICE");
+  }else if(hasPassive("senior","Query Optimizer")){
+    code+=2;
+    codeChanges.push("+2 · Senior: Query Optimizer, primo CODICE del turno");
+  }
+
+  if(dev.hp<dev.maxHp*.5&&hasClass("junior")){
+    debug+=2;
+    debugChanges.push("+2 · Junior: Developer sotto il 50% HP");
+  }
+  if(hasClass("hacker")&&enemy.typeId==="client"){
+    debug+=3;
+    debugChanges.push("+3 · Hacker: bonus contro Client");
+  }
+
+  return {code,debug,codeChanges,debugChanges};
+}
+
 export class Combat {
   team: Developer[]; activeIndex = 0; enemy: Enemy; energy = 3; block = 0; codeBoost = 0; temporaryCodeBonus = 0; drawPile: Card[]; discardPile: Card[] = []; hand: Card[] = []; result: BattleResult = "ongoing"; log: string[] = []; turn = 1; architectDefenseUsed = new Set<string>(); devopsDefenseUsed = new Set<string>(); firstCardPlayed = false; toolPlayedThisTurn = false; firstCodeUsed = false; internStressPassiveUsed = new Set<string>(); lastToolDeveloperId: string | null = null; enemyScaling = 0; nuzlockeRules: string[] = []; showDeck = false; deckView: "draw" | "discard" = "draw";
   usedCards = new Set<Card>();
