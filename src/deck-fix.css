@@ -336,3 +336,9 @@
     justify-content:start!important;
   }
 }
+
+.starter-card-slot .card-template .card-template-cost{
+  padding:0 3px!important;
+  gap:2px!important;
+  box-sizing:border-box!important;
+}
