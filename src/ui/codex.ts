@@ -3,7 +3,7 @@ import { enemies } from "../data/enemies";
 import { rewardCards, startingDeck } from "../data/cards";
 import { rewardItems } from "../data/items";
 import type { Card, Developer, Enemy, Item } from "../entities/types";
-import { renderPokerCard } from "../card-view";
+import { renderCard } from "../card-view";
 
 type CodexCategory = "developers" | "enemies" | "cards" | "items";
 type CodexEntry = { id:string; name:string; subtitle:string; details:string; tier?:number };
@@ -42,7 +42,7 @@ function enemyDetails(e:Enemy){
 }
 
 function cardDetails(c:Card){
-  return `<div class="codex-card-detail"><div class="codex-card-preview">${renderPokerCard(c)}</div><div class="codex-card-info">
+  return `<div class="codex-card-detail"><div class="codex-card-preview">${renderCard(c,{variant:"full"})}</div><div class="codex-card-info">
     <span class="codex-kicker">TOOL · TIER ${c.tier??1}</span><h2>${esc(c.name)}</h2><p class="codex-description">${esc(c.description)}</p>
     ${statGrid([["TIER",String(c.tier??1)],["COSTO",`${c.cost} ⚡`],["EFFETTO",cardEffect(c)]])}
     <section class="codex-block"><h3>EFFETTO TECNICO</h3><p>${esc(cardEffect(c))}</p></section>
