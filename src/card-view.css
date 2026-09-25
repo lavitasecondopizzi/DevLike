@@ -1,27 +1,45 @@
 .poker-card-host{box-sizing:border-box!important;min-width:0!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;color:inherit!important;display:block!important;overflow:visible!important}
-.poker-card{position:relative;box-sizing:border-box;aspect-ratio:2.5/3.5;width:100%;min-width:0;border:2px solid #d6d1c4;border-radius:10px;background:#e8e3d7;color:#111722;box-shadow:4px 5px 0 rgba(0,0,0,.3),inset 0 0 0 2px #8f8a80;padding:4px;font-family:inherit;text-align:left}
-.poker-card-inner{height:100%;box-sizing:border-box;border:1px solid #9b9589;border-radius:6px;padding:7px;display:flex;flex-direction:column;background:linear-gradient(135deg,#eeeae0,#ddd8cc);position:relative;overflow:hidden}
-.poker-card-inner:after{content:"";position:absolute;inset:5px;border:1px solid rgba(45,54,68,.18);pointer-events:none}
-.poker-card-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
-.poker-card-cost{min-width:25px;height:25px;padding:0 5px;border-radius:50%;display:flex;align-items:center;justify-content:center;gap:2px;background:#13263b;color:#f5f2e9!important;border:2px solid #607895;font-size:12px;font-weight:900;line-height:1;box-sizing:border-box;white-space:nowrap;box-shadow:1px 2px 0 rgba(0,0,0,.3)}
-.poker-card-energy{font-size:11px;line-height:1;color:#ffb347!important}
-.poker-card-tier{font-size:11px;font-weight:900;letter-spacing:.08em;border:1px solid #626b78;padding:3px 4px;background:#d9d4c8;color:#303641!important}
-.poker-card-name{margin:7px 0 5px;text-align:center;font-size:11px;line-height:1.15;font-weight:900;letter-spacing:.03em;min-height:23px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;color:#111722!important}
-.poker-card-art{aspect-ratio:1.25/1;min-height:58px;border:2px solid #26374b;background:#0d1725;display:grid;place-items:center;margin-bottom:6px;position:relative;z-index:1;box-shadow:inset 0 0 0 2px #1d2a3b}
-.poker-card-art span{font-size:34px;font-weight:900;color:#65c8d8!important;text-shadow:2px 2px 0 #08111c}
-.poker-card-type{text-align:center;font-size:11px;font-weight:900;letter-spacing:.12em;padding:3px 4px;border-top:1px solid #77736b;border-bottom:1px solid #77736b;position:relative;z-index:1;color:#111722!important}
-.poker-card-effect{margin-top:6px;position:relative;z-index:1;flex:1;display:flex;flex-direction:column}
-.poker-card-effect b{font-size:11px;line-height:1.2;text-transform:uppercase;color:#111722!important}
-.poker-card-effect p{font-size:11px;line-height:1.35;margin:5px 0 0;color:#303641!important}
-.poker-card-flavor{font-size:11px;line-height:1.25;font-style:italic;text-align:center;color:#5e5a53!important;border-top:1px solid #aaa49a;padding-top:5px;margin-top:5px;position:relative;z-index:1}
-.poker-card-bottom{display:none!important}
-.poker-card-tier-2{border-color:#b8a36c}.poker-card-tier-3{border-color:#8c9cb2}.poker-card-tier-4{border-color:#a88bb8}
-.poker-card-host.selected .poker-card{box-shadow:0 0 0 2px #5d88d9,4px 5px 0 rgba(0,0,0,.3),inset 0 0 0 2px #8f8a80}
-.poker-card-host:disabled{opacity:.55}
-.poker-card-management-host{display:flex!important;flex-direction:column!important;gap:8px;box-sizing:border-box}.poker-card-management-host>.poker-card{width:100%}
-.poker-card-management{display:flex;align-items:center;justify-content:space-between;gap:8px}.poker-card-management span{font-size:11px;color:#7f8b9d;line-height:1.2}.poker-card-management button{padding:7px 8px!important;border:1px solid #46536a!important;background:#202a3a!important;color:#e8edf5!important;font-weight:700!important;font-size:11px!important;cursor:pointer}.poker-card-management button:disabled{opacity:.5;cursor:not-allowed}
-@media(max-width:800px){.poker-card-name{font-size:11px}.poker-card-art span{font-size:34px}}
-
-/* Removed duplicated description area from all poker cards. */
-.poker-card-flavor{display:none!important}
-.poker-card-effect p{display:none!important}
+.card-template{position:relative;box-sizing:border-box;aspect-ratio:2.5/3.5;width:100%;min-width:0;border:2px solid #d6d1c4;border-radius:10px;background:#e8e3d7;color:#111722;box-shadow:4px 5px 0 rgba(0,0,0,.28),inset 0 0 0 2px #8f8a80;padding:4px;font-family:inherit;text-align:left;transition:transform .12s ease,box-shadow .12s ease,opacity .12s ease}
+.card-template-inner{height:100%;box-sizing:border-box;border:1px solid #9b9589;border-radius:6px;padding:7px;display:flex;flex-direction:column;background:linear-gradient(135deg,#eeeae0,#ddd8cc);position:relative;overflow:hidden}
+.card-template-inner:after{content:"";position:absolute;inset:5px;border:1px solid rgba(45,54,68,.18);pointer-events:none}
+.card-template-header{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.card-template-cost{min-width:25px;height:25px;padding:0 5px;border-radius:50%;display:flex;align-items:center;justify-content:center;gap:2px;background:#13263b;color:#f5f2e9!important;border:2px solid #607895;font-size:12px;font-weight:900;line-height:1;box-sizing:border-box;white-space:nowrap;box-shadow:1px 2px 0 rgba(0,0,0,.3)}
+.card-template-cost i{font-size:11px;line-height:1;color:#ffb347!important;font-style:normal}
+.card-template-tier{font-size:11px;font-weight:900;letter-spacing:.08em;border:1px solid #626b78;padding:3px 4px;background:#d9d4c8;color:#303641!important}
+.card-template-name{margin:7px 0 5px;text-align:center;font-size:12px;line-height:1.2;font-weight:900;letter-spacing:.03em;min-height:23px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;color:#111722!important}
+.card-template-art{aspect-ratio:1.25/1;min-height:58px;border:2px solid #26374b;background:#0d1725;display:grid;place-items:center;margin-bottom:7px;position:relative;z-index:1;box-shadow:inset 0 0 0 2px #1d2a3b}
+.card-template-art span{font-size:34px;font-weight:900;color:#65c8d8!important;text-shadow:2px 2px 0 #08111c}
+.card-template-effect{position:relative;z-index:1;margin-top:1px;padding:5px 6px;border-top:1px solid #8d887e;border-bottom:1px solid #aaa49a;min-height:25px;display:flex;align-items:center}
+.card-template-effect b{font-size:11px;line-height:1.25;text-transform:uppercase;color:#111722!important}
+.card-template-description{position:relative;z-index:1;flex:1;margin-top:7px;color:#303641!important;font-size:11px;line-height:1.4;overflow:hidden}
+.card-template-footer{position:relative;z-index:1;margin-top:6px;padding-top:5px;border-top:1px solid #aaa49a;color:#5e5a53;font-size:11px;line-height:1;text-align:center;letter-spacing:.08em}
+.card-template--mini .card-template-inner{padding:5px}
+.card-template--mini .card-template-name{margin:5px 0 4px;min-height:20px;font-size:11px}
+.card-template--mini .card-template-art{min-height:42px;margin-bottom:4px}
+.card-template--mini .card-template-art span{font-size:27px}
+.card-template--mini .card-template-effect{margin-top:0;padding:4px}
+.card-template--mini .card-template-description,.card-template--mini .card-template-footer{display:none}
+.card-template--compact .card-template-inner{padding:6px}
+.card-template--compact .card-template-name{margin:5px 0 4px;min-height:21px;font-size:11px}
+.card-template--compact .card-template-art{min-height:48px;margin-bottom:5px}
+.card-template--compact .card-template-art span{font-size:29px}
+.card-template--compact .card-template-effect{padding:4px 5px}
+.card-template--compact .card-template-description{font-size:11px;line-height:1.3;margin-top:5px}
+.card-template--compact .card-template-footer{margin-top:4px;padding-top:4px}
+.card-template--hand .card-template-description{font-size:11px;line-height:1.3}
+.card-template--hand.card-template--playable{transform:translateY(-3px);box-shadow:0 0 0 2px #67c8d8,5px 7px 0 rgba(0,0,0,.3),inset 0 0 0 2px #8f8a80}
+.card-template--selected{box-shadow:0 0 0 2px #5d88d9,4px 5px 0 rgba(0,0,0,.28),inset 0 0 0 2px #8f8a80}
+.card-template--unplayable,.card-template--disabled{opacity:.5}
+.card-template--unplayable{filter:saturate(.55)}
+.card-template--tier-2{border-color:#b8a36c}
+.card-template--tier-3{border-color:#8c9cb2}
+.card-template--tier-4{border-color:#a88bb8}
+.devlike-poker-management-host{min-height:0!important;padding:8px!important;background:#0f151f!important;border:1px solid #303b4d!important;border-radius:8px!important;display:flex!important;flex-direction:column!important;gap:8px!important;box-sizing:border-box!important}
+.devlike-poker-management-host:hover{border-color:#5d88d9!important}
+.devlike-poker-management-host>.card-template{width:100%!important}
+.devlike-poker-management{display:flex;flex-direction:column;gap:7px}
+.devlike-poker-management span{font-size:11px;color:#8fa1b8;text-align:center;letter-spacing:.05em;min-height:14px}
+.devlike-poker-management button{width:100%;padding:8px;border:1px solid #46536a;background:#202a3a;color:#e8edf5;font-weight:800;font-size:11px;letter-spacing:.04em;cursor:pointer}
+.devlike-poker-management button:hover:not(:disabled){background:#2a3850;border-color:#67c8d8}
+.devlike-poker-management button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:800px){.card-template-name{font-size:11px}.card-template-art span{font-size:32px}.card-template--compact .card-template-art span{font-size:27px}}
