@@ -1,41 +1,111 @@
 import type { BattleResult, Card, Developer, Enemy } from "../entities/types";
 
-export type DeveloperStatBreakdown = { code:number; debug:number; codeChanges:string[]; debugChanges:string[] };
+export type DeveloperStatContext = {
+  energy:number;
+  block:number;
+  toolPlayedThisTurn:boolean;
+  turn:number;
+  temporaryCodeBonus:number;
+  firstCodeUsed:boolean;
+  isActive:boolean;
+};
 
-export function getDeveloperTeamStatBreakdown(team:Developer[], dev:Developer, enemy:Enemy, isActive=false):DeveloperStatBreakdown {
-  const activeTeam=team.filter(member=>member.hp>0&&member.stress<member.maxStress);
-  const hasClass=(classId:string)=>activeTeam.some(member=>member.classId===classId);
-  const hasPassive=(classId:string,passive:string)=>activeTeam.some(member=>member.classId===classId&&member.passive.includes(passive));
+export type DeveloperStatBreakdown = {
+  code:number;
+  debug:number;
+  codeChanges:string[];
+  debugChanges:string[];
+};
+
+export function getDeveloperStatBreakdown(team:Developer[], dev:Developer, enemy:Enemy, context:DeveloperStatContext):DeveloperStatBreakdown {
+  const codeChanges:string[]=[];
+  const debugChanges:string[]=[];
+  const available=team.filter(member=>member.hp>0&&member.stress<member.maxStress);
+  const hasClass=(classId:string)=>available.some(member=>member.classId===classId);
+  const hasPassive=(classId:string,passive:string)=>available.some(member=>member.classId===classId&&member.passive.includes(passive));
+  const conditionMatches=(condition:string)=>{
+    if(condition==="lowHp")return dev.hp<dev.maxHp*.5;
+    if(condition==="highStress")return dev.stress>=dev.maxStress*.5;
+    if(condition==="fullHp")return dev.hp>=dev.maxHp;
+    if(condition==="highEnergy")return context.energy>=2;
+    if(condition==="defending")return context.block>0;
+    if(condition==="afterTool")return context.toolPlayedThisTurn;
+    if(condition==="everyTwoTurns")return context.turn%2===0;
+    return false;
+  };
 
   let code=dev.code;
   let debug=dev.debug;
-  const codeChanges:string[]=[];
-  const debugChanges:string[]=[];
 
   for(const item of dev.items){
-    if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name);}
-    if(item.debugBonus){debug+=item.debugBonus;debugChanges.push("+"+item.debugBonus+" · "+item.name);}
+    if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name+": bonus CODICE dell'oggetto");}
+    if(item.debugBonus){debug+=item.debugBonus;debugChanges.push("+"+item.debugBonus+" · "+item.name+": bonus DEBUG dell'oggetto");}
   }
 
-  if(isActive&&hasClass("fullstack")){
-    code+=1;
-    codeChanges.push("+1 · Fullstack: bonus temporaneo a CODICE");
-  }
-  if(hasPassive("senior","Esperienza")||hasPassive("senior","Legacy Whisperer")){
+  const seniorCodeBonus=(hasPassive("senior","Esperienza")||hasPassive("senior","Legacy Whisperer"))?2:0;
+  const seniorQueryBonus=seniorCodeBonus===0&&hasPassive("senior","Query Optimizer")&&!context.firstCodeUsed?2:0;
+  if(seniorCodeBonus){
     code+=2;
     codeChanges.push("+2 · Senior: bonus di team a CODICE");
-  }else if(isActive&&hasPassive("senior","Query Optimizer")){
+  }else if(seniorQueryBonus){
     code+=2;
     codeChanges.push("+2 · Senior: Query Optimizer, primo CODICE del turno");
   }
+  if(context.isActive&&context.temporaryCodeBonus){
+    code+=context.temporaryCodeBonus;
+    codeChanges.push("+"+context.temporaryCodeBonus+" · Fullstack: bonus temporaneo a CODICE");
+  }
 
-  if(isActive&&dev.hp<dev.maxHp*.5&&hasClass("junior")){
+  if(dev.hp<dev.maxHp*.5&&hasClass("junior")){
     debug+=2;
     debugChanges.push("+2 · Junior: Developer sotto il 50% HP");
   }
-  if(isActive&&hasClass("hacker")&&enemy.typeId==="client"){
+  if(hasClass("hacker")&&enemy.typeId==="client"){
     debug+=3;
     debugChanges.push("+3 · Hacker: bonus contro Client");
+  }
+
+  let multiplier=1;
+  if(dev.advantageEnemyIds.includes(enemy.typeId)){
+    multiplier*=1.15;
+    codeChanges.push("+15% · Vantaggio contro questo tipo di nemico");
+    debugChanges.push("+15% · Vantaggio contro questo tipo di nemico");
+  }
+  if(dev.weaknessEnemyIds.includes(enemy.typeId)){
+    multiplier*=.85;
+    codeChanges.push("-15% · Debolezza contro questo tipo di nemico");
+    debugChanges.push("-15% · Debolezza contro questo tipo di nemico");
+  }
+  if(dev.advantageConditions.some(condition=>conditionMatches(condition))){
+    multiplier*=1.1;
+    codeChanges.push("+10% · Condizione favorevole attiva");
+    debugChanges.push("+10% · Condizione favorevole attiva");
+  }
+  if(dev.weaknessConditions.some(condition=>conditionMatches(condition))){
+    multiplier*=.9;
+    codeChanges.push("-10% · Condizione sfavorevole attiva");
+    debugChanges.push("-10% · Condizione sfavorevole attiva");
+  }
+  if(enemy.weaknessDeveloperIds.includes(dev.classId)){
+    multiplier*=1.15;
+    codeChanges.push("+15% · Il nemico è debole contro questa classe");
+    debugChanges.push("+15% · Il nemico è debole contro questa classe");
+  }
+  if(enemy.advantageDeveloperIds.includes(dev.classId)){
+    multiplier*=.9;
+    codeChanges.push("-10% · Il nemico è avvantaggiato contro questa classe");
+    debugChanges.push("-10% · Il nemico è avvantaggiato contro questa classe");
+  }
+  if(enemy.typeId==="legacy"){
+    debug=Math.max(0,debug-2);
+    debugChanges.push("-2 · Legacy: penalità a DEBUG");
+  }
+
+  code=Math.max(0,Math.round(code*multiplier));
+  debug=Math.max(0,Math.round(debug*multiplier));
+  if(enemy.typeId==="client"&&dev.classId==="hacker"){
+    debug=Math.max(0,Math.round(debug*1.2));
+    debugChanges.push("+20% · Hacker contro Client: potenziamento aggiuntivo a DEBUG");
   }
 
   return {code,debug,codeChanges,debugChanges};
