@@ -376,3 +376,9 @@
   justify-content:center!important;
 }
 .starter-card-slot .card-template .card-template-cost i{flex:0 0 auto!important}
+
+.starter-card-slot .card-template .card-template-cost{
+  min-width:28px!important;width:28px!important;height:28px!important;min-height:28px!important;max-width:28px!important;
+  padding:0 4px!important;gap:2px!important;border-radius:3px!important;box-sizing:border-box!important;justify-content:center!important;
+}
+.starter-card-slot .card-template .card-template-cost i{font-size:11px!important;flex:0 0 auto!important}
