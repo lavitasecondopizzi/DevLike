@@ -67,7 +67,7 @@ setInterval(() => {
   render(game);
 },500);
 
-if(hasLocalSave() && loadGame(game)){
+if(localStorage.getItem("devlike-menu-view")!=="1" && hasLocalSave() && loadGame(game)){
   lastScreen=game.screen;
   render(game);
 }
