@@ -202,3 +202,16 @@
   .card-template--full{--card-w:140px;--card-h:202px}
   .card-template-name{font-size:11px}
 }
+
+/* Final compact pass: minimal resource header, full effect visibility, no brand footer. */
+.card-template-header{height:15px!important;flex-basis:15px!important}
+.card-template-cost{min-width:18px!important;width:18px!important;height:16px!important;font-size:11px!important;border-width:1px!important}
+.card-template-cost i{font-size:11px!important}
+.card-template-tier{padding:2px 3px!important;font-size:11px!important}
+.card-template-name{margin:2px 0 4px!important;height:18px!important;min-height:18px!important;flex-basis:18px!important}
+.card-template-effect{min-height:28px!important;padding:4px!important;align-items:flex-start!important}
+.card-template-effect b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.2!important}
+.card-template-footer{display:none!important}
+.card-template--compact .card-template-header,.card-template--hand .card-template-header{height:15px!important;flex-basis:15px!important}
+.card-template--compact .card-template-name,.card-template--hand .card-template-name{margin:2px 0 4px!important}
+.card-template--compact .card-template-effect,.card-template--hand .card-template-effect{min-height:28px!important}
