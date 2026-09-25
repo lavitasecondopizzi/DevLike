@@ -325,10 +325,10 @@ return `<section class="battle battle-redesign">
 }
 
 function leaderboardDetail(entry:LeaderboardEntry):string {
-  const team=entry.team.map(dev=>esc(dev.name)).join(" · ")||"—";
-  const deck=entry.mazzo.map(card=>esc(card.name)+(card.quantity>1?" ×"+card.quantity:"")).join(" · ")||"—";
-  const rules=entry.nuzlocke.enabled?(entry.nuzlocke.rules.map(esc).join(" · ")||"PERMADEATH"):"DISATTIVO";
-  return '<div class="leaderboard-detail"><b>'+esc(entry.nickname)+'</b><span>PUNTEGGIO '+entry.score.toLocaleString("it-IT")+' · COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · DIFFICOLTÀ x'+entry.difficolta.toFixed(1)+'</span><span>CAUSA: '+esc(entry.causaPerdita)+'</span><span>TEAM: '+team+'</span><span>MAZZO: '+deck+'</span><span>NUZLOCKE: '+rules+'</span></div>';
+  const team=entry.team.map(dev=>'<span class="leaderboard-chip">'+esc(dev.name)+'</span>').join("")||'<span class="leaderboard-empty">NESSUN DEVELOPER</span>';
+  const deck=entry.mazzo.map(card=>'<span class="leaderboard-chip">'+esc(card.name)+(card.quantity>1?" ×"+card.quantity:"")+'</span>').join("")||'<span class="leaderboard-empty">MAZZO VUOTO</span>';
+  const rules=entry.nuzlocke.enabled?(entry.nuzlocke.rules.map(rule=>'<span class="leaderboard-chip">'+esc(rule)+'</span>').join("")||'<span class="leaderboard-empty">PERMADEATH</span>'):'<span class="leaderboard-chip">DISATTIVO</span>';
+  return '<div class="leaderboard-detail"><div class="leaderboard-detail-hero"><div><span class="leaderboard-detail-kicker">RUN DI</span><h3>'+esc(entry.nickname)+'</h3></div><div class="leaderboard-detail-score"><small>PUNTEGGIO TOTALE</small><b>'+entry.score.toLocaleString("it-IT")+'</b></div></div><div class="leaderboard-cause-banner"><span>FINE DELLA RUN</span><b>'+esc(entry.causaPerdita)+'</b></div><div class="leaderboard-detail-stats"><div><small>COMMESSA</small><b>#'+entry.commessa+'</b></div><div><small>TAPPA</small><b>'+entry.tappa+'/6</b></div><div><small>DIFFICOLTÀ</small><b>x'+entry.difficolta.toFixed(1)+'</b></div><div><small>DATA</small><b>'+new Date(entry.createdAt).toLocaleDateString("it-IT")+'</b></div></div><div class="leaderboard-detail-section"><span class="leaderboard-section-title">TEAM</span><div class="leaderboard-chip-list">'+team+'</div></div><div class="leaderboard-detail-section"><span class="leaderboard-section-title">MAZZO</span><div class="leaderboard-chip-list">'+deck+'</div></div><div class="leaderboard-detail-section"><span class="leaderboard-section-title">NUZLOCKE</span><div class="leaderboard-chip-list">'+rules+'</div></div></div>';
 }
 async function openLeaderboard(game:Game){
   const shell=document.querySelector<HTMLElement>(".game-shell");
