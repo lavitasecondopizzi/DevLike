@@ -318,7 +318,8 @@ return `<section class="battle battle-redesign">
     </section>`;
   }
   const resultGame=game as Game&{lossCause?:string;leaderboardStatus?:string};
-  const cause=resultGame.lossCause??(game.combat?.active?.stress>=game.combat?.active?.maxStress?"BURNOUT":game.combat?.active?.hp<=0?"KO":"SCONFITTA");
+  const resultActive=game.combat?.active;
+  const cause=resultGame.lossCause??(resultActive&&resultActive.stress>=resultActive.maxStress?"BURNOUT":resultActive&&resultActive.hp<=0?"KO":"SCONFITTA");
   const status=resultGame.leaderboardStatus??"";
   return `<section class="panel center result"><div class="pixel-icon">☠</div><h1>${esc(game.message)}</h1><div class="result-summary"><span>COMMESSA <b>#${game.projectNumber}</b></span><span>TAPPA <b>${Math.min(game.currentNode,6)}</b></span><span>DIFFICOLTÀ <b>x${game.difficulty.toFixed(1)}</b></span><span>CAUSA <b>${esc(cause)}</b></span></div><p>La commessa è andata in produzione. Da qualche parte.</p><div class="leaderboard-submit"><label for="leaderboard-nickname">NICKNAME</label><input id="leaderboard-nickname" maxlength="20" autocomplete="nickname" placeholder="Inserisci nickname"><button type="button" class="primary" data-action="leaderboard-submit">SALVA NELLA CLASSIFICA</button><small>${esc(status)}</small></div><button type="button" class="secondary" data-action="leaderboard-open">VEDI CLASSIFICA</button><button type="button" class="primary" data-action="restart">NUOVA COMMESSA</button></section>`;
 }
