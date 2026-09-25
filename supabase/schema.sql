@@ -2,6 +2,7 @@ create extension if not exists pgcrypto;
 
 create table if not exists public.leaderboard_runs (
   id uuid primary key default gen_random_uuid(),
+  score integer not null default 0 check (score >= 0),
   nickname text not null check (char_length(nickname) between 1 and 20),
   team jsonb not null default '[]'::jsonb,
   commessa integer not null check (commessa between 1 and 999999),
@@ -12,6 +13,10 @@ create table if not exists public.leaderboard_runs (
   nuzlocke jsonb not null default '{"enabled":false,"rules":[]}'::jsonb,
   created_at timestamptz not null default now()
 );
+
+alter table public.leaderboard_runs add column if not exists score integer not null default 0;
+
+create index if not exists leaderboard_runs_score_idx on public.leaderboard_runs (score desc);
 
 create index if not exists leaderboard_runs_created_at_idx
   on public.leaderboard_runs (created_at desc);
