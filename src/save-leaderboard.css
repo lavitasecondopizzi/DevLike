@@ -26,3 +26,9 @@
   .result-summary{grid-template-columns:repeat(2,minmax(0,1fr));}
   .leaderboard-submit{grid-template-columns:1fr;}.leaderboard-submit label{text-align:left;}.leaderboard-submit small{grid-column:auto;}
 }
+
+
+.header-metric-score b{font-variant-numeric:tabular-nums}
+.result-score-breakdown{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:14px 0 4px}
+.result-score-breakdown span{display:flex;gap:5px;align-items:center;padding:7px 9px;border:1px solid rgba(96,120,149,.55);background:rgba(19,38,59,.5);font-size:11px}
+.result-score-breakdown b{font-size:11px}
