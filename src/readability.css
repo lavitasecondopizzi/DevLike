@@ -953,32 +953,6 @@ button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
   gap:6px!important;
   width:100%!important;
 }
-.game-shell > .game-header .header-phase{
-  min-width:0!important;
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:center!important;
-  gap:3px!important;
-  padding:7px 9px!important;
-  border:1px solid #35394a!important;
-  border-radius:7px!important;
-  background:#171724!important;
-  box-sizing:border-box!important;
-}
-.game-shell > .game-header .header-phase-label,
-.game-shell > .game-header .header-metric span{
-  color:#727d8f!important;
-  font-size:11px!important;
-  line-height:1!important;
-  letter-spacing:.06em!important;
-  white-space:nowrap!important;
-}
-.game-shell > .game-header .header-phase b{
-  color:#e9edf4!important;
-  font-size:11px!important;
-  line-height:1.1!important;
-  white-space:nowrap!important;
-}
 .game-shell > .game-header .header-metrics{
   min-width:0!important;
   display:grid!important;
