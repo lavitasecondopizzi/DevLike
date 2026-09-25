@@ -1119,3 +1119,7 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
   .tutorial-actions{padding:10px!important}
   .tutorial-actions button{min-width:110px!important}
 }
+
+
+/* TUTORIAL PROGRESS FIX */
+.tutorial-progress i{width:var(--tutorial-progress,5%)!important;}
