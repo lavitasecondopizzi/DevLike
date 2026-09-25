@@ -32,3 +32,5 @@
 .result-score-breakdown{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:14px 0 4px}
 .result-score-breakdown span{display:flex;gap:5px;align-items:center;padding:7px 9px;border:1px solid rgba(96,120,149,.55);background:rgba(19,38,59,.5);font-size:11px}
 .result-score-breakdown b{font-size:11px}
+
+.header-metric-score small{display:block;font-size:11px;line-height:1.2;opacity:.8}.result-summary span:last-child{min-width:0}
