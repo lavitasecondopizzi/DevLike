@@ -807,6 +807,8 @@ header small{font-family:inherit;font-size:11px;color:#7f8b9d;margin-top:4px}
   font-size:16px;
   line-height:1.6;
 }
+.menu-primary-actions .menu-new-run{flex:0 0 auto;min-width:170px;display:flex;align-items:center;justify-content:center;gap:6px;min-height:58px;padding:10px 14px;border:1px solid #4a5364;border-radius:8px;background:#151b25;color:#c7d0dc;font-size:11px;font-weight:800;box-sizing:border-box;}
+.menu-primary-actions .menu-new-run:hover{border-color:#7b8798;background:#1b2430;color:#f1f5f9;}
 .menu-primary-actions{
   display:flex;
   align-items:stretch;
