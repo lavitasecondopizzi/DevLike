@@ -13,6 +13,7 @@ import "./readability.css";
 import "./nuzlocke-rules-ui";
 import "./nuzlocke-ui-fix.css";
 import "./map-fix";
+import "./map-ui-fix";
 import "./balance-fix";
 import { Game } from "./game/Game";
 import { starterDeckForDeveloper } from "./data/cards";
