@@ -83,13 +83,39 @@ function teamSummary(dev:Developer,i:number,equipmentLimit=2){return `<div class
 function battleSetup(game:Game){
   const enemy=game.pendingEnemy!;
   const selected=game.team[game.selectedBattleStarterIndex];
+  const setupEffectiveStats=(d:Developer)=>{
+    const activeTeam=game.team.filter(member=>member.hp>0&&member.stress<member.maxStress);
+    const hasPassive=(classId:string,passive:string)=>activeTeam.some(member=>member.classId===classId&&member.passive.includes(passive));
+    const seniorCode=(hasPassive("senior","Esperienza")||hasPassive("senior","Legacy Whisperer"))?2:0;
+    const seniorQuery=seniorCode===0&&hasPassive("senior","Query Optimizer")?2:0;
+    let code=d.code+seniorCode+seniorQuery;
+    let debug=d.debug+(d.hp<d.maxHp*.5&&activeTeam.some(member=>member.classId==="junior")?2:0)+(activeTeam.some(member=>member.classId==="hacker")&&enemy.typeId==="client"?3:0);
+    const codeChanges:string[]=[];
+    const debugChanges:string[]=[];
+    for(const item of d.items){
+      if(item.codeBonus){code+=item.codeBonus;codeChanges.push("+"+item.codeBonus+" · "+item.name);}
+      if(item.debugBonus){debug+=item.debugBonus;debugChanges.push("+"+item.debugBonus+" · "+item.name);}
+    }
+    if(seniorCode)codeChanges.push("+2 · Senior");
+    if(seniorQuery)codeChanges.push("+2 · Senior: Query Optimizer");
+    if(d.hp<d.maxHp*.5&&activeTeam.some(member=>member.classId==="junior"))debugChanges.push("+2 · Junior con HP bassa");
+    if(activeTeam.some(member=>member.classId==="hacker")&&enemy.typeId==="client")debugChanges.push("+3 · Hacker contro Client");
+    const multiplier=d.advantageEnemyIds.includes(enemy.typeId)?1.15:d.weaknessEnemyIds.includes(enemy.typeId)?.85:1;
+    if(multiplier!==1){
+      const label=multiplier>1?"+15% · Vantaggio contro questo nemico":"-15% · Debolezza contro questo nemico";
+      codeChanges.push(label); debugChanges.push(label);
+    }
+    code=Math.max(0,Math.round(code*multiplier));
+    debug=Math.max(0,Math.round(debug*multiplier));
+    return {code,debug,codeTip:["Base: "+d.code,...(codeChanges.length?codeChanges.map(x=>"• "+x):["Nessun modificatore attivo"])].join("\n"),debugTip:["Base: "+d.debug,...(debugChanges.length?debugChanges.map(x=>"• "+x):["Nessun modificatore attivo"])].join("\n")};
+  };
   const team=game.team.map((dev,i)=>{
     const usable=dev.hp>0&&dev.stress<dev.maxStress;
     const selectedDev=game.selectedBattleStarterIndex===i;
     return `<div class="battle-member ${selectedDev?"selected":""} ${!usable?"disabled-dev":""}" draggable="${usable?"true":"false"}" data-battle-dev="${i}">
       <div class="battle-member-head"><div><b>${esc(dev.name)}</b><span>${esc(dev.role)}</span></div><strong>${selectedDev?"IN CAMPO":usable?"DISPONIBILE":"NON DISPONIBILE"}</strong></div>
       <div class="battle-member-bars"><div><span>HP</span><b>${dev.hp}/${dev.maxHp}</b></div><div class="mini-bar hp"><i style="width:${pct(dev.hp,dev.maxHp)}%"></i></div><div><span>STRESS</span><b>${dev.stress}/${dev.maxStress}</b></div><div class="mini-bar stress"><i style="width:${pct(dev.stress,dev.maxStress)}%"></i></div></div>
-      <div class="battle-member-stats"><span>CODICE <b>${dev.code}</b></span><span>DEBUG <b>${dev.debug}</b></span></div>
+      <div class="battle-member-stats"><span class="setup-stat-tooltip" data-tooltip="${esc(setupEffectiveStats(dev).codeTip)}">CODICE <b>${setupEffectiveStats(dev).code}</b></span><span class="setup-stat-tooltip" data-tooltip="${esc(setupEffectiveStats(dev).debugTip)}">DEBUG <b>${setupEffectiveStats(dev).debug}</b></span></div>
       <div class="battle-member-equipment">${dev.items.length?dev.items.map(item=>`<span>${esc(item.name)}</span>`).join(""):`<span>Nessun equipaggiamento</span>`}</div>
     </div>`;
   }).join("");
