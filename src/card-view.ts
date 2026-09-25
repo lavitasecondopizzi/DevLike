@@ -1,17 +1,42 @@
 import { rewardCards, rewardCardTiers, startingDeck } from "./data/cards";
 import type { Card } from "./entities/types";
 
+export type CardVariant = "full" | "compact" | "mini" | "hand";
+export type CardVisualState = "normal" | "selected" | "playable" | "unplayable" | "disabled";
+export type CardRenderOptions = { variant?: CardVariant; state?: CardVisualState };
+
 type CardGame = { deck?: Card[]; cardCollection?: Card[] };
-const esc = (value:string) => value.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
-const cards = new Map<string,Card>([...startingDeck,...rewardCards].map(card=>[card.id,card]));
+const esc=(value:string)=>value.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+const cards=new Map<string,Card>([...startingDeck,...rewardCards].map(card=>[card.id,card]));
 const art:Record<string,string>={git:">_",coffee:"☕",docker:"◈","stack-overflow":"∞","ctrl-z":"↶",grep:"?",terminal:"$_",lint:"✓",wireframe:"⌗","quick-fix":"⚡",script:"{}",monitor:"▣",cache:"◆","api-call":"⇄",prototype:"◇",exploit:"☠","freelance-hustle":"$",chatgpt:"AI",jira:"J",google:"G","rubber-duck":"◉","stackoverflow-copy":"∞","npm-install":"N","git-pull":"↓","console-log":">_",breakpoint:"⌁","rubber-duck-debug":"?","unit-test":"✓",sleep:"Z",documentation:"≡","rubber-stamp":"OK","git-push":"↑","merge-conflict":"×",regex:".*",refactor:"↻","legacy-patch":"!","stackoverflow-answer":"∞","integration-test":"⇄",hotfix:"⚡",rollback:"↩","meeting-cancel":"×","energy-drink-card":"⚡","ai-slop":"AI","coffee-overdose":"☕",production:"⚙","code-review":"✓","deadline-extension":"+","chatgpt-protocol":"AI","emergency-hotfix":"⚡"};
 
 function cardById(id:string){const base=cards.get(id);return base?{...base,tier:base.tier??rewardCardTiers[id]??1}:undefined;}
-function cardEffectText(card:Card){const effect=card.effect as Card["effect"]&{amount?:number};const amount=effect.amount;switch(effect.type){case "damage":return amount!==undefined?"DANNO · "+amount:"DANNO";case "heal":return amount!==undefined?"CURA · "+amount+" HP":"CURA";case "block":return amount!==undefined?"DIFESA · "+amount:"DIFESA";case "removeStress":return amount!==undefined?"STRESS · -"+amount:"RIDUCE STRESS";case "codeBoost":return amount!==undefined?"BOOST · +"+amount+"% DANNI":"BOOST DANNI";default:return String(effect.type).toUpperCase();}}
-function cardArt(card:Card){return art[card.id]??"✦";}
-export function renderPokerCard(card:Card){return `<article class="poker-card poker-card-tier-${card.tier??1}"><div class="poker-card-inner"><div class="poker-card-top"><span class="poker-card-cost">${card.cost} <span class="poker-card-energy">⚡</span></span><span class="poker-card-tier">T${card.tier??1}</span></div><div class="poker-card-name">${esc(card.name)}</div><div class="poker-card-art"><span>${esc(cardArt(card))}</span></div><div class="poker-card-type">TOOL</div><div class="poker-card-effect"><b>${esc(cardEffectText(card))}</b></div><div class="poker-card-bottom"><span>DEVLIKE</span><span>${card.cost} ⚡</span></div></div></article>`;}
+export function getCardArt(card:Card){return art[card.id]??"✦";}
+export function getCardEffectLabel(card:Card){const amount=(card.effect as Card["effect"]&{amount?:number}).amount;switch(card.effect.type){case "damage":return amount!==undefined?`DANNO · ${amount}`:"DANNO";case "heal":return amount!==undefined?`CURA · ${amount} HP`:"CURA";case "block":return amount!==undefined?`DIFESA · ${amount}`:"DIFESA";case "removeStress":return amount!==undefined?`STRESS · -${amount}`:"RIDUCE STRESS";case "codeBoost":return amount!==undefined?`BOOST · +${amount}% DANNI`:"BOOST DANNI";default:return String(card.effect.type).toUpperCase();}}
+export function getCardTier(card:Card){return card.tier??rewardCardTiers[card.id]??1;}
+
+export function renderCard(card:Card,options:CardRenderOptions={}){
+  const variant=options.variant??"full";
+  const state=options.state??"normal";
+  const tier=getCardTier(card);
+  const classes=["card-template",`card-template--${variant}`,`card-template--${state}`,`card-template--tier-${tier}`].join(" ");
+  const description=variant==="mini"?"":`<div class="card-template-description">${esc(card.description)}</div>`;
+  return `<article class="${classes}" data-card-id="${esc(card.id)}" data-card-tier="${tier}" data-card-state="${state}">
+    <div class="card-template-inner">
+      <header class="card-template-header"><span class="card-template-cost">${card.cost}<i>⚡</i></span><span class="card-template-tier">T${tier}</span></header>
+      <div class="card-template-name">${esc(card.name)}</div>
+      <div class="card-template-art"><span>${esc(getCardArt(card))}</span></div>
+      <div class="card-template-effect"><b>${esc(getCardEffectLabel(card))}</b></div>
+      ${description}
+      <footer class="card-template-footer"><span>DEVLIKE</span></footer>
+    </div>
+  </article>`;
+}
+
+export function renderPokerCard(card:Card){return renderCard(card,{variant:"full"});}
+
 function game():CardGame|undefined{return (window as Window&{__devlikeGame?:CardGame}).__devlikeGame;}
-function transformPlayable(element:HTMLElement){if(element.dataset.pokerRendered==="true")return;const id=element.dataset.card;if(!id)return;const card=cardById(id);if(!card)return;element.dataset.pokerRendered="true";element.classList.add("devlike-poker-host");element.innerHTML=renderPokerCard(card);}
-function transformDeck(element:HTMLElement){if(element.dataset.pokerRendered==="true")return;const g=game();if(!g)return;const action=element.querySelector<HTMLElement>("[data-deck-action]");if(!action)return;const index=Number(action.dataset.deckIndex);const isRemove=action.dataset.deckAction==="remove";const source=isRemove?g.deck:g.cardCollection;const card=source?.[index];if(!card)return;const actionMarkup=action.outerHTML;const meta=isRemove?`NEL MAZZO · ${g.deck?.length??0}`:`POSSEDUTE · ${g.cardCollection?.filter(item=>item.id===card.id).length??0} · MAZZO · ${g.deck?.filter(item=>item.id===card.id).length??0}`;element.dataset.pokerRendered="true";element.classList.add("devlike-poker-management-host");element.innerHTML=`${renderPokerCard({...card,tier:card.tier??rewardCardTiers[card.id]??1})}<div class="devlike-poker-management"><span>${meta}</span>${actionMarkup}</div>`;}
+function transformPlayable(element:HTMLElement){if(element.dataset.pokerRendered==="true")return;const id=element.dataset.card;if(!id)return;const card=cardById(id);if(!card)return;element.dataset.pokerRendered="true";element.classList.add("devlike-poker-host");element.innerHTML=renderCard(card,{variant:"hand",state:element.matches(":disabled")?"disabled":"normal"});}
+function transformDeck(element:HTMLElement){if(element.dataset.pokerRendered==="true")return;const g=game();if(!g)return;const action=element.querySelector<HTMLElement>("[data-deck-action]");if(!action)return;const index=Number(action.dataset.deckIndex);const isRemove=action.dataset.deckAction==="remove";const source=isRemove?g.deck:g.cardCollection;const card=source?.[index];if(!card)return;const actionMarkup=action.outerHTML;const meta=isRemove?`NEL MAZZO · ${g.deck?.length??0}`:`POSSEDUTE · ${g.cardCollection?.filter(item=>item.id===card.id).length??0} · MAZZO · ${g.deck?.filter(item=>item.id===card.id).length??0}`;element.dataset.pokerRendered="true";element.classList.add("devlike-poker-management-host");element.innerHTML=`${renderCard({...card,tier:card.tier??rewardCardTiers[card.id]??1},{variant:"compact"})}<div class="devlike-poker-management"><span>${meta}</span>${actionMarkup}</div>`;}
 function transformAll(){document.querySelectorAll<HTMLElement>("[data-card]").forEach(transformPlayable);document.querySelectorAll<HTMLElement>(".deck-card").forEach(transformDeck);}
 export function setupCardView(){transformAll();const observer=new MutationObserver(transformAll);observer.observe(document.querySelector("#app")??document.body,{childList:true,subtree:true});}
