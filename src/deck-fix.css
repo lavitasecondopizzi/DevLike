@@ -242,3 +242,10 @@
   .starter-card-slot .card-template-name{font-size:11px!important}
   .starter-card-slot .card-template-art{min-height:58px!important}
 }
+
+/* Starter preview: compact top block and tighter title spacing. */
+.starter-card-slot .card-template-header{padding:0 1px!important}
+.starter-card-slot .card-template-cost{min-width:22px!important;height:20px!important;padding:0 4px!important;border-width:1px!important;font-size:11px!important}
+.starter-card-slot .card-template-cost i{font-size:11px!important}
+.starter-card-slot .card-template-tier{padding:2px 4px!important;font-size:11px!important}
+.starter-card-slot .card-template-name{margin:2px 0 2px!important;min-height:18px!important}
