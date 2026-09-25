@@ -43,3 +43,14 @@
 .devlike-poker-management button:hover:not(:disabled){background:#2a3850;border-color:#67c8d8}
 .devlike-poker-management button:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:800px){.card-template-name{font-size:11px}.card-template-art span{font-size:32px}.card-template--compact .card-template-art span{font-size:27px}}
+
+/* Compact header: keep the card top visually light and pull the title upward. */
+.card-template-header{padding:0 1px!important}
+.card-template-cost{min-width:22px!important;height:20px!important;padding:0 4px!important;border-width:1px!important;font-size:11px!important}
+.card-template-cost i{font-size:11px!important}
+.card-template-tier{padding:2px 4px!important;font-size:11px!important}
+.card-template-name{margin:2px 0 2px!important;min-height:18px!important}
+.starter-card-slot .card-template-header{padding:0 1px!important}
+.starter-card-slot .card-template-cost{min-width:22px!important;height:20px!important;padding:0 4px!important}
+.starter-card-slot .card-template-tier{padding:2px 4px!important}
+.starter-card-slot .card-template-name{margin:2px 0 2px!important;min-height:18px!important}
