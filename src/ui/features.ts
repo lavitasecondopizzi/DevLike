@@ -106,6 +106,7 @@ function tutorialRefresh(index: number) {
   const current = Math.max(0, Math.min(index, sections.length - 1));
   overlay.dataset.tutorialIndex = String(current);
   sections.forEach((section, i) => section.classList.toggle("active", i === current));
+  overlay.querySelectorAll<HTMLButtonElement>("[data-tutorial-step]").forEach((step, i) => step.classList.toggle("active", i === current));
   const content = overlay.querySelector<HTMLElement>(".tutorial-content");
   const progress = overlay.querySelector<HTMLElement>("[data-tutorial-progress]");
   const bar = overlay.querySelector<HTMLElement>("[data-tutorial-bar]");
