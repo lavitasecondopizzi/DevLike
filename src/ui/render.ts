@@ -1,7 +1,7 @@
 import { Game } from "../game/Game";
 import { getDeveloperStatBreakdown } from "../game/Combat";
 import { renderCard } from "../card-view";
-import { hasLocalSave } from "../save";
+import { clearLocalSave, hasLocalSave } from "../save";
 import { buildLeaderboardEntry, fetchLeaderboard, submitLeaderboardEntry, type LeaderboardEntry } from "../leaderboard";
 import type { Developer, Enemy, MapNode } from "../entities/types";
 import { getNuzlockeRuleInfo } from "./nuzlocke";
