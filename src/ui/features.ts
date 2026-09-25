@@ -69,20 +69,9 @@ function tutorialInit() {
   tutorialRefresh(0);
 }
 
-function injectMenuButtons(game: FeatureGame) {
-  if (game.screen !== "menu") return;
-  const center = document.querySelector<HTMLElement>(".game-shell .center");
-  if (!center || center.querySelector(".feature-menu")) return;
-  const active = game.nuzlockeActive;
-  center.insertAdjacentHTML("beforeend", `<div class="feature-menu"><button type="button" class="secondary" data-feature-open="tutorial">TUTORIAL</button><button type="button" class="secondary" data-feature-open="codex">CODEX</button><button type="button" class="secondary nuzlocke-menu" data-feature-open="nuzlocke">NUZLOCKE</button>${active ? `<small class="mode-chip">NUZLOCKE ATTIVA</small>` : ""}</div>`);
-}
-
 export function setupFeatures(game: FeatureGame) {
   const originalStart = game.start.bind(game);
   game.start = () => { originalStart(); game.nuzlockeGraveyard = []; };
-
-  const observer = new MutationObserver(() => injectMenuButtons(game));
-  observer.observe(document.getElementById("app")!, { childList: true, subtree: true });
 
   document.addEventListener("click", event => {
     const target = event.target as HTMLElement;
@@ -104,5 +93,4 @@ export function setupFeatures(game: FeatureGame) {
   }, true);
 
   setupCodex();
-  injectMenuButtons(game);
 }
