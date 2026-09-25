@@ -341,7 +341,7 @@ async function openLeaderboard(game:Game){
     const status=document.querySelector<HTMLElement>(".leaderboard-status");
     if(!list||!status)return;
     status.textContent=entries.length?entries.length+" RUN REGISTRATE":"NESSUN RECORD";
-    list.innerHTML=entries.map((entry,index)=>'<button type="button" class="leaderboard-row" data-leaderboard-index="'+index+'"><span class="leaderboard-rank">'+String(index+1).padStart(2,"0")+'</span><span class="leaderboard-main"><b>'+esc(entry.nickname)+'</b><small>PUNTEGGIO '+entry.score.toLocaleString("it-IT")+' · COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · x'+entry.difficolta.toFixed(1)+'</small></span><span class="leaderboard-cause">'+esc(entry.causaPerdita)+'</span></button>').join("");
+    list.innerHTML=entries.map((entry,index)=>'<button type="button" class="leaderboard-row" data-leaderboard-index="'+index+'"><span class="leaderboard-rank">'+String(index+1).padStart(2,"0")+'</span><span class="leaderboard-main"><b>'+esc(entry.nickname)+'</b><span class="leaderboard-score">'+entry.score.toLocaleString("it-IT")+'</span></span><span class="leaderboard-cause"><small>FINE RUN</small><b>'+esc(entry.causaPerdita)+'</b></span></button>').join("");
     list.querySelectorAll<HTMLElement>("[data-leaderboard-index]").forEach(row=>row.onclick=()=>{const entry=entries[Number(row.dataset.leaderboardIndex)];if(!entry)return;const existing=row.nextElementSibling;if(existing?.classList.contains("leaderboard-detail")){existing.remove();return;}row.insertAdjacentHTML("afterend",leaderboardDetail(entry));});
   }catch(error){
     const status=document.querySelector<HTMLElement>(".leaderboard-status");
