@@ -65,3 +65,37 @@
   white-space:nowrap;
 }
 .map-node{position:relative!important}
+
+/* Map node readability: separate icon, destination and node type at a glance. */
+.map-node{
+  padding:10px 8px!important;
+  gap:4px!important;
+  justify-content:center!important;
+}
+.map-node .node-icon{
+  font-size:18px!important;
+  line-height:1!important;
+  min-height:18px;
+}
+.map-node b{
+  display:block!important;
+  max-width:100%!important;
+  font-size:13px!important;
+  line-height:1.25!important;
+  color:#e8eef6!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.map-node small{
+  display:block!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  letter-spacing:.4px!important;
+  color:#94a3b8!important;
+  text-transform:uppercase!important;
+}
+.map-node.available:not(.visited) b{color:#f1f7ff!important}
+.map-node.current b{color:#fff!important}
+.map-node.visited:not(.current) b{color:#b7c1ce!important}
+.map-node.hidden-encounter b{font-size:16px!important;color:#facc15!important}
