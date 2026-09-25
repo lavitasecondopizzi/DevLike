@@ -1,6 +1,6 @@
 import { Game } from "../game/Game";
 import { getDeveloperStatBreakdown } from "../game/Combat";
-import { renderPokerCard } from "../card-view";
+import { renderCard } from "../card-view";
 import type { Developer, Enemy, MapNode } from "../entities/types";
 
 const root = document.querySelector<HTMLDivElement>("#app")!;
@@ -258,7 +258,7 @@ return `<section class="battle battle-redesign">
       <button type="button" data-action="defend" ${c.canDefendForUi?"":"disabled"}><b>DIFESA</b><small>${c.team.some(d=>d.classId==="architect"&&d.hp>0&&d.stress<d.maxStress)&&!c.architectDefenseUsed.has("team")?"GRATIS":"COSTO: 1 ⚡"} · +${c.defensePreview} BLOCCO${c.team.some(d=>d.classId==="devops"&&d.passive.includes("Auto-Scaling")&&d.hp>0&&d.stress<d.maxStress)&&!c.nuzlockeRules.includes("noHealing")?" · +2 HP":""}${c.nuzlockeRules.includes("noStressRecovery")?" · NESSUN RECUPERO STRESS":" · -3 STRESS"}</small></button>
     </div>
     <div class="battle-hand-label"><span>TOOL IN MANO</span><b>${c.hand.length} CARTE</b><button type="button" class="deck-counter" data-action="toggle-deck">MAZZO · ${c.drawPile.length} DISPONIBILI</button></div>
-    <div class="hand">${c.hand.map((card,i)=>{const playable=c.canPlayCardForUi(card);const reason=c.cardPlayReasonForUi(card);return `<button type="button" class="card combat-card ${playable?"":"card-unavailable"}" data-card="${i}" data-poker-rendered="true" ${playable?"":`disabled title="${esc(reason)}"`}>${renderPokerCard(card)}<span class="combat-card-preview">${esc(c.cardPreview(card))}</span>${!playable?`<span class="combat-card-reason">${esc(reason)}</span>`:""}</button>`;}).join("")}</div>
+    <div class="hand">${c.hand.map((card,i)=>{const playable=c.canPlayCardForUi(card);const reason=c.cardPlayReasonForUi(card);return `<button type="button" class="card combat-card ${playable?"":"card-unavailable"}" data-card="${i}" data-poker-rendered="true" ${playable?"":`disabled title="${esc(reason)}"`}>${renderCard(card,{variant:"hand",state:playable?"playable":"unplayable"})}<span class="combat-card-preview">${esc(c.cardPreview(card))}</span>${!playable?`<span class="combat-card-reason">${esc(reason)}</span>`:""}</button>`;}).join("")}</div>
     ${c.showDeck?`<div class="deck-viewer">
       <div class="deck-viewer-head">
         <div class="deck-viewer-tabs">
@@ -267,7 +267,7 @@ return `<section class="battle battle-redesign">
         </div>
         <button type="button" data-action="toggle-deck">CHIUDI</button>
       </div>
-      <div class="deck-viewer-grid">${(c.deckView==="draw"?c.drawPile:c.discardPile).map(card=>`<div class="deck-viewer-card">${renderPokerCard(card)}</div>`).join("")||`<p class="deck-viewer-empty">${c.deckView==="draw"?"Il mazzo è vuoto.":"Nessuna carta negli scarti."}</p>`}</div>
+      <div class="deck-viewer-grid">${(c.deckView==="draw"?c.drawPile:c.discardPile).map(card=>`<div class="deck-viewer-card">${renderCard(card,{variant:"compact"})}</div>`).join("")||`<p class="deck-viewer-empty">${c.deckView==="draw"?"Il mazzo è vuoto.":"Nessuna carta negli scarti."}</p>`}</div>
     </div>`:""}
     <button type="button" class="end ${c.incomingLethalPreview?"danger":""}" data-action="end-turn">${c.incomingLethalPreview?"ATTENZIONE · ATTACCO POTENZIALMENTE LETALE":"FINE TURNO"} → ${c.incomingDamagePreview} DMG · +${c.incomingStressPreview} STRESS PREVISTI</button>
   </section>
@@ -281,7 +281,7 @@ return `<section class="battle battle-redesign">
     <div class="battle-ability"><strong>ABILITÀ</strong><span>${esc(enemy.passive)}</span>${c.deadlinePhaseName?`<div class="deadline-phase-card ${c.deadlinePhaseSpecialReady?"ready":""}"><strong>FASE ${c.deadlinePhaseNumber}/3 · ${esc(c.deadlinePhaseName)}</strong><span>${esc(c.deadlinePhaseDescription)}</span><small>${esc(c.deadlinePhaseAbility)}</small><em>${c.deadlinePhaseSpecialReady?"ABILITÀ SPECIALE PRONTA":"ABILITÀ SPECIALE GIÀ USATA"}</em></div>`:""}</div>
     <div class="battle-matchups"><div><b>VANTAGGI</b>${enemy.advantages.map(x=>`<span>${esc(x)}</span>`).join("")}</div><div><b>DEBOLEZZE</b>${enemy.weaknesses.map(x=>`<span>${esc(x)}</span>`).join("")}</div></div>
   </aside>
-</section>`;}  if(game.screen==="reward"){const card=game.reward!;return `<section class="panel center reward-screen"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi questo Tool al MAZZO.</p><button type="button" class="reward-card reward-card-poker" data-action="reward">${renderPokerCard(card)}<span class="reward-card-confirm">AGGIUNGI AL MAZZO · ${card.cost} ⚡</span></button></section>`;}
+</section>`;}  if(game.screen==="reward"){const card=game.reward!;return `<section class="panel center reward-screen"><h2>RICOMPENSA</h2><p>Il percorso continua. Aggiungi questo Tool al MAZZO.</p><button type="button" class="reward-card reward-card-poker" data-action="reward">${renderCard(card,{variant:"full"})}<span class="reward-card-confirm">AGGIUNGI AL MAZZO · ${card.cost} ⚡</span></button></section>`;}
   if(game.screen==="event"&&game.currentEvent){
     const event=game.currentEvent;
     const choices=event.choices.map((choice,i)=>{
@@ -307,7 +307,7 @@ return `<section class="battle battle-redesign">
     const options=game.bossRewardOptions.map((option,i)=>{
       if(option.kind==="item"&&option.item)return `<button type="button" class="boss-reward-card boss-item-reward" data-boss-reward="${i}"><span class="boss-reward-kind">OGGETTO · ZAINO</span><b>${esc(option.item.name)}</b><strong>+${option.item.codeBonus} COD · +${option.item.debugBonus} DEBUG</strong><small>${esc(option.item.description)}</small></button>`;
       const card=option.card!;
-      return `<button type="button" class="boss-reward-card boss-tool-reward" data-boss-reward="${i}"><span class="boss-reward-kind">TOOL · MAZZO</span><b>${esc(card.name)}</b><strong>${card.cost} ⚡</strong><small>${esc(card.description)}</small></button>`;
+      return `<button type="button" class="boss-reward-card boss-tool-reward" data-boss-reward="${i}"><span class="boss-reward-kind">TOOL · MAZZO</span>${renderCard(card,{variant:"full"})}</button>`;
     }).join("");
     return `<section class="panel selection-panel boss-reward-panel">
       <div class="selection-heading"><div><h2>DROP DELLA DEADLINE</h2><p>Hai completato la commessa. Scegli UNA sola ricompensa tra 3 oggetti da mettere direttamente nello ZAINO e 3 Tool da aggiungere al MAZZO.</p></div><span class="random-badge">6 DROP · 1 SCELTA</span></div>
