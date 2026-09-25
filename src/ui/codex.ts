@@ -67,6 +67,30 @@ function dataForCategory(category: string): Array<{ id: string; name: string; su
     .map(i => ({ id: i.id, name: i.name, tier: i.tier, subtitle: `T${i.tier} · +${i.codeBonus} COD · +${i.debugBonus} DEBUG`, details: itemDetails(i) }));
 }
 
+function codexRefresh(category: string, selectedId?: string) {
+  const overlay = document.querySelector<HTMLElement>('[data-feature-overlay="codex"]');
+  if (!overlay) return;
+  const list = overlay.querySelector<HTMLElement>("[data-codex-list]");
+  const detail = overlay.querySelector<HTMLElement>("[data-codex-detail]");
+  const tabs = overlay.querySelectorAll<HTMLButtonElement>("[data-codex-category]");
+  const data = dataForCategory(category);
+  const selected = data.find((entry) => entry.id === selectedId) ?? data[0];
+  tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.codexCategory === category));
+  if (list) {
+    let lastTier: number | undefined;
+    const markup: string[] = [];
+    data.forEach((entry) => {
+      if (entry.tier !== undefined && entry.tier !== lastTier) {
+        lastTier = entry.tier;
+        markup.push(`<div class="codex-tier-divider"><span>TIER ${entry.tier}</span></div>`);
+      }
+      markup.push(`<button type="button" class="codex-entry ${entry.id === selected?.id ? "selected" : ""}" data-codex-entry="${esc(entry.id)}"><b>${esc(entry.name)}</b><small>${esc(entry.subtitle)}</small></button>`);
+    });
+    list.innerHTML = markup.join("");
+  }
+  if (detail) detail.innerHTML = selected?.details ?? `<div class="codex-empty">NESSUN RECORD</div>`;
+}
+
 export function codexMarkup() {
   return `<div class="feature-overlay codex-overlay" data-feature-overlay="codex"><div class="feature-window codex-window"><div class="feature-titlebar"><div><span class="codex-kicker">DATABASE</span><h2>CODEX DEVLIKE</h2></div><button type="button" class="feature-close" data-feature-close>CHIUDI ×</button></div><nav class="codex-tabs"><button type="button" class="active" data-codex-category="developers">DEVELOPER</button><button type="button" data-codex-category="enemies">NEMICI</button><button type="button" data-codex-category="cards">TOOL</button><button type="button" data-codex-category="items">OGGETTI</button></nav><div class="codex-layout"><aside class="codex-list" data-codex-list></aside><article class="codex-detail" data-codex-detail></article></div></div></div>`;
 }
