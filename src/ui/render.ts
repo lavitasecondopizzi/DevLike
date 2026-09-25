@@ -160,7 +160,15 @@ function screen(game:Game){
     </div>
     <div class="menu-footer"><span>BUILD 0.1 · PROTOTYPE</span><span>NESSUN CLIENTE È STATO SODDISFATTO DURANTE IL TEST</span></div>
   </section>`;
-  if(game.screen==="team")return `<section class="panel selection-panel"><div class="selection-heading"><div><h2>SCEGLI IL DEVELOPER PRINCIPALE</h2><p>Ogni commessa parte con un solo developer. Gli altri arriveranno lungo il percorso.</p></div><span class="random-badge">3 CANDIDATI CASUALI</span></div><div class="developer-choice-grid">${game.startingCandidates.map(dev=>`<button type="button" class="developer-choice ${game.selectedStartingId===dev.id?"selected":""}" data-dev="${dev.id}">${devCard(dev,game.selectedStartingId===dev.id,false,false)}</button>`).join("")}</div><div class="selection-footer"><div class="selection-hint">${game.selectedStartingId?"Developer selezionato. Controlla statistiche, abilità, vantaggi e debolezze, poi conferma.":"Clicca una scheda per selezionare il tuo protagonista."}</div><button type="button" class="primary" data-action="confirm-start" ${game.selectedStartingId?"":"disabled"}>INIZIA LA COMMESSA</button></div></section>`;
+  if(game.screen==="team")return `<section class="panel selection-panel team-selection">
+    <div class="team-selection-hero">
+      <div class="team-selection-copy"><span class="team-selection-kicker">AVVIO COMMESSA · SELEZIONE TEAM</span><h2>SCEGLI IL DEVELOPER PRINCIPALE</h2><p>La prima scelta definisce il tuo punto di partenza. Valuta statistiche, abilità, vantaggi e debolezze prima di confermare.</p></div>
+      <div class="team-selection-meta"><span class="team-selection-count"><b>3</b><small>CANDIDATI</small></span><span class="team-selection-rule">1 DEVELOPER · INIZIO COMMESSA</span></div>
+    </div>
+    <div class="team-selection-guide"><span><b>01</b> SCEGLI</span><i></i><span><b>02</b> ANALIZZA</span><i></i><span><b>03</b> CONFERMA</span></div>
+    <div class="developer-choice-grid team-candidates">${game.startingCandidates.map((dev,index)=>`<button type="button" class="developer-choice ${game.selectedStartingId===dev.id?"selected":""}" data-dev="${dev.id}" aria-pressed="${game.selectedStartingId===dev.id}"><span class="candidate-index">CANDIDATO 0${index+1}</span>${devCard(dev,game.selectedStartingId===dev.id,false,false)}</button>`).join("")}</div>
+    <div class="selection-footer team-selection-footer"><div class="selection-status"><span class="selection-status-dot ${game.selectedStartingId?"active":""}"></span><div><b>${game.selectedStartingId?"DEVELOPER SELEZIONATO":"NESSUN DEVELOPER SELEZIONATO"}</b><small>${game.selectedStartingId?"Controlla la scheda e avvia la commessa quando sei pronto.":"Seleziona una delle tre schede per continuare."}</small></div></div><button type="button" class="primary team-confirm" data-action="confirm-start" ${game.selectedStartingId?"":"disabled"}><span>▶</span> INIZIA LA COMMESSA</button></div>
+  </section>`;
   if(game.screen==="map"){
     return `<section class="panel map-panel">
       <div class="map-top">
