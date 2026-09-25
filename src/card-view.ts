@@ -20,7 +20,7 @@ export function renderCard(card:Card,options:CardRenderOptions={}){
   const state=options.state??"normal";
   const tier=getCardTier(card);
   const classes=["card-template",`card-template--${variant}`,`card-template--${state}`,`card-template--tier-${tier}`].join(" ");
-  const description=variant==="mini"?"":`<div class="card-template-description">${esc(card.description)}</div>`;
+  const description="";
   return `<article class="${classes}" data-card-id="${esc(card.id)}" data-card-tier="${tier}" data-card-state="${state}">
     <div class="card-template-inner">
       <header class="card-template-header"><span class="card-template-cost">${card.cost}<i>⚡</i></span><span class="card-template-tier">T${tier}</span></header>
