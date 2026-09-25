@@ -342,7 +342,7 @@ async function openLeaderboard(game:Game){
     if(!list||!status)return;
     status.textContent=entries.length?entries.length+" RUN REGISTRATE":"NESSUN RECORD";
     list.innerHTML=entries.map((entry,index)=>'<button type="button" class="leaderboard-row" data-leaderboard-index="'+index+'"><span class="leaderboard-rank">'+String(index+1).padStart(2,"0")+'</span><span class="leaderboard-main"><b>'+esc(entry.nickname)+'</b><small>COMMESSA #'+entry.commessa+' · TAPPA '+entry.tappa+' · x'+entry.difficolta.toFixed(1)+'</small></span><span class="leaderboard-cause">'+esc(entry.causaPerdita)+'</span></button>').join("");
-    list.querySelectorAll<HTMLElement>("[data-leaderboard-index]").forEach(row=>row.onclick=()=>{const entry=entries[Number(row.dataset.leaderboardIndex)];if(entry)row.insertAdjacentHTML("afterend",leaderboardDetail(entry));});
+    list.querySelectorAll<HTMLElement>("[data-leaderboard-index]").forEach(row=>row.onclick=()=>{const entry=entries[Number(row.dataset.leaderboardIndex)];if(!entry)return;const existing=row.nextElementSibling;if(existing?.classList.contains("leaderboard-detail")){existing.remove();return;}row.insertAdjacentHTML("afterend",leaderboardDetail(entry));});
   }catch(error){
     const status=document.querySelector<HTMLElement>(".leaderboard-status");
     if(status)status.textContent=error instanceof Error&&error.message==="LEADERBOARD_API_URL_NOT_CONFIGURED"?"CLASSIFICA ONLINE NON CONFIGURATA":"ERRORE NEL CARICAMENTO DELLA CLASSIFICA";
