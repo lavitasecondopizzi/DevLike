@@ -978,7 +978,7 @@ button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
 }
 .game-shell > .game-header .header-metrics{
   display:grid!important;
-  grid-template-columns:repeat(4,minmax(76px,auto))!important;
+  grid-template-columns:repeat(5,minmax(76px,auto))!important;
   gap:7px!important;
 }
 .game-shell > .game-header .header-metric{
@@ -1029,7 +1029,7 @@ button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
   .game-shell > .game-header .header-phase{flex:0 0 auto!important}
   .game-shell > .game-header .header-metrics{
     flex:1 1 auto!important;
-    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
   }
   .game-shell > .game-header .header-metric{min-width:0!important}
 }
