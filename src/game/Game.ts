@@ -33,7 +33,7 @@ const MAP_NODE_COST: Partial<Record<NormalNodeType, number>> = {
 };
 
 export class Game {
-  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; cardCollection:Card[]=[]; inventory:Item[]=[]; bossRewardOptions:BossRewardOption[]=[]; currentEvent:GameEvent|null=null; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
+  screen:GameScreen="menu"; team:Developer[]=[]; deck:Card[]=[]; cardCollection:Card[]=[]; inventory:Item[]=[]; bossRewardOptions:BossRewardOption[]=[]; currentEvent:GameEvent|null=null; combat:Combat|null=null; pendingEnemy:Enemy|null=null; currentNode=0; tempo=8; mapNodes:MapNode[]=[]; currentMapNodeId:string|null=null; projectNumber=1; difficulty=1; reward:Card|null=null; itemReward:Item|null=null; startingCandidates:Developer[]=[]; recruitCandidates:Developer[]=[]; selectedStartingId:string|null=null; selectedRecruitIndex:number|null=null; recruitTargetIndex:number|null=null; selectedItemTargetIndex:number|null=null; selectedBattleStarterIndex=0; score=0; normalBattlesWon=0; eliteBattlesWon=0; stagesReached=0; completedCommesse=0; scoreDevSurvivors=0; scoreDevBurnouts=0; scoreDevKOs=0; private pendingBattleScoreType:"normal"|"elite"|"boss"|null=null; equipmentSource:EquipmentSource|null=null; equipmentReturnScreen:GameScreen="map"; message="";
   start(){this.screen="team";this.team=[];this.deck=[...startingDeck];this.cardCollection=[...startingDeck].map(card=>({...card}));this.inventory=[];this.currentNode=0;this.tempo=8;this.mapNodes=[];this.currentMapNodeId=null;this.projectNumber=1;this.difficulty=1;this.reward=null;this.itemReward=null;this.bossRewardOptions=[];this.currentEvent=null;this.combat=null;this.pendingEnemy=null;this.selectedStartingId=null;this.recruitCandidates=[];this.selectedRecruitIndex=null;this.recruitTargetIndex=null;this.selectedItemTargetIndex=null;this.selectedBattleStarterIndex=0;this.equipmentSource=null;this.startingCandidates=this.randomDevelopers(3);this.message="Tre developer disponibili. Scegline UNO come protagonista.";}
   private cloneItem(item:Item):Item{return {...item};}
   private cloneDeveloper(dev:Developer):Developer{return {...dev,items:dev.items.map(x=>this.cloneItem(x))};}
@@ -132,15 +132,20 @@ export class Game {
     if(!current)return [];
     return this.mapNodes.filter(node=>!node.visited&&this.followsMapRoute(current,node));
   }
+  get scoreBreakdown(){return {normal:this.normalBattlesWon*100,elite:this.eliteBattlesWon*250,tappe:this.stagesReached*300,commesse:this.completedCommesse*1000,dev:this.scoreDevSurvivors*150+this.scoreDevBurnouts*100+this.scoreDevKOs*50};}
+  private addScore(amount:number){this.score+=amount;}
+  private registerStageReached(row:number){if(row>=1&&row<=6){this.stagesReached+=1;this.addScore(300);}}
+  private registerBattleVictory(){if(this.pendingBattleScoreType==="elite"){this.eliteBattlesWon+=1;this.addScore(250);}else if(this.pendingBattleScoreType==="normal"){this.normalBattlesWon+=1;this.addScore(100);}}
+  private registerCompletedCommessa(){this.completedCommesse+=1;this.addScore(1000);for(const dev of this.team){if(dev.hp<=0)this.scoreDevKOs+=1;else if(dev.stress>=dev.maxStress)this.scoreDevBurnouts+=1;else this.scoreDevSurvivors+=1;}this.addScore(this.scoreDevSurvivors*150+this.scoreDevBurnouts*100+this.scoreDevKOs*50-(this.scoreDevSurvivors*150+this.scoreDevBurnouts*100+this.scoreDevKOs*50));const current=this.scoreDevSurvivors+this.scoreDevBurnouts+this.scoreDevKOs;const expected=this.completedCommesse*3;const newSurvivors=this.team.filter(d=>d.hp>0&&d.stress<d.maxStress).length;const newBurnouts=this.team.filter(d=>d.hp>0&&d.stress>=d.maxStress).length;const newKOs=this.team.filter(d=>d.hp<=0).length;this.addScore(newSurvivors*150+newBurnouts*100+newKOs*50);}
   selectMapNode(id:string){
     const node=this.mapNodes.find(n=>n.id===id);
     if(!node||node.visited||!this.availableMapNodes.some(n=>n.id===id))return;
     this.currentMapNodeId=id;
     node.visited=true;
-    this.currentNode=Math.min(node.row,6);
+    this.currentNode=Math.min(node.row,6);this.registerStageReached(node.row);
 
     if(node.type==="boss"){
-      return this.prepareBattle(this.scaleBoss({...boss,intent:{...boss.intent}}));
+      return this.prepareBattle(this.scaleBoss({...boss,intent:{...boss.intent}}),"boss");
     }
 
     const cost=MAP_NODE_COST[node.type]??1;
@@ -148,7 +153,7 @@ export class Game {
 
     if(node.type==="battle"||node.type==="elite"){
       const source=enemies.find(e=>e.id===node.enemyId)??this.enemyForNode(node.type,node.row);
-      this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}},node.row,node.type==="elite"));
+      this.prepareBattle(this.scaleEnemy({...source,intent:{...source.intent}},node.row,node.type==="elite"),node.type==="elite"?"elite":"normal");
     }else if(node.type==="reward"){
       this.generateReward();
     }else if(node.type==="item"){
@@ -180,7 +185,7 @@ export class Game {
     }
   }
 
-  private prepareBattle(enemy:Enemy){this.pendingEnemy=enemy;this.selectedBattleStarterIndex=0;this.screen="battleSetup";this.message="Ordina il team: il Developer in prima posizione sarà il primo a combattere.";}
+  private prepareBattle(enemy:Enemy,type:"normal"|"elite"|"boss"="normal"){this.pendingBattleScoreType=type;this.pendingEnemy=enemy;this.selectedBattleStarterIndex=0;this.screen="battleSetup";this.message="Ordina il team: il Developer in prima posizione sarà il primo a combattere.";}
   selectBattleStarter(index:number){this.moveBattleStarter(index,0);}
   moveBattleStarter(fromIndex:number,toIndex=0){const d=this.team[fromIndex];if(!d||d.hp<=0||d.stress>=d.maxStress)return;const current=this.team.splice(fromIndex,1)[0];if(!current)return;const target=Math.max(0,Math.min(toIndex,this.team.length));this.team.splice(target,0,current);this.selectedBattleStarterIndex=0;}
   confirmBattleStarter(){const first=this.team[0];if(!this.pendingEnemy||!first||first.hp<=0||first.stress>=first.maxStress)return;this.selectedBattleStarterIndex=0;this.startBattle(this.pendingEnemy);}
@@ -309,8 +314,9 @@ export class Game {
   selectEquipmentSource(zone:"dev"|"bag",itemIndex:number,devIndex=-1){const team=this.equipmentTeam;const item=zone==="bag"?this.inventory[itemIndex]:team[devIndex]?.items[itemIndex];if(!item)return;this.equipmentSource={zone,itemIndex,devIndex};}
   moveSelectedEquipment(targetZone:"dev"|"bag",targetDevIndex=-1,targetItemIndex=-1){const source=this.equipmentSource;if(!source)return;const team=this.equipmentTeam;const sourceItems=source.zone==="bag"?this.inventory:team[source.devIndex]?.items;if(!sourceItems||!sourceItems[source.itemIndex])return;if(targetZone==="dev"){const targetItems=team[targetDevIndex]?.items;if(!targetItems||targetItemIndex<0||targetItemIndex>=this.equipmentLimit())return;if(source.zone==="dev"&&source.devIndex===targetDevIndex&&source.itemIndex===targetItemIndex)return;const sourceItem=sourceItems[source.itemIndex],targetItem=targetItems[targetItemIndex];if(source.zone==="dev"&&source.devIndex===targetDevIndex){[targetItems[targetItemIndex],targetItems[source.itemIndex]]=[targetItems[source.itemIndex],targetItems[targetItemIndex]];}else{if(targetItem)sourceItems[source.itemIndex]=targetItem;else sourceItems.splice(source.itemIndex,1);targetItems[targetItemIndex]=sourceItem;}}else if(source.zone==="bag"){if(targetItemIndex>=0&&targetItemIndex<this.inventory.length)[this.inventory[source.itemIndex],this.inventory[targetItemIndex]]=[this.inventory[targetItemIndex],this.inventory[source.itemIndex]];}else{this.inventory.push(sourceItems[source.itemIndex]);sourceItems.splice(source.itemIndex,1);}this.equipmentSource=null;}
   updateTeamFromCombat(){if(this.combat)this.team=this.combat.team;}
-  onCombatFinished(){this.updateTeamFromCombat();if(this.combat?.result==="victory"){if(this.combat.enemy.id==="deadline"){
+  onCombatFinished(){this.updateTeamFromCombat();if(this.combat?.result==="victory"){this.registerBattleVictory();if(this.combat.enemy.id==="deadline"){
       const completedTier=this.currentTier();
+      this.registerCompletedCommessa();
       this.team.forEach(dev=>{dev.hp=dev.maxHp;dev.stress=0;});
       this.projectNumber+=1;
       this.difficulty+=.5;
