@@ -304,3 +304,35 @@
   color:#f5f2e9!important;box-shadow:none!important;
 }
 .starter-card-slot .card-template .card-template-cost i{font-size:11px!important}
+
+/* Starter deck: cards form a tight row with only a minimal separation. */
+.starter-deck-cards.starter-deck-full-cards{
+  grid-template-columns:repeat(5,132px)!important;
+  justify-content:start!important;
+  gap:3px!important;
+}
+.starter-card-slot{
+  width:132px!important;
+  min-width:132px!important;
+  padding-top:8px!important;
+}
+@media(max-width:900px){
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:repeat(3,132px)!important;
+    justify-content:start!important;
+    gap:3px!important;
+  }
+}
+@media(max-width:640px){
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:repeat(2,132px)!important;
+    justify-content:start!important;
+    gap:3px!important;
+  }
+}
+@media(max-width:420px){
+  .starter-deck-cards.starter-deck-full-cards{
+    grid-template-columns:132px!important;
+    justify-content:start!important;
+  }
+}
