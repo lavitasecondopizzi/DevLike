@@ -1340,3 +1340,74 @@ button:focus-visible{outline:2px solid #78aef3;outline-offset:2px}
   .team-candidates .dev-description{min-height:0!important}
   .team-candidates .ability{min-height:0!important}
 }
+
+
+/* ===== DEVELOPER CARDS COMPACT PASS ===== */
+.team-candidates{
+  gap:14px!important;
+}
+.team-candidates .developer-choice{
+  border-radius:10px!important;
+}
+.team-candidates .candidate-index{
+  min-height:26px!important;
+  padding:0 10px!important;
+}
+.team-candidates .dev-card{
+  padding:12px!important;
+}
+.team-candidates .dev-head{
+  padding-bottom:8px!important;
+}
+.team-candidates .dev-head b{
+  font-size:14px!important;
+}
+.team-candidates .dev-head span{
+  margin-top:2px!important;
+}
+.team-candidates .dev-description{
+  min-height:0!important;
+  margin:9px 0!important;
+  font-size:11px!important;
+  line-height:1.45!important;
+}
+.team-candidates .bar,
+.team-candidates .stress{
+  height:5px!important;
+  margin:3px 0 7px!important;
+}
+.team-candidates .stat-grid{
+  gap:6px!important;
+  margin:9px 0!important;
+}
+.team-candidates .stat-grid span{
+  padding:7px!important;
+}
+.team-candidates .stat-grid b{
+  font-size:14px!important;
+}
+.team-candidates .ability{
+  min-height:0!important;
+  padding-top:9px!important;
+  font-size:11px!important;
+  line-height:1.45!important;
+}
+.team-candidates .matchup-grid{
+  gap:6px!important;
+  margin-top:9px!important;
+}
+.team-candidates .matchup-grid>div{
+  min-height:0!important;
+  padding:7px!important;
+}
+.team-candidates .matchup-grid strong{
+  margin-bottom:4px!important;
+}
+.team-candidates .matchup-grid span{
+  margin-top:2px!important;
+  line-height:1.3!important;
+}
+@media(max-width:520px){
+  .team-candidates .dev-card{padding:11px!important}
+  .team-candidates .dev-description{margin:8px 0!important}
+}
