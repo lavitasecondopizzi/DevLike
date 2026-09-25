@@ -85,13 +85,11 @@ function screen(game:Game){
   if(game.screen==="menu")return `<section class="panel center"><div class="pixel-icon">⌨</div><h1>DEVLIKE</h1><p>Un roguelike dove il vero boss è il cliente.</p><button type="button" class="primary" data-action="start">NUOVA COMMESSA</button></section>`;
   if(game.screen==="team")return `<section class="panel selection-panel"><div class="selection-heading"><div><h2>SCEGLI IL DEVELOPER PRINCIPALE</h2><p>Ogni commessa parte con un solo developer. Gli altri arriveranno lungo il percorso.</p></div><span class="random-badge">3 CANDIDATI CASUALI</span></div><div class="developer-choice-grid">${game.startingCandidates.map(dev=>`<button type="button" class="developer-choice ${game.selectedStartingId===dev.id?"selected":""}" data-dev="${dev.id}">${devCard(dev,game.selectedStartingId===dev.id,false,false)}</button>`).join("")}</div><div class="selection-footer"><div class="selection-hint">${game.selectedStartingId?"Developer selezionato. Controlla statistiche, abilità, vantaggi e debolezze, poi conferma.":"Clicca una scheda per selezionare il tuo protagonista."}</div><button type="button" class="primary" data-action="confirm-start" ${game.selectedStartingId?"":"disabled"}>INIZIA LA COMMESSA</button></div></section>`;
   if(game.screen==="map"){
-    const choices=game.availableMapNodes;
-    const choiceText=choices.map(node=>`${nodeIcon[node.type]} ${node.hiddenEncounter?"?":node.title} — ${esc(node.description)}`).join("<br>");
     return `<section class="panel map-panel">
       <div class="map-top">
         <div><small>${esc(game.message||"Scegli il prossimo nodo.")}</small></div>
       </div>
-      <div class="map-objective"><strong>OBIETTIVO</strong><span>Segui il percorso, gestisci il Tempo e arriva alla PAUSA FINALE prima della DEADLINE.</span></div>
+      <div class="map-objective"><strong>OBIETTIVO</strong><span>Segui il percorso fino alla PAUSA FINALE e affronta la DEADLINE.</span></div>
       <div class="roguelike-help" aria-label="Legenda mappa"><span>⚔ BATTAGLIA</span><span>☠ ELITE</span><span>? EVENTO</span><span>◆ TOOL</span><span>🔧 OGGETTO</span><span>👤 RECLUTA</span><span>＋ PAUSA</span><span>☠ DEADLINE</span></div>
       ${renderMap(game)}
       <div class="team-strip">${game.team.map((dev,i)=>teamSummary(dev,i,nuzlockeEquipmentLimit(game))).join("")}</div>
