@@ -297,3 +297,10 @@
   min-height:28px!important;height:auto!important;overflow:visible!important;
 }
 .starter-card-slot .card-template .card-template-effect b{overflow:visible!important;white-space:normal!important}
+
+.starter-card-slot .card-template .card-template-cost{
+  min-width:22px!important;width:22px!important;height:22px!important;min-height:22px!important;max-width:22px!important;
+  padding:0!important;border-radius:3px!important;background:#13263b!important;border:1px solid #607895!important;
+  color:#f5f2e9!important;box-shadow:none!important;
+}
+.starter-card-slot .card-template .card-template-cost i{font-size:11px!important}
