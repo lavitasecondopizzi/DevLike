@@ -1244,3 +1244,48 @@ header small,.header-stat{font-size:11px!important;line-height:1.6!important}
     max-height:none!important;
   }
 }
+
+
+/* FINAL COMBAT FLOW — use normal vertical flow so every battle section owns its space. */
+.battle-redesign .battle-main{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:7px!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  overflow-y:auto!important;
+  overflow-x:visible!important;
+  align-content:initial!important;
+}
+.battle-redesign .battle-turnbar,
+.battle-redesign .battle-active-card,
+.battle-redesign .battle-energy,
+.battle-redesign .battle-feedback,
+.battle-redesign .battle-actions,
+.battle-redesign .battle-hand-label,
+.battle-redesign .end{
+  flex:0 0 auto!important;
+}
+.battle-redesign .battle-active-card{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.battle-redesign .battle-actions{
+  width:100%!important;
+}
+.battle-redesign .hand{
+  flex:0 0 190px!important;
+  height:190px!important;
+  min-height:190px!important;
+  max-height:190px!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+}
+.battle-redesign .end{
+  flex:0 0 34px!important;
+  min-height:34px!important;
+  height:34px!important;
+}
