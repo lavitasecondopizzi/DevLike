@@ -10,6 +10,7 @@ import "./deck-fix.css";
 import "./card-view.css";
 import "./team-tools-fix.css";
 import "./readability.css";
+import "./save-leaderboard.css";
 import "./nuzlocke-rules-ui";
 import "./nuzlocke-ui-fix.css";
 import "./map-fix";
@@ -50,9 +51,23 @@ setupCardView();
 
 render(game);
 
+window.addEventListener("devlike-load-save",()=>{
+  if(loadGame(game)) render(game);
+});
+
 let lastScreen = game.screen;
 setInterval(() => {
-  if (game.screen === lastScreen) return;
-  lastScreen = game.screen;
+  if(game.screen==="result"){
+    if(hasLocalSave()) clearLocalSave();
+    return;
+  }
+  if(game.screen!=="menu") saveGame(game);
+  if(game.screen===lastScreen)return;
+  lastScreen=game.screen;
   render(game);
-}, 50);
+},500);
+
+if(hasLocalSave() && loadGame(game)){
+  lastScreen=game.screen;
+  render(game);
+}
