@@ -66,30 +66,6 @@ function tutorialInit() {
   tutorialRefresh(0);
 }
 
-function codexRefresh(category: string, selectedId?: string) {
-  const overlay = document.querySelector<HTMLElement>('[data-feature-overlay="codex"]');
-  if (!overlay) return;
-  const list = overlay.querySelector<HTMLElement>("[data-codex-list]");
-  const detail = overlay.querySelector<HTMLElement>("[data-codex-detail]");
-  const tabs = overlay.querySelectorAll<HTMLButtonElement>("[data-codex-category]");
-  const data = dataForCategory(category);
-  const selected = data.find(x => x.id === selectedId) ?? data[0];
-  tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.codexCategory === category));
-  if (list) {
-    let lastTier: number | undefined;
-    const markup: string[] = [];
-    data.forEach(x => {
-      if (x.tier !== undefined && x.tier !== lastTier) {
-        lastTier = x.tier;
-        markup.push(`<div class="codex-tier-divider"><span>TIER ${x.tier}</span></div>`);
-      }
-      markup.push(`<button type="button" class="codex-entry ${x.id === selected?.id ? "selected" : ""}" data-codex-entry="${esc(x.id)}"><b>${esc(x.name)}</b><small>${esc(x.subtitle)}</small></button>`);
-    });
-    list.innerHTML = markup.join("");
-  }
-  if (detail) detail.innerHTML = selected?.details ?? `<div class="codex-empty">NESSUN RECORD</div>`;
-}
-
 function injectMenuButtons(game: FeatureGame) {
   if (game.screen !== "menu") return;
   const center = document.querySelector<HTMLElement>(".game-shell .center");
