@@ -144,3 +144,11 @@
   .roguelike-help{gap:5px!important;overflow-x:auto!important;flex-wrap:nowrap!important;scrollbar-width:thin!important}
   .roguelike-help:before{flex:none!important}
 }
+
+/* Map header: message first, objective as quiet secondary guidance. */
+.map-top{margin-bottom:8px!important;padding:2px 2px 8px!important}
+.map-top small{font-size:13px!important;line-height:1.45!important;color:#d5deea!important;margin-top:0!important}
+.map-objective{display:flex!important;align-items:center!important;gap:9px!important;margin-bottom:9px!important;padding:7px 9px!important;border:1px solid #26364a!important;border-radius:8px!important;background:#101923!important}
+.map-objective strong{flex:none!important;font-size:11px!important;letter-spacing:.7px!important;color:#7f9fbe!important}
+.map-objective span{font-size:11px!important;line-height:1.4!important;color:#8f9bad!important}
+@media(max-width:800px){.map-objective{align-items:flex-start!important;flex-direction:column!important;gap:3px!important}}
